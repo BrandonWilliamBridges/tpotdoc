@@ -177,6 +177,16 @@ form.ask textarea { min-height: 130px; resize: vertical; }
 .step p { color: var(--muted); font-size: .98rem; }
 .tag { justify-self: start; font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; background: var(--stone); color: var(--muted); padding: 3px 8px; border-radius: 3px; }
 
+/* Merch */
+.tees { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.tee { margin: 0; display: grid; gap: 14px; align-content: start; }
+.tee img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 4px; border: 1px solid var(--line); }
+.tee figcaption { display: grid; gap: 4px; }
+.tee h3 { font-size: 1.2rem; }
+.tee p { color: var(--muted); font-size: .95rem; }
+.tee .tag { margin-top: 4px; }
+@media (max-width: 600px) { .tees { grid-template-columns: 1fr; } }
+
 footer { border-top: 1px solid var(--line); padding-block: 32px; color: var(--muted); font-size: .9rem; }
 footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 .next-level { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -462,9 +472,41 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         <div class="step">
           <h3>Bridges Body Boldness</h3>
           <p>Brochures, cards, cups and tees designed by Mark &amp; Yv'e, to carry the message with you.</p>
-          <span class="tag">Coming soon</span>
+          <a href="#merch">See the first designs ↓</a>
         </div>
       </div>
+    </div>
+  </section>
+
+  <section class="block lesson" id="merch">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Bridges Body Boldness</p>
+        <h2>Fight the good fight</h2>
+        <figure class="scripture">
+          <p>“Fight the good fight of faith, lay hold on eternal life, whereunto thou art also called.”</p>
+          <cite>1 Timothy 6:12</cite>
+        </figure>
+      </div>
+      <div class="tees">
+        <figure class="tee">
+          <img src="img/tee-fight-womens.jpg" alt="Hand-drawn raised fist beside the words FIGHT FIGHT FIGHT, printed on a ribbed tan top" loading="lazy">
+          <figcaption>
+            <h3>Fight · Women’s</h3>
+            <p>Fitted ribbed top</p>
+            <span class="tag">Coming soon</span>
+          </figcaption>
+        </figure>
+        <figure class="tee">
+          <img src="img/tee-fight-classic.jpg" alt="Hand-drawn raised fist beside the words FIGHT FIGHT FIGHT, printed on a classic light tee" loading="lazy">
+          <figcaption>
+            <h3>Fight · Classic</h3>
+            <p>Classic tee</p>
+            <span class="tag">Coming soon</span>
+          </figcaption>
+        </figure>
+      </div>
+      <p class="next-site">Designed by Mark &amp; Yv'e Bridges. Cups, cards and brochures are on the way.</p>
     </div>
   </section>
 </main>
