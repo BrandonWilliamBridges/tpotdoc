@@ -185,7 +185,10 @@ form.ask textarea { min-height: 130px; resize: vertical; }
 .tag { justify-self: start; font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; background: var(--stone); color: var(--muted); padding: 3px 8px; border-radius: 3px; }
 
 footer { border-top: 1px solid var(--line); padding-block: 32px; color: var(--muted); font-size: .9rem; }
-footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.next-level { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.btn.soon { padding: 8px 14px; font-size: .88rem; color: var(--muted); cursor: default; }
+.btn.soon:hover { border-color: var(--line); }
 
 @media (max-width: 860px) {
   .welcome .wrap, .lesson-grid, .ask-grid { grid-template-columns: 1fr; }
@@ -461,6 +464,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <h3>Share your faith</h3>
           <p>Free printable soul-winning scripts in dozens of languages, from our friends at Revival.com.</p>
           <a href="https://www.revival.com" target="_blank" rel="noopener">Visit Revival.com ↗</a>
+          <p class="form-note">*After clicking, simply scroll down on the Revival.com home page, click “Soulwinning Tools,” and scroll to your desired language.</p>
         </div>
         <div class="step">
           <h3>Bridges Body Boldness</h3>
@@ -475,7 +479,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 <footer>
   <div class="wrap">
     <span>The Principles of the Doctrine of Christ · Scripture quotations from the King James Version.</span>
-    <span>Next: <em>Going on unto perfection</em></span>
+    <span class="next-level">Ready for the next level? <em>Going on unto perfection</em>
+      <span class="btn ghost soon" role="button" aria-disabled="true">Coming soon</span></span>
   </div>
 </footer>
 
