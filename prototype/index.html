@@ -140,6 +140,19 @@ section.block { padding-block: 64px; }
 .roots span.part { background: var(--stone); padding: 4px 8px; border-radius: 3px; }
 .journal-note { font-size: .82rem; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 12px; }
 
+/* Fruitful word study */
+.ladder { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ladder li { display: flex; align-items: center; gap: 8px; font-size: .95rem; }
+.ladder li span { background: var(--surface); border: 1px solid var(--line); padding: 5px 11px; border-radius: 3px; }
+.ladder li:first-child span { background: var(--navy); color: var(--navy-ink); border-color: var(--navy); }
+.ladder li:last-child span { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.ladder li + li::before { content: "+"; color: var(--muted); }
+.fruit-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 8px; }
+.fruit-cards .wordcard { position: static; }
+.fruit-intro { max-width: var(--measure); display: grid; gap: 16px; }
+.fruit-wrap { display: grid; gap: 28px; }
+.check-note { font-size: .85rem; color: var(--muted); }
+
 /* Ask & pray */
 .ask-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 48px; align-items: start; }
 .ask-intro { display: grid; gap: 14px; max-width: 46ch; }
@@ -170,6 +183,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 @media (max-width: 860px) {
   .welcome .wrap, .lesson-grid, .ask-grid { grid-template-columns: 1fr; }
   .wordcard { position: static; }
+  .fruit-cards { grid-template-columns: 1fr; }
   .stones { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .steps { grid-template-columns: 1fr; }
   .portrait { max-width: 300px; }
@@ -189,6 +203,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     <nav class="main" aria-label="Main">
       <a href="#foundations">Foundations</a>
       <a href="#repentance">Repentance</a>
+      <a href="#fruitful">Fruitful</a>
       <a href="#ask">Ask &amp; Pray</a>
       <a href="#next">Next Steps</a>
     </nav>
@@ -329,7 +344,64 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     </div>
   </section>
 
-  <section class="block" id="ask">
+  <section class="block" id="fruitful">
+    <div class="wrap fruit-wrap">
+      <div class="fruit-intro">
+        <p class="eyebrow">Word Study · Growing in Christ</p>
+        <h2 style="font-size: clamp(1.8rem, 3.6vw, 2.5rem);">Neither barren nor unfruitful</h2>
+        <p class="big-def">God did not save you to sit still. He planted a new life in you, and it is meant to grow and bear fruit.</p>
+        <p>Peter gives new believers a simple plan for growth. Start with faith, and keep adding to it:</p>
+        <ol class="ladder" aria-label="2 Peter 1:5-7, the qualities we add to our faith, in order">
+          <li><span>Faith</span></li>
+          <li><span>Virtue</span></li>
+          <li><span>Knowledge</span></li>
+          <li><span>Temperance</span></li>
+          <li><span>Patience</span></li>
+          <li><span>Godliness</span></li>
+          <li><span>Brotherly kindness</span></li>
+          <li><span>Charity (love)</span></li>
+        </ol>
+        <figure class="scripture">
+          <p>“For if these things be in you, and abound, they make you that ye shall neither be barren nor unfruitful in the knowledge of our Lord Jesus Christ.”</p>
+          <cite>2 Peter 1:8</cite>
+        </figure>
+        <p>Two Greek words in that verse show what God is keeping us from. Both begin with the little letter <em>a-</em>, which means “without,” the same way “a-” works in the English word <em>atypical</em>.</p>
+      </div>
+
+      <div class="fruit-cards">
+        <aside class="wordcard" aria-label="Greek word study: barren">
+          <p class="eyebrow">“Barren”</p>
+          <p class="greek" lang="el">ἀργός</p>
+          <p class="say">argos · say it <strong>ar-GOS</strong></p>
+          <dl>
+            <div><dt>Strong’s number</dt><dd>G692</dd></div>
+            <div><dt>Built from</dt>
+              <dd class="roots"><span class="part">a- · without</span> + <span class="part">ergon · work</span></dd></div>
+            <div><dt>Plain meaning</dt><dd>Without work: inactive, unemployed. By implication, lazy or useless. Translated <em>barren, idle, slow</em>.</dd></div>
+          </dl>
+        </aside>
+        <aside class="wordcard" aria-label="Greek word study: unfruitful">
+          <p class="eyebrow">“Unfruitful”</p>
+          <p class="greek" lang="el">ἄκαρπος</p>
+          <p class="say">akarpos · say it <strong>AK-ar-pos</strong></p>
+          <dl>
+            <div><dt>Strong’s number</dt><dd>G175</dd></div>
+            <div><dt>Built from</dt>
+              <dd class="roots"><span class="part">a- · without</span> + <span class="part">karpos · fruit</span></dd></div>
+            <div><dt>Plain meaning</dt><dd>Without fruit. Barren, whether a field that grows nothing or a life that shows nothing of God.</dd></div>
+          </dl>
+        </aside>
+      </div>
+
+      <div class="fruit-intro">
+        <h3 style="font-size: 1.35rem;">What this means for you</h3>
+        <p>Remember the first foundation stone: we repent from <em>dead works</em>, things we did to earn God’s favor. Now Peter shows the other side. Once we belong to Jesus, our faith is not meant to sit <em>without work</em> or <em>without fruit</em>. As we add these qualities day by day, God makes our lives busy with His purposes and full of His fruit.</p>
+        <p class="journal-note">From Yv'e’s study journal, October 13, 2026.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block lesson" id="ask">
     <div class="wrap ask-grid">
       <div class="ask-intro">
         <img src="img/dianna.jpg" alt="Dianna “Yv'e” Bridges">
@@ -366,7 +438,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     </div>
   </section>
 
-  <section class="block lesson" id="next">
+  <section class="block" id="next">
     <div class="wrap">
       <div class="section-head">
         <p class="eyebrow">Next Steps</p>
