@@ -172,7 +172,7 @@ form.ask input, form.ask textarea, form.ask select {
 }
 form.ask textarea { min-height: 130px; resize: vertical; }
 .radio-row { display: flex; gap: 18px; flex-wrap: wrap; font-weight: 400; }
-.radio-row label { display: flex; gap: 8px; align-items: center; font-weight: 400; }
+form.ask .radio-row label { display: flex; gap: 8px; align-items: center; font-weight: 400; }
 .radio-row input { width: auto; }
 .form-note { font-size: .82rem; color: var(--muted); }
 .thanks { background: var(--stone); border-radius: 4px; padding: 16px; }
@@ -185,7 +185,21 @@ form.ask textarea { min-height: 130px; resize: vertical; }
 .tag { justify-self: start; font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; background: var(--stone); color: var(--muted); padding: 3px 8px; border-radius: 3px; }
 
 /* Merch */
-.tees { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.tees { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 420px)); gap: 24px; }
+
+/* FAQ */
+.faq-search { display: grid; gap: 6px; max-width: 480px; font-size: .92rem; font-weight: 600; margin-bottom: 20px; }
+.faq-search input { font: inherit; font-weight: 400; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px; width: 100%; }
+.faq-list { display: grid; gap: 10px; max-width: var(--measure); }
+.faq-item { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; }
+.faq-item summary { cursor: pointer; padding: 14px 18px; font-family: var(--font-display); font-size: 1.15rem; font-weight: 650; }
+.faq-answer { padding: 0 18px 18px; display: grid; gap: 12px; }
+.faq-answer ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
+.faq-empty { margin-top: 12px; color: var(--muted); }
+
+/* Printables */
+.card-strip { display: flex; gap: 16px; overflow-x: auto; padding-block: 4px 14px; scroll-snap-type: x mandatory; }
+.card-strip img { flex: none; width: 200px; aspect-ratio: 2.75 / 4.25; height: auto; border-radius: 8px; border: 1px solid var(--line); box-shadow: 0 2px 10px rgba(20, 24, 50, .12); scroll-snap-align: start; background: #fff; }
 .tee { margin: 0; display: grid; gap: 14px; align-content: start; }
 .tee img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 4px; border: 1px solid var(--line); }
 .tee figcaption { display: grid; gap: 4px; }
@@ -223,9 +237,10 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
     <nav class="main" aria-label="Main">
       <a href="#foundations">Foundations</a>
       <a href="#repentance">Repentance</a>
-      <a href="#fruitful">Fruitful</a>
+      <a href="#faith">Faith</a>
+      <a href="#faq">Questions</a>
       <a href="#ask">Ask &amp; Pray</a>
-      <a href="#next">Next Steps</a>
+      <a href="#printables">Cards</a>
     </nav>
   </div>
 </header>
@@ -272,12 +287,12 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
           <span class="phrase">“repentance from dead works”</span>
           <span class="status">Read the first lesson →</span>
         </a>
-        <div class="stone">
+        <a class="stone open" href="#faith">
           <span class="num">2</span>
           <h3>Faith</h3>
           <span class="phrase">“faith toward God”</span>
-          <span class="status">Coming soon</span>
-        </div>
+          <span class="status">Read the second lesson →</span>
+        </a>
         <div class="stone">
           <span class="num">3</span>
           <h3>Baptisms</h3>
@@ -316,7 +331,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         <p class="big-def">Repentance means changing your mind about sin and about God, and letting that change turn your whole life around.</p>
         <p>The New Testament was first written in Greek. The word translated “repentance” is <strong>metanoia</strong>. It is built from two smaller words: <em>meta</em>, which carries the idea of “after” or “change,” and <em>noeō</em>, which means “to think” or “to understand.” Put together, it means <strong>to think differently afterward</strong>: to reconsider.</p>
 
-        <h3>Three things happen when we repent</h3>
+        <h3 id="three-things">Three things happen when we repent</h3>
         <ul>
           <li><strong>We see it differently.</strong> God opens our eyes, and we agree with Him that sin is wrong.</li>
           <li><strong>We feel it.</strong> The old word for this is <em>compunction</em>: a real, godly sorrow over sin. It is not shame that crushes us. It is sorrow that leads us to God.</li>
@@ -327,6 +342,19 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
           <p>“For godly sorrow worketh repentance to salvation not to be repented of: but the sorrow of the world worketh death.”</p>
           <cite>2 Corinthians 7:10</cite>
         </figure>
+
+        <h3 id="fruit-of-repentance">Fruit that fits repentance</h3>
+        <p>John the Baptist preached to the Pharisees and Sadducees. These were religious people who trusted their birthright, their family line, and their traditions to save them. John told them that real repentance shows up in how we live.</p>
+        <figure class="scripture">
+          <p>“Bring forth therefore fruits meet for repentance.”</p>
+          <cite>Matthew 3:8 · “meet” means fitting</cite>
+        </figure>
+        <p>That fruit is not something we produce by trying harder. It is what the Holy Spirit grows in us:</p>
+        <figure class="scripture">
+          <p>“But the fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith, meekness, temperance: against such there is no law.”</p>
+          <cite>Galatians 5:22–23</cite>
+        </figure>
+        <p class="check-note"><strong>Recommended reading:</strong> Matthew 3:1–10, and Galatians 5:4–26, where the apostle Paul writes to people trying to be made right with God by keeping the law.</p>
 
         <h3>What are “dead works”?</h3>
         <p>Hebrews calls this “repentance from dead works.” Dead works are anything that cannot give life: the sins we used to live in, and also our own efforts to earn God’s approval. We turn away from both. Our new life comes from Jesus, not from trying harder.</p>
@@ -364,7 +392,52 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
     </div>
   </section>
 
-  <section class="block" id="fruitful">
+  <section class="block" id="faith">
+    <div class="wrap lesson-grid">
+      <article class="lesson-body">
+        <p class="eyebrow">Foundation Stone 2 · Word Study</p>
+        <h2 style="font-size: clamp(1.8rem, 3.6vw, 2.5rem);">What is faith toward God?</h2>
+        <p class="big-def">Faith means being persuaded that God is true, and leaning your whole weight on Jesus to save you.</p>
+        <p>The Greek word for faith is <strong>pistis</strong>. It comes from a verb that means “to persuade.” So faith begins when God convinces your heart that He is telling the truth.</p>
+
+        <h3>Four sides of faith</h3>
+        <ul>
+          <li><strong>Conviction.</strong> You are persuaded that God and His Word are true.</li>
+          <li><strong>Reliance.</strong> You trust Christ, and Christ alone, for your salvation.</li>
+          <li><strong>Constancy.</strong> You keep holding on, day after day.</li>
+          <li><strong>The faith.</strong> The word can also mean the gospel itself: the truth we believe.</li>
+        </ul>
+
+        <h3>What did Jesus say about faith?</h3>
+        <p>A Roman officer asked Jesus to heal his servant, and said Jesus only needed to speak the word. Jesus was amazed.</p>
+        <figure class="scripture">
+          <p>“When Jesus heard it, he marvelled, and said to them that followed, Verily I say unto you, I have not found so great faith, no, not in Israel.”</p>
+          <cite>Matthew 8:10 · read Matthew 8:1–13</cite>
+        </figure>
+        <p>A woman who had been sick for twelve years believed that if she could only touch His garment, she would be healed.</p>
+        <figure class="scripture">
+          <p>“But Jesus turned him about, and when he saw her, he said, Daughter, be of good comfort; thy faith hath made thee whole. And the woman was made whole from that hour.”</p>
+          <cite>Matthew 9:22 · read Matthew 9:20–22</cite>
+        </figure>
+        <p>God has given every believer “the measure of faith” (Romans 12:3). Our <a href="#printables">Measure of Faith cards</a> help that faith grow, one verse and one prayer at a time.</p>
+      </article>
+
+      <aside class="wordcard" aria-label="Greek word study: faith">
+        <p class="eyebrow">The Greek word</p>
+        <p class="greek" lang="el">πίστις</p>
+        <p class="say">pistis · say it <strong>PIS-tis</strong></p>
+        <dl>
+          <div><dt>Strong’s number</dt><dd>G4102 (noun, “faith”)</dd></div>
+          <div><dt>Comes from</dt><dd>G3982, “to persuade”</dd></div>
+          <div><dt>Plain meaning</dt><dd>Persuasion; a firm conviction that God is true; especially reliance on Christ for salvation.</dd></div>
+          <div><dt>Also translated</dt><dd>assurance, belief, believe, faith, fidelity</dd></div>
+        </dl>
+        <p class="journal-note">From Yv'e’s study journal, Wednesday, October 14, 2026, 5:52 a.m.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="block lesson" id="fruitful">
     <div class="wrap fruit-wrap">
       <div class="fruit-intro">
         <p class="eyebrow">Word Study · Growing in Christ</p>
@@ -418,6 +491,33 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         <p>Remember the first foundation stone: we repent from <em>dead works</em>, things we did to earn God’s favor. Now Peter shows the other side. Once we belong to Jesus, our faith is not meant to sit <em>without work</em> or <em>without fruit</em>. As we add these qualities day by day, God makes our lives busy with His purposes and full of His fruit.</p>
         <p class="journal-note">From Yv'e’s study journal, October 13, 2026.</p>
       </div>
+    </div>
+  </section>
+
+  <section class="block" id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Questions &amp; Answers</p>
+        <h2>Has someone asked this already?</h2>
+        <p>Search the questions other new believers have asked. If you don’t find yours, <a href="#ask">send it in</a>.</p>
+      </div>
+      <label class="faq-search" for="faq-q"><span>Search questions</span>
+        <input id="faq-q" type="search" placeholder="Try “repent” or “saved”" autocomplete="off">
+      </label>
+      <div class="faq-list" id="faq-list">
+        <details class="faq-item" open>
+          <summary>How do I know I really repented?</summary>
+          <div class="faq-answer">
+            <p>If you are asking this question, God is already at work in your heart. Here is what the Word shows us:</p>
+            <ul>
+              <li><strong>Look at what happened inside.</strong> Did you see your sin differently, feel godly sorrow, and turn toward God? Those are the <a href="#three-things">three things that happen when we repent</a>.</li>
+              <li><strong>Look for fruit over time.</strong> Real repentance shows in how we live, as the Holy Spirit grows His fruit in us. See <a href="#fruit-of-repentance">fruit that fits repentance</a> (Matthew 3:8; Galatians 5:22–23).</li>
+              <li><strong>Rest on God’s promise, not your feelings.</strong> “If we confess our sins, he is faithful and just to forgive us our sins” (1 John 1:9). God wrote His Word “that ye may know that ye have eternal life” (1 John 5:13).</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+      <p class="faq-empty" id="faq-empty" hidden>No questions match that yet. <a href="#ask">Ask it here</a> and we will answer from the Word.</p>
     </div>
   </section>
 
@@ -485,7 +585,31 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
     </div>
   </section>
 
-  <section class="block lesson" id="merch">
+  <section class="block lesson" id="printables">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Printables · Measure of Faith</p>
+        <h2>Measure of Faith cards</h2>
+        <p>“According as God hath dealt to every man the measure of faith” (Romans 12:3). Each card has a verse on one end and a prayer on the other, so you can read it from either side. Set 1 is about the assurance of salvation.</p>
+      </div>
+      <div class="card-strip" tabindex="0" aria-label="Measure of Faith cards, Set 1">
+        <img src="printables/measure-of-faith/img/card-1.png" alt="Card: Romans 12:3, the measure of faith" loading="lazy">
+        <img src="printables/measure-of-faith/img/card-2.png" alt="Card: Assurance of Salvation, Set 1, 1 John 5:13, with prayer" loading="lazy">
+        <img src="printables/measure-of-faith/img/card-3.png" alt="Card 1: Romans 3:23 and 6:23, with prayer" loading="lazy">
+        <img src="printables/measure-of-faith/img/card-4.png" alt="Card 2: John 3:16, with prayer" loading="lazy">
+        <img src="printables/measure-of-faith/img/card-5.png" alt="Card 3: Romans 10:13, with prayer" loading="lazy">
+        <img src="printables/measure-of-faith/img/card-6.png" alt="Card 4: Acts 4:12, with prayer" loading="lazy">
+        <img src="printables/measure-of-faith/img/card-7.png" alt="Card 5: Mark 16:15–16, with prayer" loading="lazy">
+        <img src="printables/measure-of-faith/img/card-8.png" alt="Card: list of the cards in Set 1, and how to use them" loading="lazy">
+      </div>
+      <div class="cta-row" style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+        <a class="btn primary" href="printables/measure-of-faith/measure-of-faith-set-1.pdf" target="_blank" rel="noopener">Print sheet (PDF)</a>
+        <span class="form-note">Letter-size card stock, 8 cards per sheet. Cut on the dashed lines.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="merch">
     <div class="wrap">
       <div class="section-head">
         <p class="eyebrow">Bridges Body Boldness</p>
@@ -496,14 +620,6 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         </figure>
       </div>
       <div class="tees">
-        <figure class="tee">
-          <img src="img/tee-fight-womens.jpg" alt="Hand-drawn raised fist beside the words FIGHT FIGHT FIGHT, printed on a ribbed tan top" loading="lazy">
-          <figcaption>
-            <h3>Fight · Women’s</h3>
-            <p>Fitted ribbed top</p>
-            <span class="tag">Coming soon</span>
-          </figcaption>
-        </figure>
         <figure class="tee">
           <img src="img/tee-fight-classic.jpg" alt="Hand-drawn raised fist beside the words FIGHT FIGHT FIGHT, printed on a classic light tee" loading="lazy">
           <figcaption>
@@ -520,7 +636,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
 
 <footer>
   <div class="wrap">
-    <span>The Principles of the Doctrine of Christ · Scripture quotations from the King James Version.</span>
+    <span>The Principles of the Doctrine of Christ · Scripture quotations from the King James Version. Greek word studies from <em>The New Strong’s Exhaustive Concordance of the Bible</em> (Thomas Nelson Publishers, 1990).</span>
     <span class="next-level">Ready for the next level? <em>Going on unto perfection</em>
       <span class="btn ghost soon" role="button" aria-disabled="true">Coming soon</span></span>
   </div>
@@ -530,6 +646,17 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
   document.getElementById('ask-form').addEventListener('submit', function (e) {
     e.preventDefault();
     document.getElementById('ask-thanks').hidden = false;
+  });
+
+  document.getElementById('faq-q').addEventListener('input', function (e) {
+    var q = e.target.value.trim().toLowerCase();
+    var shown = 0;
+    document.querySelectorAll('#faq-list .faq-item').forEach(function (item) {
+      var hit = !q || item.textContent.toLowerCase().indexOf(q) !== -1;
+      item.hidden = !hit;
+      if (hit) shown++;
+    });
+    document.getElementById('faq-empty').hidden = shown > 0;
   });
 </script>
 

@@ -1,0 +1,36 @@
+/* Measure of Faith card fronts. Card: 2.75in x 4.25in portrait, read like a playing card.
+   Colors taken from Yv'e's card-back logo: magenta field, yellow and blue blocks, black outline. */
+:root {
+  --mof-magenta: #b8327f;
+  --mof-yellow: #f6c90e;
+  --mof-blue: #4a78cf;
+  --mof-ink: #1d1a22;
+  --mof-muted: #5d5866;
+  --mof-paper: #ffffff;
+}
+.card {
+  width: 2.75in; height: 4.25in; background: var(--mof-paper); color: var(--mof-ink);
+  display: grid; grid-template-rows: 1fr 0.26in 1fr; overflow: hidden;
+  font-family: "Figtree", "Helvetica Neue", Arial, sans-serif;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.card .half { padding: 0.2in 0.22in 0.08in; display: flex; flex-direction: column; gap: 0.05in; min-height: 0; }
+.card .bottom { transform: rotate(180deg); }
+.card .label {
+  margin: 0 0 0.03in; display: flex; align-items: center; gap: 0.07in;
+  font-size: 6.6pt; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mof-magenta);
+}
+.card .label.alt { color: var(--mof-blue); }
+.card .blocks { display: inline-flex; gap: 1.5px; flex: none; }
+.card .blocks i { display: block; width: 6px; height: 6px; border: 1px solid var(--mof-ink); background: var(--mof-yellow); }
+.card .blocks i:nth-child(2) { background: var(--mof-blue); }
+.card .verse { margin: 0; font-family: "Spectral", Georgia, serif; font-size: 9.6pt; line-height: 1.36; }
+.card.small .verse { font-size: 8.9pt; line-height: 1.33; }
+.card .ref { margin: 0 0 0.03in; font-size: 7pt; font-weight: 600; letter-spacing: 0.06em; color: var(--mof-muted); text-transform: uppercase; }
+.card .prayer { margin: 0; font-size: 9pt; line-height: 1.42; font-weight: 500; }
+.card .list { margin: 0.02in 0 0; padding: 0; list-style: none; display: grid; gap: 0.04in; font-family: "Spectral", Georgia, serif; font-size: 9.6pt; }
+.card .mid {
+  background: var(--mof-magenta); display: flex; align-items: center; justify-content: center;
+  border-block: 1.5px solid var(--mof-ink);
+}
+.card .mid span { color: var(--mof-yellow); font-size: 6.4pt; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; }

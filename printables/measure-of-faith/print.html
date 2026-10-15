@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Measure of Faith, Set 1 (print sheet)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@500;600&family=Spectral:wght@400&display=swap">
+<link rel="stylesheet" href="cards.css">
+<style>
+  /* Letter sheet, 2 columns x 4 rows of 4.25in x 2.75in cells: the same grid as Yv'e's card-back sheet.
+     Each portrait card is turned sideways to fit its cell. */
+  @page { size: 8.5in 11in; margin: 0; }
+  html, body { margin: 0; background: #fff; }
+  .sheet { width: 8.5in; height: 11in; display: grid; grid-template-columns: repeat(2, 4.25in); grid-template-rows: repeat(4, 2.75in); }
+  .cell { position: relative; overflow: hidden; outline: 0.5px dashed #b9b4c0; outline-offset: -0.25px; }
+  .cell .card { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-90deg); }
+</style>
+</head>
+<body>
+<div class="sheet" id="sheet"></div>
+<script src="cards.js"></script>
+<script>renderCards(document.getElementById('sheet'), h => `<div class="cell">${h}</div>`);</script>
+</body>
+</html>
