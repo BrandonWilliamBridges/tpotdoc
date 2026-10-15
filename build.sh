@@ -3,7 +3,11 @@
 set -e
 cd "$(dirname "$0")"
 mkdir -p docs/img
+rm -f docs/img/*.jpg
 cp prototype/img/*.jpg docs/img/
+mkdir -p docs/printables/measure-of-faith/img
+cp printables/measure-of-faith/measure-of-faith-set-1.pdf docs/printables/measure-of-faith/
+cp printables/measure-of-faith/img/*.png docs/printables/measure-of-faith/img/
 touch docs/.nojekyll
 {
   cat <<'EOF'
