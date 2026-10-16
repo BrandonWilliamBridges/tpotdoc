@@ -1,0 +1,387 @@
+#!/usr/bin/env python3
+"""Builds the GitHub Pages site in docs/ from prototype/index.html (the single source of truth).
+
+Outputs
+  docs/index.html            Version A: everything on one long page
+  docs/v2/...                Version B: one page per lesson, each with its own URL
+  docs/sitemap.xml, robots.txt, llms.txt, llms-full.txt   search + AI-search files
+
+Every page gets a title, description, canonical URL, Open Graph tags and JSON-LD structured data.
+Flip INDEXABLE to True only when Yv'e has approved the wording and the site launches.
+"""
+import datetime
+import html
+import json
+import re
+import shutil
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+SRC = ROOT / "prototype" / "index.html"
+OUT = ROOT / "docs"
+
+SITE_URL = "https://brandonwilliambridges.github.io/tpotdoc"  # change when the real domain is live
+SITE_NAME = "The Principles of the Doctrine of Christ"
+INDEXABLE = False  # draft: every page says noindex until launch
+MULTI_DIR = "v2"   # where Version B lives while Yv'e compares the two layouts
+TODAY = datetime.date.today().isoformat()
+
+AUTHOR = {
+    "@type": "Person",
+    "name": "Dianna Bridges",
+    "alternateName": "Yv'e Bridges",
+    "description": "Bible teacher writing foundational lessons for new believers, based on Hebrews 6:1-2.",
+}
+
+# Version B pages: slug -> which source sections it holds, plus its search metadata.
+PAGES = [
+    {
+        "slug": "", "sections": ["welcome", "verse-band", "foundations", "next", "merch"],
+        "title": f"{SITE_NAME} | For New Believers",
+        "description": "Welcome to the family of God. Simple Bible lessons for new Christians on the six foundations of Hebrews 6:1-2, starting with repentance and faith.",
+        "type": "home",
+    },
+    {
+        "slug": "repentance", "sections": ["repentance"],
+        "title": "What Is Repentance? Meaning of Metanoia (Greek G3341)",
+        "description": "Repentance means changing your mind about sin and God, and letting it turn your life around. A simple word study of metanoia for new believers.",
+        "type": "lesson", "about": "Repentance", "published": "2026-09-23", "nav": "Repentance",
+    },
+    {
+        "slug": "faith", "sections": ["faith"],
+        "title": "What Is Faith Toward God? Meaning of Pistis (Greek G4102)",
+        "description": "Faith means being persuaded that God is true and leaning your whole weight on Jesus. A simple word study of pistis, with Matthew 8 and 9.",
+        "type": "lesson", "about": "Faith", "published": "2026-10-14", "nav": "Faith",
+    },
+    {
+        "slug": "fruitful", "sections": ["fruitful"],
+        "title": "Neither Barren nor Unfruitful: 2 Peter 1:8 Word Study",
+        "description": "What 'barren' and 'unfruitful' mean in 2 Peter 1:8, and Peter's plan for growth: add to your faith virtue, knowledge, patience, godliness and love.",
+        "type": "lesson", "about": "Spiritual growth", "published": "2026-10-13", "nav": "Fruitful",
+    },
+    {
+        "slug": "questions", "sections": ["faq"],
+        "title": "Questions New Believers Ask",
+        "description": "Answers from God's Word to questions new Christians ask, like 'How do I know I really repented?'",
+        "type": "faq",
+    },
+    {
+        "slug": "ask", "sections": ["ask"],
+        "title": "Ask a Question or Request Prayer",
+        "description": "Send a question about the Christian faith or a prayer request. Every message is read personally and answered from God's Word.",
+        "type": "contact",
+    },
+    {
+        "slug": "cards", "sections": ["printables"],
+        "title": "Measure of Faith Scripture Cards (Free Printable)",
+        "description": "Free printable Scripture and prayer cards on the assurance of salvation: John 3:16, Romans 10:13, Acts 4:12 and more. Based on Romans 12:3.",
+        "type": "cards",
+    },
+]
+LESSON_ORDER = ["repentance", "faith", "fruitful"]
+
+# In-page anchors in the source, and where they live in Version B.
+ANCHORS = {
+    "top": "", "foundations": "#foundations", "next": "#next", "merch": "#merch",
+    "repentance": "repentance/", "three-things": "repentance/#three-things",
+    "fruit-of-repentance": "repentance/#fruit-of-repentance",
+    "faith": "faith/", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/",
+    "printables": "cards/",
+}
+
+ONE_PAGE = {
+    "title": f"{SITE_NAME} | For New Believers",
+    "description": PAGES[0]["description"],
+}
+
+
+# ---------- parsing ----------
+
+def grab(pattern, text, flags=re.S):
+    m = re.search(pattern, text, flags)
+    if not m:
+        raise SystemExit(f"build.py: could not find {pattern!r} in {SRC.name}")
+    return m.group(0)
+
+
+def parse(src):
+    parts = {
+        "fonts": "\n".join(re.findall(r"<link [^>]*>", src.split("<style>")[0])),
+        "style": grab(r"<style>.*?</style>", src),
+        "banner": grab(r'<div class="proto-banner">.*?</div>', src),
+        "header": grab(r'<header class="site">.*?</header>', src),
+        "footer": grab(r"<footer>.*?</footer>", src),
+        "script": grab(r"<script>.*?</script>", src),
+        "main": grab(r'<main id="top">.*?</main>', src),
+    }
+    sections = {}
+    for m in re.finditer(r'\n  (<section([^>]*)>.*?\n  </section>|<div class="verse-band">.*?\n  </div>)', parts["main"], re.S):
+        block = m.group(1)
+        if block.startswith('<div class="verse-band">'):
+            key = "verse-band"
+        else:
+            idm = re.search(r'id="([^"]+)"', m.group(2) or "")
+            key = idm.group(1) if idm else "welcome"
+        sections[key] = block
+    return parts, sections
+
+
+# ---------- helpers ----------
+
+def page_url(slug):
+    base = f"{SITE_URL}/{MULTI_DIR}/" if MULTI_DIR else f"{SITE_URL}/"
+    return base + (f"{slug}/" if slug else "")
+
+
+def text_of(fragment):
+    t = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", fragment, flags=re.S)
+    t = re.sub(r"</(p|li|h[1-6]|dt|dd|summary|figure|blockquote|div)>", "\n", t)
+    t = re.sub(r"<br\s*/?>", "\n", t)
+    t = re.sub(r"<[^>]+>", "", t)
+    t = html.unescape(t)
+    lines = [re.sub(r"\s+", " ", ln).strip() for ln in t.splitlines()]
+    return "\n".join(ln for ln in lines if ln)
+
+
+def faq_items(sections):
+    out = []
+    for m in re.finditer(r'<details class="faq-item"[^>]*>\s*<summary>(.*?)</summary>\s*<div class="faq-answer">(.*?)</div>\s*</details>', sections.get("faq", ""), re.S):
+        out.append((text_of(m.group(1)), text_of(m.group(2)).replace("\n", " ")))
+    return out
+
+
+def rewrite_links(fragment, root, home):
+    """Point source #anchors at their Version B pages; fix asset paths for the page's depth."""
+    def fix(m):
+        target = m.group(1)
+        if target not in ANCHORS:
+            print(f"  warning: unmapped anchor #{target}")
+            return m.group(0)
+        return f'href="{home}{ANCHORS[target]}"'
+    fragment = re.sub(r'href="#([\w-]+)"', fix, fragment)
+    fragment = fragment.replace('src="img/', f'src="{root}img/')
+    fragment = fragment.replace('src="printables/', f'src="{root}printables/')
+    fragment = fragment.replace('href="printables/', f'href="{root}printables/')
+    return fragment
+
+
+def promote_heading(fragment):
+    """A lesson's h2 becomes the page's single h1 in Version B."""
+    return re.sub(r"<h2([^>]*)>(.*?)</h2>", r"<h1\1>\2</h1>", fragment, count=1, flags=re.S)
+
+
+# ---------- page shell ----------
+
+COMPARE_CSS = """
+<style>
+  .compare { background: var(--navy); color: var(--navy-ink); padding-block: 14px; border-bottom: 4px solid var(--accent); }
+  .compare .wrap { display: grid; gap: 10px; }
+  .compare p { margin: 0; font-size: 1.05rem; line-height: 1.5; }
+  .compare strong.big { display: block; font-family: var(--font-display); font-size: clamp(1.25rem, 3vw, 1.6rem); font-weight: 650; }
+  .compare .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+  .compare .tabs a { color: var(--navy-ink); text-decoration: none; font-weight: 600; padding: 8px 14px; border-radius: 6px; border: 2px solid rgba(255,255,255,.45); }
+  .compare .tabs a[aria-current="page"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .pager { border-top: 1px solid var(--line); padding-block: 24px; }
+  .pager .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .pager a { font-weight: 600; text-decoration: none; }
+</style>"""
+
+
+def compare_bar(root, current):
+    a_cur = ' aria-current="page"' if current == "A" else ""
+    b_cur = ' aria-current="page"' if current == "B" else ""
+    return f"""<div class="compare">
+  <div class="wrap">
+    <p><strong class="big">Yv'e, please compare these two layouts!</strong>
+    Same words, two ways to arrange them. <b>Version A</b> keeps everything on one long page. <b>Version B</b> gives each lesson its own page, which helps Google and AI assistants send people straight to the right lesson. Tap back and forth, then tell Brandon which one you like.</p>
+    <div class="tabs" role="navigation" aria-label="Choose a layout">
+      <a href="{root}"{a_cur}>A · One long page</a>
+      <a href="{root}{MULTI_DIR}/"{b_cur}>B · Separate pages</a>
+    </div>
+  </div>
+</div>"""
+
+
+def head(parts, title, description, canonical, og_image, jsonld):
+    robots = "index, follow, max-snippet:-1, max-image-preview:large" if INDEXABLE else "noindex, nofollow"
+    ld = "\n".join(f'<script type="application/ld+json">{json.dumps(obj, ensure_ascii=False)}</script>' for obj in jsonld)
+    t, d = html.escape(title), html.escape(description)
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{t}</title>
+<meta name="description" content="{d}">
+<meta name="robots" content="{robots}">
+<meta name="author" content="Dianna (Yv'e) Bridges">
+<link rel="canonical" href="{canonical}">
+<link rel="alternate" type="text/plain" title="LLM summary" href="{SITE_URL}/llms.txt">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{SITE_NAME}">
+<meta property="og:title" content="{t}">
+<meta property="og:description" content="{d}">
+<meta property="og:url" content="{canonical}">
+<meta property="og:image" content="{og_image}">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{t}">
+<meta name="twitter:description" content="{d}">
+<meta name="twitter:image" content="{og_image}">
+<meta name="theme-color" content="#1f2d5c">
+{ld}
+<style>:root{{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}}body{{margin:0}}img{{max-width:100%}}[hidden]{{display:none!important}}</style>
+{parts['fonts']}
+{parts['style']}
+{COMPARE_CSS}
+</head>
+<body>"""
+
+
+def website_ld(url):
+    return {
+        "@context": "https://schema.org", "@type": "WebSite", "name": SITE_NAME,
+        "alternateName": "TPOTDOC", "url": url, "inLanguage": "en",
+        "description": PAGES[0]["description"], "author": AUTHOR, "publisher": AUTHOR,
+        "about": [{"@type": "Thing", "name": n} for n in ["Repentance", "Faith", "Baptism", "Laying on of hands", "Resurrection of the dead", "Eternal judgment"]],
+    }
+
+
+def faq_ld(items):
+    return {
+        "@context": "https://schema.org", "@type": "FAQPage",
+        "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in items],
+    }
+
+
+def breadcrumb_ld(page):
+    crumbs = [{"@type": "ListItem", "position": 1, "name": "Home", "item": page_url("")}]
+    if page["slug"]:
+        crumbs.append({"@type": "ListItem", "position": 2, "name": page.get("nav") or page["title"].split(" | ")[0], "item": page_url(page["slug"])})
+    return {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": crumbs}
+
+
+def page_ld(page, sections):
+    url = page_url(page["slug"])
+    out = [breadcrumb_ld(page)]
+    if page["type"] == "home":
+        out.insert(0, website_ld(url))
+    elif page["type"] == "lesson":
+        out.insert(0, {
+            "@context": "https://schema.org", "@type": ["Article", "LearningResource"],
+            "headline": page["title"].split(" | ")[0], "description": page["description"],
+            "url": url, "mainEntityOfPage": url, "inLanguage": "en",
+            "author": AUTHOR, "publisher": AUTHOR,
+            "datePublished": page["published"], "dateModified": TODAY,
+            "image": f"{SITE_URL}/img/og.png",
+            "about": {"@type": "Thing", "name": page["about"]},
+            "educationalLevel": "Beginner", "audience": {"@type": "Audience", "audienceType": "New Christians"},
+            "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": page_url("")},
+            "citation": "The New Strong's Exhaustive Concordance of the Bible, Thomas Nelson Publishers, 1990",
+        })
+    elif page["type"] == "faq":
+        out.insert(0, faq_ld(faq_items(sections)))
+    elif page["type"] == "cards":
+        out.insert(0, {
+            "@context": "https://schema.org", "@type": "DigitalDocument", "name": "Measure of Faith cards, Set 1: Assurance of Salvation",
+            "description": page["description"], "encodingFormat": "application/pdf", "isAccessibleForFree": True,
+            "url": f"{SITE_URL}/printables/measure-of-faith/measure-of-faith-set-1.pdf", "author": AUTHOR,
+        })
+    return out
+
+
+def pager(page, home):
+    if page["slug"] not in LESSON_ORDER:
+        return ""
+    i = LESSON_ORDER.index(page["slug"])
+    by_slug = {p["slug"]: p for p in PAGES}
+    prev_link = f'<a href="{home}{LESSON_ORDER[i-1]}/">← {by_slug[LESSON_ORDER[i-1]]["nav"]}</a>' if i > 0 else f'<a href="{home}#foundations">← All foundations</a>'
+    next_link = f'<a href="{home}{LESSON_ORDER[i+1]}/">Next: {by_slug[LESSON_ORDER[i+1]]["nav"]} →</a>' if i + 1 < len(LESSON_ORDER) else f'<a href="{home}questions/">Questions &amp; answers →</a>'
+    return f'<nav class="pager" aria-label="Lessons"><div class="wrap">{prev_link}{next_link}</div></nav>'
+
+
+# ---------- build ----------
+
+def build():
+    src = SRC.read_text()
+    parts, sections = parse(src)
+
+    if OUT.exists():
+        for child in OUT.iterdir():
+            if child.name != "CNAME":
+                shutil.rmtree(child) if child.is_dir() else child.unlink()
+    (OUT / "img").mkdir(parents=True, exist_ok=True)
+    for f in (ROOT / "prototype" / "img").iterdir():
+        if f.suffix.lower() in (".jpg", ".png"):
+            shutil.copy2(f, OUT / "img" / f.name)
+    cards = ROOT / "printables" / "measure-of-faith"
+    (OUT / "printables" / "measure-of-faith" / "img").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(cards / "measure-of-faith-set-1.pdf", OUT / "printables" / "measure-of-faith")
+    for f in (cards / "img").glob("*.png"):
+        shutil.copy2(f, OUT / "printables" / "measure-of-faith" / "img" / f.name)
+    (OUT / ".nojekyll").touch()
+    og = f"{SITE_URL}/img/og.png"
+
+    # Version A: one long page
+    one = head(parts, ONE_PAGE["title"], ONE_PAGE["description"], f"{SITE_URL}/", og,
+               [website_ld(f"{SITE_URL}/"), faq_ld(faq_items(sections))])
+    one += "\n" + compare_bar("", "A") + "\n" + parts["banner"] + "\n" + parts["header"] + "\n" + parts["main"] + "\n" + parts["footer"] + "\n" + parts["script"] + "\n</body>\n</html>\n"
+    (OUT / "index.html").write_text(one)
+
+    # Version B: one page per lesson
+    for page in PAGES:
+        depth = 1 + (1 if page["slug"] else 0)
+        root = "../" * depth
+        home = "../" if page["slug"] else ""
+        body = "\n".join(sections[k] for k in page["sections"])
+        if page["slug"]:
+            body = promote_heading(body)
+        body = rewrite_links(body, root, home)
+        header = rewrite_links(parts["header"], root, home)
+        nav_target = f'href="{home}{page["slug"]}/"' if page["slug"] else None
+        if nav_target:
+            header = header.replace(nav_target, nav_target + ' aria-current="page"', 1)
+        doc = head(parts, page["title"], page["description"], page_url(page["slug"]), og, page_ld(page, sections))
+        doc += "\n" + compare_bar(root, "B") + "\n" + parts["banner"] + "\n" + header
+        doc += f'\n<main id="top">\n  {body}\n</main>\n' + pager(page, home) + "\n"
+        doc += rewrite_links(parts["footer"], root, home) + "\n" + parts["script"] + "\n</body>\n</html>\n"
+        dest = OUT / MULTI_DIR / page["slug"] / "index.html" if page["slug"] else OUT / MULTI_DIR / "index.html"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(doc)
+
+    # sitemap.xml
+    urls = [f"{SITE_URL}/"] + [page_url(p["slug"]) for p in PAGES]
+    sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    sm += [f"  <url><loc>{u}</loc><lastmod>{TODAY}</lastmod></url>" for u in urls]
+    sm.append("</urlset>")
+    (OUT / "sitemap.xml").write_text("\n".join(sm) + "\n")
+
+    # robots.txt: welcome search engines and AI assistants (only honored at a domain root)
+    bots = ["*", "Googlebot", "Bingbot", "GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot",
+            "Claude-User", "PerplexityBot", "Perplexity-User", "Google-Extended", "Applebot-Extended"]
+    robots = "\n".join(f"User-agent: {b}\nAllow: /\n" for b in bots) + f"\nSitemap: {SITE_URL}/sitemap.xml\n"
+    (OUT / "robots.txt").write_text(robots)
+
+    # llms.txt (llmstxt.org) and llms-full.txt: plain summaries AI assistants can read and quote
+    by_slug = {p["slug"]: p for p in PAGES}
+    lines = [f"# {SITE_NAME}", "",
+             "> Simple, Scripture-based Bible lessons for people who are new to faith in Jesus Christ, built on the six foundations named in Hebrews 6:1-2: repentance from dead works, faith toward God, the doctrine of baptisms, laying on of hands, resurrection of the dead, and eternal judgment. Written by Dianna \"Yv'e\" Bridges. Scripture quotations are KJV; Greek word studies use Strong's Concordance.",
+             "", "## Lessons"]
+    lines += [f"- [{by_slug[s]['title'].split(' | ')[0]}]({page_url(s)}): {by_slug[s]['description']}" for s in LESSON_ORDER]
+    lines += ["", "## Help for new believers"]
+    lines += [f"- [{by_slug[s]['title'].split(' | ')[0]}]({page_url(s)}): {by_slug[s]['description']}" for s in ["questions", "ask", "cards"]]
+    lines += ["", "## Optional", f"- [Full text of every lesson]({SITE_URL}/llms-full.txt): all lessons as plain text"]
+    (OUT / "llms.txt").write_text("\n".join(lines) + "\n")
+
+    full = [f"# {SITE_NAME}", f"Source: {SITE_URL}/", f"Updated: {TODAY}", ""]
+    for p in PAGES[1:]:
+        full += [f"## {p['title'].split(' | ')[0]}", f"URL: {page_url(p['slug'])}", "",
+                 "\n\n".join(text_of(sections[k]) for k in p["sections"]), ""]
+    (OUT / "llms-full.txt").write_text("\n".join(full) + "\n")
+
+    print(f"Built Version A (docs/index.html) and Version B ({len(PAGES)} pages in docs/{MULTI_DIR}/), "
+          f"sitemap, robots.txt, llms.txt. Indexable: {INDEXABLE}")
+
+
+if __name__ == "__main__":
+    build()

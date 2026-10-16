@@ -636,12 +636,14 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
 </footer>
 
 <script>
-  document.getElementById('ask-form').addEventListener('submit', function (e) {
+  var askForm = document.getElementById('ask-form');
+  if (askForm) askForm.addEventListener('submit', function (e) {
     e.preventDefault();
     document.getElementById('ask-thanks').hidden = false;
   });
 
-  document.getElementById('faq-q').addEventListener('input', function (e) {
+  var faqSearch = document.getElementById('faq-q');
+  if (faqSearch) faqSearch.addEventListener('input', function (e) {
     var q = e.target.value.trim().toLowerCase();
     var shown = 0;
     document.querySelectorAll('#faq-list .faq-item').forEach(function (item) {
