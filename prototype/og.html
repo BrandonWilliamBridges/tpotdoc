@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Share image</title>
+<!-- Source for img/og.png, the 1200x630 preview shown when the site is shared in texts, social posts and search.
+     Re-render: Chrome --headless --window-size=1200,630 --screenshot=img/og.png og.html -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Figtree:wght@600&family=Spectral:ital@1&display=swap">
+<style>
+  html, body { margin: 0; }
+  body { width: 1200px; height: 630px; background: #1f2d5c; color: #f3f5fb; font-family: "Figtree", sans-serif; display: grid; grid-template-columns: 1fr 360px; overflow: hidden; }
+  .text { padding: 72px 0 64px 80px; display: grid; align-content: space-between; }
+  .eyebrow { font-size: 22px; letter-spacing: .16em; text-transform: uppercase; color: #f0cf86; }
+  h1 { margin: 18px 0 0; font-family: "Fraunces", serif; font-weight: 650; font-size: 68px; line-height: 1.05; }
+  h1 em { color: #f0cf86; font-weight: 500; }
+  .verse { font-family: "Spectral", serif; font-style: italic; font-size: 26px; opacity: .85; }
+  .stones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 72px 72px 64px 0; align-content: end; }
+  .stones div { background: rgba(255,255,255,.1); border-radius: 3px; padding: 14px 16px; font-size: 18px; }
+  .stones div:first-child { background: #d9ad52; color: #1a1405; }
+</style>
+</head>
+<body>
+  <div class="text">
+    <div>
+      <div class="eyebrow">Foundations for new believers</div>
+      <h1>The Principles of the Doctrine of <em>Christ</em></h1>
+    </div>
+    <div class="verse">Hebrews 6:1–2</div>
+  </div>
+  <div class="stones">
+    <div>Repentance</div><div>Faith</div><div>Baptisms</div><div>Laying on of hands</div><div>Resurrection</div><div>Eternal judgment</div>
+  </div>
+</body>
+</html>
