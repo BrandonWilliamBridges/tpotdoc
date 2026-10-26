@@ -62,9 +62,10 @@ header.site {
   border-bottom: 1px solid var(--line);
 }
 header.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; flex-wrap: wrap; }
-.brand { display: flex; align-items: baseline; gap: 10px; text-decoration: none; color: var(--ink); }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
 .brand b { font-family: var(--font-display); font-size: 1.15rem; letter-spacing: .02em; }
 .brand span { font-size: .8rem; color: var(--muted); letter-spacing: .1em; }
+.brand img { width: 44px; height: 44px; flex: none; }
 nav.main { display: flex; gap: 18px; flex-wrap: wrap; font-size: .95rem; }
 nav.main a { color: var(--ink); text-decoration: none; }
 nav.main a:hover { color: var(--accent); }
@@ -190,6 +191,14 @@ form.ask .radio-row label { display: flex; gap: 8px; align-items: center; font-w
 .faq-answer ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
 .faq-empty { margin-top: 12px; color: var(--muted); }
 
+/* Churches */
+.church-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 16px; }
+.church { background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 18px 20px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.church h3 { font-size: 1.2rem; }
+.church .where { color: var(--muted); font-size: .95rem; }
+.church a { font-weight: 600; overflow-wrap: anywhere; }
+.prayer-head { font-size: 1.35rem; margin: 32px 0 14px; }
+
 /* Printables */
 .card-strip { display: flex; gap: 16px; overflow-x: auto; padding-block: 4px 14px; scroll-snap-type: x mandatory; }
 .card-strip img { flex: none; width: 200px; aspect-ratio: 2.75 / 4.25; height: auto; border-radius: 8px; border: 1px solid var(--line); box-shadow: 0 2px 10px rgba(20, 24, 50, .12); scroll-snap-align: start; background: #fff; }
@@ -226,13 +235,14 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
 
 <header class="site">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="The Principles of the Doctrine of Christ, home"><b>The Principles</b><span>TPOTDOC</span></a>
+    <a class="brand" href="#top" aria-label="The Principles of the Doctrine of Christ, home"><img src="img/logo.png" alt="" width="44" height="44"><b>The Principles</b><span>TPOT DOC</span></a>
     <nav class="main" aria-label="Main">
       <a href="#foundations">Foundations</a>
       <a href="#repentance">Repentance</a>
       <a href="#faith">Faith</a>
       <a href="#faq">Questions</a>
       <a href="#ask">Ask &amp; Pray</a>
+      <a href="#churches">Churches</a>
       <a href="#printables">Cards</a>
     </nav>
   </div>
@@ -560,8 +570,8 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
       <div class="steps">
         <div class="step">
           <h3>Find a strong church</h3>
-          <p>Get planted with believers near you who teach the Word. A church finder will live here.</p>
-          <span class="tag">Coming soon</span>
+          <p>Get planted with believers who teach the Word. Start with churches Yv'e and Mark recommend, and a 24-hour prayer line.</p>
+          <a href="#churches">See churches and prayer ↓</a>
         </div>
         <div class="step">
           <h3>Share your faith</h3>
@@ -578,7 +588,46 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
     </div>
   </section>
 
-  <section class="block lesson" id="printables">
+  <section class="block lesson" id="churches">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Find a Church · Pray With Others</p>
+        <h2>Churches and prayer we recommend</h2>
+        <p>God never meant for you to grow alone. Get planted in a church that preaches the Word. These churches stream their services online, so you can join from anywhere while you look for a church near you.</p>
+      </div>
+      <div class="church-list">
+        <article class="church">
+          <h3>New Beginnings Church</h3>
+          <p class="where">Bedford, Texas (Dallas–Fort Worth)</p>
+          <p>Pastors Larry &amp; Tiz Huch</p>
+          <a href="https://newbeginnings.org/" target="_blank" rel="noopener">newbeginnings.org ↗</a>
+        </article>
+        <article class="church">
+          <h3>Mercy Culture Church</h3>
+          <p class="where">Fort Worth, Texas, with campuses in Dallas, Waco, Austin, San Antonio, Orange County, Washington, D.C., and online</p>
+          <p>Pastors Landon &amp; Heather Schott</p>
+          <a href="https://mercyculture.com/" target="_blank" rel="noopener">mercyculture.com ↗</a>
+        </article>
+        <article class="church">
+          <h3>Revival Today Church</h3>
+          <p class="where">Campuses in Pittsburgh, Texas, Arizona, California and Toronto</p>
+          <p>Need prayer? Text PRAYER to 75767.</p>
+          <a href="https://www.revivaltodaychurch.com/" target="_blank" rel="noopener">revivaltodaychurch.com ↗</a>
+        </article>
+      </div>
+      <h3 class="prayer-head">Pray with others, 24/7</h3>
+      <div class="church-list">
+        <article class="church">
+          <h3>BPN Radio</h3>
+          <p class="where">A 24-hour internet prayer station from Breakout Ministries</p>
+          <p>Tune in any time, day or night, and pray along with live prayer leaders.</p>
+          <a href="http://mobile.bpnradio.com/" target="_blank" rel="noopener">bpnradio.com ↗</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="printables">
     <div class="wrap">
       <div class="section-head">
         <p class="eyebrow">Printables · Measure of Faith</p>
@@ -602,7 +651,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
     </div>
   </section>
 
-  <section class="block" id="merch">
+  <section class="block lesson" id="merch">
     <div class="wrap">
       <div class="section-head">
         <p class="eyebrow">Bridges Body Boldness</p>
@@ -636,12 +685,14 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
 </footer>
 
 <script>
-  document.getElementById('ask-form').addEventListener('submit', function (e) {
+  var askForm = document.getElementById('ask-form');
+  if (askForm) askForm.addEventListener('submit', function (e) {
     e.preventDefault();
     document.getElementById('ask-thanks').hidden = false;
   });
 
-  document.getElementById('faq-q').addEventListener('input', function (e) {
+  var faqSearch = document.getElementById('faq-q');
+  if (faqSearch) faqSearch.addEventListener('input', function (e) {
     var q = e.target.value.trim().toLowerCase();
     var shown = 0;
     document.querySelectorAll('#faq-list .faq-item').forEach(function (item) {

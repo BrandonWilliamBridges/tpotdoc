@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1000" height="1000" role="img" aria-labelledby="t">
+  <title id="t">TPOT DOC, The Principles of the Doctrine of Christ</title>
+  <!-- Vector redraw of the AI concept logo, with Yv'e's changes:
+       "TEAPOT DOC" -> "TPOT DOC"; "THE" added to the lower ring; the gold cross moved from the Bible onto the teapot. -->
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&amp;family=Montserrat:wght@700&amp;display=swap');
+      .ring-text-top { font-family: "Libre Baskerville", Georgia, "Times New Roman", serif; font-weight: 700; font-size: 76px; letter-spacing: 9px; fill: #1f3f6e; }
+      .ring-text-bottom { font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif; font-weight: 700; font-size: 32px; letter-spacing: 3px; fill: #1d2a44; }
+    </style>
+    <path id="arc-top" d="M 98,500 A 402,402 0 0 1 902,500"/>
+    <path id="arc-bottom" d="M 47,500 A 453,453 0 0 0 953,500"/>
+    <linearGradient id="navy" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a6aa8"/>
+      <stop offset="0.55" stop-color="#22487f"/>
+      <stop offset="1" stop-color="#16325c"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f1d79a"/>
+      <stop offset="0.5" stop-color="#d4ad5c"/>
+      <stop offset="1" stop-color="#b48a3c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f6e3b0" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#f6e3b0" stop-opacity="0"/>
+    </radialGradient>
+    <symbol id="sparkle" viewBox="-20 -20 40 40">
+      <path d="M0,-20 C2,-5 5,-2 20,0 C5,2 2,5 0,20 C-2,5 -5,2 -20,0 C-5,-2 -2,-5 0,-20 Z" fill="url(#gold)"/>
+    </symbol>
+  </defs>
+
+  <!-- seal rings -->
+  <circle cx="500" cy="500" r="480" fill="#ffffff"/>
+  <circle cx="500" cy="500" r="478" fill="none" stroke="#1f3f6e" stroke-width="13"/>
+  <circle cx="500" cy="500" r="466" fill="none" stroke="#7fa0c8" stroke-width="2.5"/>
+  <circle cx="500" cy="500" r="392" fill="none" stroke="#1f3f6e" stroke-width="9"/>
+
+  <!-- ring lettering -->
+  <text class="ring-text-top"><textPath href="#arc-top" startOffset="50%" text-anchor="middle">TPOT DOC</textPath></text>
+  <text class="ring-text-bottom"><textPath href="#arc-bottom" startOffset="50%" text-anchor="middle">THE PRINCIPLES OF THE DOCTRINE OF CHRIST</textPath></text>
+  <use href="#sparkle" x="40" y="476" width="48" height="48"/>
+  <use href="#sparkle" x="912" y="476" width="48" height="48"/>
+
+  <g transform="translate(0,-40)">
+  <!-- light behind the Bible -->
+  <circle cx="500" cy="300" r="120" fill="url(#glow)"/>
+  <g stroke="#d9b56a" stroke-width="4" stroke-linecap="round" opacity="0.85">
+    <line x1="500" y1="178" x2="500" y2="200"/>
+    <line x1="440" y1="190" x2="450" y2="210"/>
+    <line x1="560" y1="190" x2="550" y2="210"/>
+    <line x1="392" y1="215" x2="408" y2="230"/>
+    <line x1="608" y1="215" x2="592" y2="230"/>
+  </g>
+
+  <!-- open Bible (cross moved to the teapot) -->
+  <g stroke-linejoin="round">
+    <path d="M 352,262 L 352,348 C 405,338 460,344 500,368 C 540,344 595,338 648,348 L 648,262" fill="none" stroke="url(#gold)" stroke-width="9"/>
+    <path d="M 500,352 C 462,326 414,320 368,326 L 368,246 C 414,240 462,248 500,276 Z" fill="#fbf4e1" stroke="#c9a24f" stroke-width="5"/>
+    <path d="M 500,352 C 538,326 586,320 632,326 L 632,246 C 586,240 538,248 500,276 Z" fill="#fbf4e1" stroke="#c9a24f" stroke-width="5"/>
+    <g stroke="#e3cf9f" stroke-width="2.5" fill="none">
+      <path d="M 388,268 C 420,265 455,270 482,286"/><path d="M 388,288 C 420,285 455,290 482,306"/><path d="M 388,308 C 420,305 455,310 482,326"/>
+      <path d="M 612,268 C 580,265 545,270 518,286"/><path d="M 612,288 C 580,285 545,290 518,306"/><path d="M 612,308 C 580,305 545,310 518,326"/>
+    </g>
+  </g>
+
+  </g>
+
+  <!-- steam -->
+  <g fill="none" stroke="#c9ccd3" stroke-width="10" stroke-linecap="round" opacity="0.8">
+    <path d="M 238,452 C 214,420 250,398 232,366 C 220,344 236,326 250,318"/>
+  </g>
+
+  <!-- teapot -->
+  <g>
+    <!-- handle -->
+    <path d="M 652,520 C 690,452 790,446 796,526 C 802,600 742,650 690,684" fill="none" stroke="url(#navy)" stroke-width="30" stroke-linecap="round"/>
+    <path d="M 662,530 C 698,474 772,470 778,528 C 782,588 734,628 694,656" fill="none" stroke="#e2c27c" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="684" cy="690" r="17" fill="url(#navy)"/>
+    <!-- spout -->
+    <path d="M 356,566 C 312,556 284,520 262,486 L 236,452 C 230,445 220,450 224,460 C 244,512 268,590 318,640 C 334,656 352,664 366,662 Z" fill="url(#navy)" stroke="#d4ad5c" stroke-width="3"/>
+    <!-- foot -->
+    <path d="M 420,722 L 404,758 C 440,772 560,772 596,758 L 580,722 Z" fill="url(#navy)" stroke="#d4ad5c" stroke-width="3"/>
+    <!-- body -->
+    <path d="M 336,598 C 336,490 414,462 500,462 C 586,462 664,490 664,598 C 664,688 594,734 500,734 C 406,734 336,688 336,598 Z" fill="url(#navy)"/>
+    <path d="M 378,540 C 362,600 380,676 452,712" fill="none" stroke="#e2c27c" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 620,540 C 636,600 618,676 548,712" fill="none" stroke="#e2c27c" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 392,524 C 380,560 380,590 386,616" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.18"/>
+    <!-- shoulder rim -->
+    <ellipse cx="500" cy="472" rx="124" ry="16" fill="#1c3d6c" stroke="url(#gold)" stroke-width="6"/>
+    <!-- lid -->
+    <path d="M 412,468 C 418,422 458,404 500,404 C 542,404 582,422 588,468 Z" fill="url(#navy)" stroke="#d4ad5c" stroke-width="3"/>
+    <circle cx="500" cy="392" r="16" fill="url(#navy)" stroke="#d4ad5c" stroke-width="3"/>
+    <path d="M 500,348 L 500,378 M 487,360 L 513,360" stroke="#1f3f6e" stroke-width="8" stroke-linecap="round"/>
+    <path d="M 500,348 L 500,378 M 487,360 L 513,360" stroke="#e2c27c" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- the gold cross, moved here from the Bible -->
+    <path d="M 487,530 h 26 v 34 h 30 v 26 h -30 v 72 h -26 v -72 h -30 v -26 h 30 Z" fill="url(#gold)" stroke="#9c7630" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+</svg>

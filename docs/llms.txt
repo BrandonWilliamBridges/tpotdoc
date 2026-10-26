@@ -1,0 +1,17 @@
+# The Principles of the Doctrine of Christ
+
+> Simple, Scripture-based Bible lessons for people who are new to faith in Jesus Christ, built on the six foundations named in Hebrews 6:1-2: repentance from dead works, faith toward God, the doctrine of baptisms, laying on of hands, resurrection of the dead, and eternal judgment. Written by Dianna "Yv'e" Bridges. Scripture quotations are KJV; Greek word studies use Strong's Concordance.
+
+## Lessons
+- [What Is Repentance? Meaning of Metanoia (Greek G3341)](https://brandonwilliambridges.github.io/tpotdoc/v2/repentance/): Repentance means changing your mind about sin and God, and letting it turn your life around. A simple word study of metanoia for new believers.
+- [What Is Faith Toward God? Meaning of Pistis (Greek G4102)](https://brandonwilliambridges.github.io/tpotdoc/v2/faith/): Faith means being persuaded that God is true and leaning your whole weight on Jesus. A simple word study of pistis, with Matthew 8 and 9.
+- [Neither Barren nor Unfruitful: 2 Peter 1:8 Word Study](https://brandonwilliambridges.github.io/tpotdoc/v2/fruitful/): What 'barren' and 'unfruitful' mean in 2 Peter 1:8, and Peter's plan for growth: add to your faith virtue, knowledge, patience, godliness and love.
+
+## Help for new believers
+- [Questions New Believers Ask](https://brandonwilliambridges.github.io/tpotdoc/v2/questions/): Answers from God's Word to questions new Christians ask, like 'How do I know I really repented?'
+- [Ask a Question or Request Prayer](https://brandonwilliambridges.github.io/tpotdoc/v2/ask/): Send a question about the Christian faith or a prayer request. Every message is read personally and answered from God's Word.
+- [Churches and 24/7 Prayer We Recommend](https://brandonwilliambridges.github.io/tpotdoc/v2/churches/): Find a church that preaches the Word: New Beginnings, Mercy Culture and Revival Today, plus BPN Radio, a 24-hour internet prayer station.
+- [Measure of Faith Scripture Cards (Free Printable)](https://brandonwilliambridges.github.io/tpotdoc/v2/cards/): Free printable Scripture and prayer cards on the assurance of salvation: John 3:16, Romans 10:13, Acts 4:12 and more. Based on Romans 12:3.
+
+## Optional
+- [Full text of every lesson](https://brandonwilliambridges.github.io/tpotdoc/llms-full.txt): all lessons as plain text
