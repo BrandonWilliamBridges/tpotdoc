@@ -32,7 +32,7 @@ For a new page, add an entry to `PAGES`:
 ```sh
 ./build.sh && python3 scripts/check_site.py
 ```
-Fix every error, and fix the warnings too unless there is a reason not to. If a card changed, run `printables/measure-of-faith/render.sh` before `./build.sh`. Do one visual check: screenshot `docs/index.html` and one `docs/v2/` page with headless Chrome. Its minimum viewport is 500px.
+Fix every error, and fix the warnings too unless there is a reason not to. If a card changed, run `printables/measure-of-faith/render.sh` before `./build.sh`. Do one visual check: screenshot `docs/index.html` and the changed page (`docs/<slug>/index.html`) with headless Chrome. Its minimum viewport is 500px.
 
 ## 5. Ship
 ```sh
