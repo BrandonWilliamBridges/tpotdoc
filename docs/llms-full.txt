@@ -145,14 +145,15 @@ I have a question
 Please pray for me
 First name
 Email, so we can reply
+Leave this empty
 Topic
 RepentanceFaith toward GodBaptisms
 Laying on of handsResurrection of the deadEternal judgment
 Something else
 Your message
 Send message
-Prototype: this form does not send yet. On the live site it will go to Yv'e’s inbox.
-Preview only: on the live site this would send your message to Yv'e, and you would see a thank-you here.
+Your message goes privately to Yv'e’s inbox (delivered by FormSubmit). We never share your email.
+Thank you! Your message is on its way to Yv'e. She reads every one personally. If you asked a question, watch your inbox for her reply.
 
 ## Churches and 24/7 Prayer We Recommend
 URL: https://brandonwilliambridges.github.io/tpotdoc/v2/churches/
