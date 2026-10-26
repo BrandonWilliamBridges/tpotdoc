@@ -1,6 +1,6 @@
 # The Principles of the Doctrine of Christ
 Source: https://brandonwilliambridges.github.io/tpotdoc/
-Updated: 2026-10-16
+Updated: 2026-10-26
 
 ## What Is Repentance? Meaning of Metanoia (Greek G3341)
 URL: https://brandonwilliambridges.github.io/tpotdoc/v2/repentance/
@@ -153,6 +153,30 @@ Your message
 Send message
 Prototype: this form does not send yet. On the live site it will go to Yv'e’s inbox.
 Preview only: on the live site this would send your message to Yv'e, and you would see a thank-you here.
+
+## Churches and 24/7 Prayer We Recommend
+URL: https://brandonwilliambridges.github.io/tpotdoc/v2/churches/
+
+Find a Church · Pray With Others
+Churches and prayer we recommend
+God never meant for you to grow alone. Get planted in a church that preaches the Word. These churches stream their services online, so you can join from anywhere while you look for a church near you.
+New Beginnings Church
+Bedford, Texas (Dallas–Fort Worth)
+Pastors Larry & Tiz Huch
+newbeginnings.org ↗
+Mercy Culture Church
+Fort Worth, Texas, with campuses in Dallas, Waco, Austin, San Antonio, Orange County, Washington, D.C., and online
+Pastors Landon & Heather Schott
+mercyculture.com ↗
+Revival Today Church
+Campuses in Pittsburgh, Texas, Arizona, California and Toronto
+Need prayer? Text PRAYER to 75767.
+revivaltodaychurch.com ↗
+Pray with others, 24/7
+BPN Radio
+A 24-hour internet prayer station from Breakout Ministries
+Tune in any time, day or night, and pray along with live prayer leaders.
+bpnradio.com ↗
 
 ## Measure of Faith Scripture Cards (Free Printable)
 URL: https://brandonwilliambridges.github.io/tpotdoc/v2/cards/

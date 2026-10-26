@@ -3,7 +3,7 @@
 
 Errors:   broken local links/images, invalid JSON-LD, not exactly one <h1>, missing title/description/canonical,
           missing llms.txt / sitemap.xml / robots.txt.
-Warnings: title over 60 characters, description outside 70-160 characters, images without alt text.
+Warnings: title over 60 characters, description outside 70-160 characters, images without an alt attribute.
 """
 import html
 import json
@@ -45,8 +45,8 @@ for page in sorted(DOCS.rglob("*.html")):
         except json.JSONDecodeError as e:
             errors.append(f"{rel}: invalid JSON-LD ({e})")
     for img in re.findall(r"<img\b[^>]*>", s):
-        if 'alt="' not in img or 'alt=""' in img:
-            warnings.append(f"{rel}: image without alt text: {img[:80]}")
+        if 'alt="' not in img:  # alt="" is fine for decorative images
+            warnings.append(f"{rel}: image without alt attribute: {img[:80]}")
     for href in re.findall(r'(?:href|src)="([^"#:?][^"#?]*)', s):
         if href.startswith(("http", "mailto", "tel")):
             continue
