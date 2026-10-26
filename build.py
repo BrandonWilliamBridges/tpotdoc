@@ -72,6 +72,12 @@ PAGES = [
         "type": "contact",
     },
     {
+        "slug": "churches", "sections": ["churches"],
+        "title": "Churches and 24/7 Prayer We Recommend",
+        "description": "Find a church that preaches the Word: New Beginnings, Mercy Culture and Revival Today, plus BPN Radio, a 24-hour internet prayer station.",
+        "type": "churches", "nav": "Churches",
+    },
+    {
         "slug": "cards", "sections": ["printables"],
         "title": "Measure of Faith Scripture Cards (Free Printable)",
         "description": "Free printable Scripture and prayer cards on the assurance of salvation: John 3:16, Romans 10:13, Acts 4:12 and more. Based on Romans 12:3.",
@@ -86,7 +92,7 @@ ANCHORS = {
     "repentance": "repentance/", "three-things": "repentance/#three-things",
     "fruit-of-repentance": "repentance/#fruit-of-repentance",
     "faith": "faith/", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/",
-    "printables": "cards/",
+    "printables": "cards/", "churches": "churches/",
 }
 
 ONE_PAGE = {
@@ -229,6 +235,8 @@ def head(parts, title, description, canonical, og_image, jsonld):
 <meta name="twitter:description" content="{d}">
 <meta name="twitter:image" content="{og_image}">
 <meta name="theme-color" content="#1f2d5c">
+<link rel="icon" type="image/png" href="{SITE_URL}/img/favicon.png">
+<link rel="apple-touch-icon" href="{SITE_URL}/img/logo.png">
 {ld}
 <style>:root{{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}}body{{margin:0}}img{{max-width:100%}}[hidden]{{display:none!important}}</style>
 {parts['fonts']}
@@ -281,6 +289,13 @@ def page_ld(page, sections):
         })
     elif page["type"] == "faq":
         out.insert(0, faq_ld(faq_items(sections)))
+    elif page["type"] == "churches":
+        churches = re.findall(r'<article class="church">\s*<h3>(.*?)</h3>.*?<a href="([^"]+)"', sections.get("churches", ""), re.S)
+        out.insert(0, {
+            "@context": "https://schema.org", "@type": "ItemList", "name": page["title"],
+            "itemListElement": [{"@type": "ListItem", "position": i + 1, "item": {"@type": "Organization", "name": html.unescape(n), "url": u}}
+                                for i, (n, u) in enumerate(churches)],
+        })
     elif page["type"] == "cards":
         out.insert(0, {
             "@context": "https://schema.org", "@type": "DigitalDocument", "name": "Measure of Faith cards, Set 1: Assurance of Salvation",
@@ -369,7 +384,7 @@ def build():
              "", "## Lessons"]
     lines += [f"- [{by_slug[s]['title'].split(' | ')[0]}]({page_url(s)}): {by_slug[s]['description']}" for s in LESSON_ORDER]
     lines += ["", "## Help for new believers"]
-    lines += [f"- [{by_slug[s]['title'].split(' | ')[0]}]({page_url(s)}): {by_slug[s]['description']}" for s in ["questions", "ask", "cards"]]
+    lines += [f"- [{by_slug[s]['title'].split(' | ')[0]}]({page_url(s)}): {by_slug[s]['description']}" for s in ["questions", "ask", "churches", "cards"]]
     lines += ["", "## Optional", f"- [Full text of every lesson]({SITE_URL}/llms-full.txt): all lessons as plain text"]
     (OUT / "llms.txt").write_text("\n".join(lines) + "\n")
 
