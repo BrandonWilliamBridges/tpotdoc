@@ -871,7 +871,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         <h3>How it is delivered</h3>
         <p>Form messages are delivered to Yv'e’s inbox by FormSubmit (formsubmit.co), a form-delivery service. The message passes through their servers on the way. Yv'e, and anyone she personally asks to help answer prayer requests, reads it. We do not post your request publicly, and we do not share your email address with anyone else.</p>
         <h3>Cookies and tracking</h3>
-        <p>This site sets no cookies and shows no advertising. It does not use Google Fonts or other third-party services that watch your visit. If we add visitor statistics, we will use a privacy-respecting counter that records page views without cookies and without identifying you.</p>
+        <p>This site sets no cookies and shows no advertising. It does not use Google Fonts or other third-party services that track you. To learn which lessons are most helpful, we count page views with Cloudflare Web Analytics, which uses no cookies and does not identify you or follow you to other sites.</p>
         <h3>Links to other sites</h3>
         <p>We link to churches, ministries and prayer lines we recommend. Each of those sites has its own privacy practices, which we do not control.</p>
         <h3>Children</h3>
@@ -896,8 +896,8 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
 <script>
   // Contact form: sends to Yv'e's inbox through FormSubmit (formsubmit.co). The address is assembled here
   // rather than written out in the page, so spam bots scanning the HTML don't pick it up.
-  // After FormSubmit's activation email is confirmed, swap INBOX for the random alias it provides.
-  var INBOX = ['markyve77', 'gmail.com'].join('@');
+  // info@tpotdoc.com forwards (Cloudflare Email Routing) to Yv'e and anyone she adds as a helper.
+  var INBOX = ['info', 'tpotdoc.com'].join('@');
   var askForm = document.getElementById('ask-form');
   if (askForm) askForm.addEventListener('submit', function (e) {
     e.preventDefault();
