@@ -78,6 +78,18 @@ PAGES = [
         "type": "churches", "nav": "Churches",
     },
     {
+        "slug": "prayers", "sections": ["prayers"],
+        "title": "Scripture Prayers for Everyday Needs",
+        "description": "Prayers built from God's Word for everyday needs, starting with a prayer before a test from James 1:5, 2 Timothy 1:7 and Philippians 4:6-7.",
+        "type": "prayers", "nav": "Prayers",
+    },
+    {
+        "slug": "about", "sections": ["about"],
+        "title": "About Dianna \"Yv'e\" Bridges",
+        "description": "Yv'e Bridges has taught God's Word in children's, youth, women's and singles ministries for decades, and wrote Praying A to Z.",
+        "type": "about", "nav": "About",
+    },
+    {
         "slug": "cards", "sections": ["printables"],
         "title": "Measure of Faith Scripture Cards (Free Printable)",
         "description": "Free printable Scripture and prayer cards on the assurance of salvation: John 3:16, Romans 10:13, Acts 4:12 and more. Based on Romans 12:3.",
@@ -92,7 +104,8 @@ ANCHORS = {
     "repentance": "repentance/", "three-things": "repentance/#three-things",
     "fruit-of-repentance": "repentance/#fruit-of-repentance",
     "faith": "faith/", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/",
-    "printables": "cards/", "churches": "churches/",
+    "printables": "cards/", "churches": "churches/", "prayers": "prayers/", "about": "about/",
+    "prayer-for-a-test": "prayers/#prayer-for-a-test",
 }
 
 
@@ -269,6 +282,18 @@ def page_ld(page, sections):
             "itemListElement": [{"@type": "ListItem", "position": i + 1, "item": {"@type": "Organization", "name": html.unescape(n), "url": u}}
                                 for i, (n, u) in enumerate(churches)],
         })
+    elif page["type"] == "prayers":
+        out.insert(0, {
+            "@context": "https://schema.org", "@type": "CollectionPage", "name": page["title"],
+            "description": page["description"], "url": url, "inLanguage": "en", "author": AUTHOR,
+            "hasPart": [{"@type": "CreativeWork", "name": text_of(h), "url": f"{url}#{i}"}
+                        for i, h in re.findall(r'<article class="prayer" id="([^"]+)">.*?<h3>(.*?)</h3>', sections.get("prayers", ""), re.S)],
+        })
+    elif page["type"] == "about":
+        out.insert(0, {
+            "@context": "https://schema.org", "@type": "ProfilePage", "url": url,
+            "mainEntity": {**AUTHOR, "image": f"{SITE_URL}/img/dianna.jpg"},
+        })
     elif page["type"] == "cards":
         out.insert(0, {
             "@context": "https://schema.org", "@type": "DigitalDocument", "name": "Measure of Faith cards, Set 1: Assurance of Salvation",
@@ -367,7 +392,7 @@ def build():
              "", "## Lessons"]
     lines += [f"- [{by_slug[s]['title'].split(' | ')[0]}]({page_url(s)}): {by_slug[s]['description']}" for s in LESSON_ORDER]
     lines += ["", "## Help for new believers"]
-    lines += [f"- [{by_slug[s]['title'].split(' | ')[0]}]({page_url(s)}): {by_slug[s]['description']}" for s in ["questions", "ask", "churches", "cards"]]
+    lines += [f"- [{by_slug[s]['title'].split(' | ')[0]}]({page_url(s)}): {by_slug[s]['description']}" for s in ["prayers", "questions", "ask", "churches", "cards", "about"]]
     lines += ["", "## Optional", f"- [Full text of every lesson]({SITE_URL}/llms-full.txt): all lessons as plain text"]
     (OUT / "llms.txt").write_text("\n".join(lines) + "\n")
 

@@ -194,6 +194,21 @@ form.ask { position: relative; }
 .faq-answer ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
 .faq-empty { margin-top: 12px; color: var(--muted); }
 
+/* Scripture prayers */
+.prayer { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 24px; display: grid; gap: 14px; margin-top: 28px; min-width: 0; }
+.prayer h3 { font-size: 1.45rem; }
+.prayer-verses { display: grid; gap: 12px; }
+.prayer-text { border-left: 3px solid var(--accent); padding-left: 18px; }
+.prayer-text p:last-child { font-family: var(--font-scripture, Georgia, serif); font-size: 1.15rem; line-height: 1.7; }
+.draft-note { font-size: .85rem; color: var(--muted); font-style: italic; }
+.coming-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 8px 24px; padding-left: 1.2em; color: var(--muted); }
+
+/* About */
+.about-grid { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 40px; align-items: start; }
+.about-grid > img { width: 100%; aspect-ratio: 786/880; object-fit: cover; border-radius: 4px 120px 4px 4px; }
+.about-body { display: grid; gap: 14px; max-width: 65ch; min-width: 0; }
+@media (max-width: 720px) { .about-grid { grid-template-columns: 1fr; } .about-grid > img { max-width: 240px; } }
+
 /* Churches */
 .church-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 16px; }
 .church { background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 18px 20px; display: grid; gap: 6px; align-content: start; min-width: 0; }
@@ -244,9 +259,11 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
       <a href="#repentance">Repentance</a>
       <a href="#faith">Faith</a>
       <a href="#faq">Questions</a>
+      <a href="#prayers">Prayers</a>
       <a href="#ask">Ask &amp; Pray</a>
       <a href="#churches">Churches</a>
       <a href="#printables">Cards</a>
+      <a href="#about">About</a>
     </nav>
   </div>
 </header>
@@ -630,7 +647,76 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
           <p>Tune in any time, day or night, and pray along with live prayer leaders.</p>
           <a href="http://mobile.bpnradio.com/" target="_blank" rel="noopener">bpnradio.com ↗</a>
         </article>
+        <article class="church">
+          <h3>Billy Graham 24/7 Prayer Line</h3>
+          <p class="where">From the Billy Graham Evangelistic Association</p>
+          <p>Callers are answered by a live voice, day or night, for prayer and to talk about following Jesus. You can also chat online with their Peace With God team.</p>
+          <a href="https://billygraham.org/billy-graham-24-7-prayer-line/" target="_blank" rel="noopener">billygraham.org ↗</a>
+          <a href="https://peacewithgod.net/" target="_blank" rel="noopener">Chat at peacewithgod.net ↗</a>
+        </article>
       </div>
+      <h3 class="prayer-head">For children</h3>
+      <div class="church-list">
+        <article class="church">
+          <h3>Fuego Kids</h3>
+          <p class="where">Children's books from Pam White, Yv'e's friend and partner in children's ministry</p>
+          <p>Fuego is a storybook character who teaches boys and girls Bible truths, like how to meet with God every day and let their light shine.</p>
+          <a href="https://www.fuegokids.com/" target="_blank" rel="noopener">fuegokids.com ↗</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block lesson" id="prayers">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Scripture Prayers</p>
+        <h2>Prayers from God’s Word for everyday needs</h2>
+        <p class="big-def">A Scripture prayer is a prayer built from God’s own promises, so you can pray with confidence that you are asking according to His will.</p>
+        <figure class="scripture">
+          <p>“And this is the confidence that we have in him, that, if we ask any thing according to his will, he heareth us.”</p>
+          <cite>1 John 5:14</cite>
+        </figure>
+        <p>Pray these out loud. Put your own name in them. A new prayer is added often. If you need prayer for something not listed here, <a href="#ask">send a prayer request</a> and Yv'e will pray for you personally.</p>
+      </div>
+
+      <article class="prayer" id="prayer-for-a-test">
+        <p class="eyebrow">Prayer 1</p>
+        <h3>A prayer before a test</h3>
+        <div class="prayer-verses">
+          <figure class="scripture">
+            <p>“If any of you lack wisdom, let him ask of God, that giveth to all men liberally, and upbraideth not; and it shall be given him.”</p>
+            <cite>James 1:5</cite>
+          </figure>
+          <figure class="scripture">
+            <p>“For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.”</p>
+            <cite>2 Timothy 1:7</cite>
+          </figure>
+          <figure class="scripture">
+            <p>“Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God. And the peace of God, which passeth all understanding, shall keep your hearts and minds through Christ Jesus.”</p>
+            <cite>Philippians 4:6–7</cite>
+          </figure>
+        </div>
+        <div class="prayer-text">
+          <p class="eyebrow">Pray</p>
+          <p>Father God, thank You that You give wisdom freely to everyone who asks, so I ask You for wisdom today. You have not given me a spirit of fear, but of power, of love, and of a sound mind. I receive Your peace over my heart and my mind. Help me remember what I have studied, think clearly, and do my very best for Your glory. Whatever the result, I trust You. In Jesus’ name, amen.</p>
+        </div>
+        <p class="draft-note">Draft for Yv'e to review: this prayer was written for her, not taken from her notes.</p>
+      </article>
+
+      <h3 class="prayer-head">Prayers coming soon</h3>
+      <ul class="coming-list">
+        <li>When I am afraid or anxious</li>
+        <li>For healing</li>
+        <li>For a loved one to be saved</li>
+        <li>For provision and finances</li>
+        <li>For peace in my family</li>
+        <li>When I am grieving</li>
+        <li>For guidance in a decision</li>
+        <li>For strength against temptation</li>
+        <li>For my job and my work</li>
+        <li>To forgive someone who hurt me</li>
+      </ul>
     </div>
   </section>
 
@@ -679,6 +765,21 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         </figure>
       </div>
       <p class="next-site">Designed by Mark &amp; Yv'e Bridges. Cups, cards and brochures are on the way.</p>
+    </div>
+  </section>
+
+  <section class="block lesson" id="about">
+    <div class="wrap about-grid">
+      <img src="img/dianna.jpg" alt="Dianna “Yv'e” Bridges smiling">
+      <div class="about-body">
+        <p class="eyebrow">About</p>
+        <h2>Meet Yv'e Bridges</h2>
+        <p class="big-def">Dianna “Yv'e” Bridges has taught the Word of God to children, youth and adults for decades.</p>
+        <p>Yv'e gave her life to Jesus on March 25, 1983, in Cypress, Texas. Since then she has served in children’s ministries and choirs for decades, in Houston, in the Daytona Beach, Florida area, and in the Dallas–Fort Worth Metroplex.</p>
+        <p>From the late 1990s into the 2000s, she served alongside Pam and Robert White at Kids for Christ Elementary, the children’s ministry of Calvary Cathedral. She also served three years as a lay counselor at a crisis pregnancy center, and has spoken to youth groups, at a pro-life rally in Daytona in 2000, and in women’s and singles ministries.</p>
+        <p>She is the author of <em>Praying A to Z</em> and the Kids for Christ <em>“Bring Them Home!” Witnessing Workbook</em>. She started this site to give new believers a strong foundation, built on the six principles of Hebrews 6:1–2.</p>
+        <p class="draft-note">Written from Yv'e’s own notes. Yv'e, please check the details and wording.</p>
+      </div>
     </div>
   </section>
 </main>

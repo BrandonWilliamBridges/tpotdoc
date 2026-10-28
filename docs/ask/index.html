@@ -220,6 +220,21 @@ form.ask { position: relative; }
 .faq-answer ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
 .faq-empty { margin-top: 12px; color: var(--muted); }
 
+/* Scripture prayers */
+.prayer { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 24px; display: grid; gap: 14px; margin-top: 28px; min-width: 0; }
+.prayer h3 { font-size: 1.45rem; }
+.prayer-verses { display: grid; gap: 12px; }
+.prayer-text { border-left: 3px solid var(--accent); padding-left: 18px; }
+.prayer-text p:last-child { font-family: var(--font-scripture, Georgia, serif); font-size: 1.15rem; line-height: 1.7; }
+.draft-note { font-size: .85rem; color: var(--muted); font-style: italic; }
+.coming-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 8px 24px; padding-left: 1.2em; color: var(--muted); }
+
+/* About */
+.about-grid { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 40px; align-items: start; }
+.about-grid > img { width: 100%; aspect-ratio: 786/880; object-fit: cover; border-radius: 4px 120px 4px 4px; }
+.about-body { display: grid; gap: 14px; max-width: 65ch; min-width: 0; }
+@media (max-width: 720px) { .about-grid { grid-template-columns: 1fr; } .about-grid > img { max-width: 240px; } }
+
 /* Churches */
 .church-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 16px; }
 .church { background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 18px 20px; display: grid; gap: 6px; align-content: start; min-width: 0; }
@@ -277,9 +292,11 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
       <a href="../repentance/">Repentance</a>
       <a href="../faith/">Faith</a>
       <a href="../questions/">Questions</a>
+      <a href="../prayers/">Prayers</a>
       <a href="../ask/" aria-current="page">Ask &amp; Pray</a>
       <a href="../churches/">Churches</a>
       <a href="../cards/">Cards</a>
+      <a href="../about/">About</a>
     </nav>
   </div>
 </header>
