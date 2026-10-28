@@ -24,6 +24,12 @@ SITE_URL = "https://tpotdoc.com"
 CUSTOM_DOMAIN = "tpotdoc.com"  # written to docs/CNAME so GitHub Pages serves the site there
 SITE_NAME = "The Principles of the Doctrine of Christ"
 INDEXABLE = False  # draft: every page says noindex until launch
+CF_ANALYTICS_TOKEN = ""  # Cloudflare Web Analytics site token (cookie-free). Empty = no analytics script.
+# Content Security Policy (meta tag; GitHub Pages cannot send real headers). Only our own files, FormSubmit and
+# Cloudflare Analytics are allowed to run or receive data. Page scripts live in site.js/go.js so no inline script is needed.
+CSP = ("default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; "
+       "font-src 'self'; img-src 'self' data:; connect-src 'self' https://formsubmit.co https://cloudflareinsights.com; "
+       "form-action 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests")
 TODAY = datetime.date.today().isoformat()
 
 AUTHOR = {
@@ -90,6 +96,12 @@ PAGES = [
         "type": "about", "nav": "About",
     },
     {
+        "slug": "privacy", "sections": ["privacy"],
+        "title": "Privacy",
+        "description": "What this site collects (only what you send through the Ask & Pray form), how it is delivered, and that we set no cookies and show no ads.",
+        "type": "privacy",
+    },
+    {
         "slug": "cards", "sections": ["printables"],
         "title": "Measure of Faith Scripture Cards (Free Printable)",
         "description": "Free printable Scripture and prayer cards on the assurance of salvation: John 3:16, Romans 10:13, Acts 4:12 and more. Based on Romans 12:3.",
@@ -105,7 +117,7 @@ ANCHORS = {
     "fruit-of-repentance": "repentance/#fruit-of-repentance",
     "faith": "faith/", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/",
     "printables": "cards/", "churches": "churches/", "prayers": "prayers/", "about": "about/",
-    "prayer-for-a-test": "prayers/#prayer-for-a-test", "prayer-when-tested": "prayers/#prayer-when-tested",
+    "privacy": "privacy/", "prayer-for-a-test": "prayers/#prayer-for-a-test", "prayer-when-tested": "prayers/#prayer-when-tested",
 }
 
 
@@ -193,14 +205,17 @@ PAGE_CSS = """
 </style>"""
 
 
-def head(parts, title, description, canonical, og_image, jsonld, extra=""):
-    robots = "index, follow, max-snippet:-1, max-image-preview:large" if INDEXABLE else "noindex, nofollow"
+def head(parts, title, description, canonical, og_image, jsonld, extra="", noindex=False):
+    robots = "index, follow, max-snippet:-1, max-image-preview:large" if INDEXABLE and not noindex else "noindex, nofollow"
+    analytics = (f'<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon=\'{{"token": "{CF_ANALYTICS_TOKEN}"}}\'></script>'
+                 if CF_ANALYTICS_TOKEN else "")
     ld = "\n".join(f'<script type="application/ld+json">{json.dumps(obj, ensure_ascii=False)}</script>' for obj in jsonld)
     t, d = html.escape(title), html.escape(description)
     return f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="{CSP}">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{t}</title>
 <meta name="description" content="{d}">
@@ -224,10 +239,12 @@ def head(parts, title, description, canonical, og_image, jsonld, extra=""):
 <link rel="apple-touch-icon" href="{SITE_URL}/img/logo.png">
 {ld}
 <style>:root{{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}}body{{margin:0}}img{{max-width:100%}}[hidden]{{display:none!important}}</style>
-{parts['fonts']}
+<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fonts/fonts.css">
 {parts['style']}
 {PAGE_CSS}
 {extra}
+{analytics}
 </head>
 <body>"""
 
@@ -294,6 +311,8 @@ def page_ld(page, sections):
             "@context": "https://schema.org", "@type": "ProfilePage", "url": url,
             "mainEntity": {**AUTHOR, "image": f"{SITE_URL}/img/dianna.jpg"},
         })
+    elif page["type"] == "privacy":
+        out.insert(0, {"@context": "https://schema.org", "@type": "WebPage", "name": "Privacy", "url": url, "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": page_url("")}})
     elif page["type"] == "cards":
         out.insert(0, {
             "@context": "https://schema.org", "@type": "DigitalDocument", "name": "Measure of Faith cards, Set 1: Assurance of Salvation",
@@ -337,8 +356,12 @@ def build():
 
     # Old one-page links (e.g. /#ask) forward to the page that now holds that section.
     moved = {k: v for k, v in ANCHORS.items() if v and not v.startswith("#")}
-    hash_redirect = ("<script>(function(){var m=" + json.dumps(moved) +
-                     ";var h=location.hash.slice(1);if(m[h])location.replace(m[h]);})();</script>")
+    (OUT / "go.js").write_text("(function(){var m=" + json.dumps(moved) +
+                               ";var h=location.hash.slice(1);if(m[h])location.replace(m[h]);})();\n")
+    hash_redirect = '<script src="/go.js"></script>'
+    (OUT / "site.js").write_text(re.sub(r"^<script>\s*|\s*</script>$", "", parts["script"]).strip() + "\n")
+    site_script = '<script src="/site.js"></script>'
+    shutil.copytree(ROOT / "prototype" / "fonts", OUT / "fonts")
 
     for page in PAGES:
         root = "../" if page["slug"] else ""
@@ -354,10 +377,38 @@ def build():
                    extra="" if page["slug"] else hash_redirect)
         doc += "\n" + parts["banner"] + "\n" + header
         doc += f'\n<main id="top">\n  {body}\n</main>\n' + pager(page, root) + "\n"
-        doc += rewrite_links(parts["footer"], root, root) + "\n" + parts["script"] + "\n</body>\n</html>\n"
+        doc += rewrite_links(parts["footer"], root, root) + "\n" + site_script + "\n</body>\n</html>\n"
         dest = OUT / page["slug"] / "index.html" if page["slug"] else OUT / "index.html"
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(doc)
+
+    # 404 page. GitHub Pages serves docs/404.html for any missing path, so every link on it is root-relative.
+    lessons = {p["slug"]: p for p in PAGES}
+    links = "".join(f'<li><a href="/{sl}/">{html.escape(lessons[sl]["nav"])}</a></li>' for sl in LESSON_ORDER)
+    body = f"""  <section class="block lesson" id="not-found">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Page not found</p>
+        <h1>We could not find that page</h1>
+        <p class="big-def">The link may be old or mistyped. Everything on the site is still here, one foundation stone at a time.</p>
+        <figure class="scripture">
+          <p>“I am the way, the truth, and the life: no man cometh unto the Father, but by me.”</p>
+          <cite>John 14:6</cite>
+        </figure>
+      </div>
+      <div class="about-body">
+        <p><a class="btn primary" href="/">Go to the home page</a></p>
+        <h3>Lessons</h3>
+        <ul>{links}</ul>
+        <p>Or <a href="/ask/">ask a question or request prayer</a>.</p>
+      </div>
+    </div>
+  </section>"""
+    doc = head(parts, "Page not found", "That page is not here. Find the lessons, prayers and the Ask & Pray form on " + SITE_NAME + ".",
+               f"{SITE_URL}/404.html", og, [{"@context": "https://schema.org", "@type": "WebPage", "name": "Page not found"}], noindex=True)
+    doc += "\n" + parts["banner"] + "\n" + rewrite_links(parts["header"], "/", "/")
+    doc += f'\n<main id="top">\n{body}\n</main>\n' + rewrite_links(parts["footer"], "/", "/") + "\n" + site_script + "\n</body>\n</html>\n"
+    (OUT / "404.html").write_text(doc)
 
     # The comparison period used /v2/ URLs; keep them working by forwarding to the new addresses.
     for page in PAGES:
