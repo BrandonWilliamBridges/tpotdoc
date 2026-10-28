@@ -74,13 +74,13 @@ PAGES = [
     {
         "slug": "churches", "sections": ["churches"],
         "title": "Churches and 24/7 Prayer We Recommend",
-        "description": "Find a church that preaches the Word: New Beginnings, Mercy Culture and Revival Today, plus BPN Radio, a 24-hour internet prayer station.",
+        "description": "Find a church that preaches the Word, and pray with someone 24/7: Billy Graham, Crossroads and Family Life Radio prayer lines, and BPN Radio.",
         "type": "churches", "nav": "Churches",
     },
     {
         "slug": "prayers", "sections": ["prayers"],
         "title": "Scripture Prayers for Everyday Needs",
-        "description": "Prayers built from God's Word for everyday needs, starting with a prayer before a test from James 1:5, 2 Timothy 1:7 and Philippians 4:6-7.",
+        "description": "Prayers built from God's Word for everyday needs: a prayer before a test, and a prayer for when you are tested or tempted (Hebrews 4:15).",
         "type": "prayers", "nav": "Prayers",
     },
     {
@@ -105,7 +105,7 @@ ANCHORS = {
     "fruit-of-repentance": "repentance/#fruit-of-repentance",
     "faith": "faith/", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/",
     "printables": "cards/", "churches": "churches/", "prayers": "prayers/", "about": "about/",
-    "prayer-for-a-test": "prayers/#prayer-for-a-test",
+    "prayer-for-a-test": "prayers/#prayer-for-a-test", "prayer-when-tested": "prayers/#prayer-when-tested",
 }
 
 
