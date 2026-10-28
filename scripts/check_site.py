@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Checks the built site in docs/ for SEO and AI-search basics. Run after ./build.sh; exits 1 on errors.
 
-Errors:   broken local links/images, invalid JSON-LD, not exactly one <h1>, missing title/description/canonical,
+Errors:   broken local links/images, redirects to missing pages, invalid JSON-LD, not exactly one <h1>, missing title/description/canonical,
           missing llms.txt / sitemap.xml / robots.txt.
 Warnings: title over 60 characters, description outside 70-160 characters, images without an alt attribute.
 """
@@ -21,6 +21,14 @@ for f in ("llms.txt", "llms-full.txt", "sitemap.xml", "robots.txt"):
 for page in sorted(DOCS.rglob("*.html")):
     rel = page.relative_to(DOCS)
     s = page.read_text()
+    refresh = re.search(r'http-equiv="refresh" content="0; url=([^"]+)"', s)
+    if refresh:  # redirect stub: only check that it points at a page that exists
+        target = refresh.group(1)
+        if target.startswith("http"):
+            local = DOCS / re.sub(r"^https?://[^/]+/[^/]+/?", "", target)
+            if not (local / "index.html" if target.endswith("/") else local).exists():
+                errors.append(f"{rel}: redirects to missing page {target}")
+        continue
     h1 = len(re.findall(r"<h1[\s>]", s))
     if h1 != 1:
         errors.append(f"{rel}: {h1} <h1> elements (want exactly 1)")
