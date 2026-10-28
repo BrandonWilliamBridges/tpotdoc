@@ -1,2 +1,7 @@
 source-material/
 .DS_Store
+
+# Wrangler local state
+admin/.wrangler/
+admin/node_modules/
+.dev.vars

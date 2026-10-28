@@ -1,0 +1,17 @@
+# Private analytics dashboard for Yv'e at https://admin.tpotdoc.com
+# A Cloudflare Worker (free plan). Cloudflare Access sits in front of it, so only approved emails can sign in.
+name = "tpotdoc-admin"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = false
+routes = [{ pattern = "admin.tpotdoc.com", custom_domain = true }]
+
+[vars]
+# Filled in during setup (see admin/README.md).
+ACCOUNT_ID = ""
+SITE_TAG = ""                 # Web Analytics site tag for tpotdoc.com (not the public beacon token)
+ACCESS_TEAM_DOMAIN = ""       # e.g. "tpotdoc.cloudflareaccess.com"
+ACCESS_AUD = ""               # Application Audience (AUD) tag of the Access app for admin.tpotdoc.com
+
+# Secret (never in this file): CF_API_TOKEN, a read-only token with "Account Analytics: Read".
+#   npx wrangler secret put CF_API_TOKEN

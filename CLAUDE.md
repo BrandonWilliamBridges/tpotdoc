@@ -13,6 +13,7 @@ Live at https://tpotdoc.com (GitHub Pages, served from `main` → `docs/`; DNS o
 - `printables/measure-of-faith/` holds the card source (`cards.js`, `cards.css`). `render.sh` regenerates the PDF and card PNGs.
 - `source-material/` holds Yv'e's original photos and journal pages. It is git-ignored and must never be published.
 - `scripts/check_site.py` checks the build for SEO and AI-search problems.
+- `admin/` is a separate Cloudflare Worker for the private analytics dashboard at admin.tpotdoc.com, protected by Cloudflare Access. It is deployed with Wrangler, not GitHub Pages. See `admin/README.md`.
 
 ## Standing rules
 - **Always optimize for search (SEO) and AI answers (GEO/AEO).** This is part of every change, not a separate task. Use the `ship-site` skill.
