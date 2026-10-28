@@ -1,7 +1,7 @@
 // Contact form: sends to Yv'e's inbox through FormSubmit (formsubmit.co). The address is assembled here
   // rather than written out in the page, so spam bots scanning the HTML don't pick it up.
-  // After FormSubmit's activation email is confirmed, swap INBOX for the random alias it provides.
-  var INBOX = ['markyve77', 'gmail.com'].join('@');
+  // info@tpotdoc.com forwards (Cloudflare Email Routing) to Yv'e and anyone she adds as a helper.
+  var INBOX = ['info', 'tpotdoc.com'].join('@');
   var askForm = document.getElementById('ask-form');
   if (askForm) askForm.addEventListener('submit', function (e) {
     e.preventDefault();
