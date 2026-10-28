@@ -37,4 +37,4 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://brandonwilliambridges.github.io/tpotdoc/sitemap.xml
+Sitemap: https://tpotdoc.com/sitemap.xml

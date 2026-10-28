@@ -25,7 +25,7 @@ for page in sorted(DOCS.rglob("*.html")):
     if refresh:  # redirect stub: only check that it points at a page that exists
         target = refresh.group(1)
         if target.startswith("http"):
-            local = DOCS / re.sub(r"^https?://[^/]+/[^/]+/?", "", target)
+            local = DOCS / re.sub(r"^https?://[^/]+/", "", target)
             if not (local / "index.html" if target.endswith("/") else local).exists():
                 errors.append(f"{rel}: redirects to missing page {target}")
         continue
