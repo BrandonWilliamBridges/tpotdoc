@@ -13,7 +13,8 @@
     var message = f.message.value.trim();
     err.hidden = true;
     if (!message) { err.textContent = 'Please write your message before sending.'; err.hidden = false; f.message.focus(); return; }
-    if (kind === 'Question' && !email) { err.textContent = 'Please add your email so Yv\'e can send you an answer.'; err.hidden = false; f.email.focus(); return; }
+    var wantsReply = f.contact.value === 'yes';
+    if (wantsReply && !email) { err.textContent = 'Please add your email so Yv\'e can reply, or choose “No reply needed.”'; err.hidden = false; f.email.focus(); return; }
     if (email && !f.email.checkValidity()) { err.textContent = 'That email address doesn\'t look complete. Please check it.'; err.hidden = false; f.email.focus(); return; }
     if (f._honey.value) return;
     var name = f.name.value.trim() || 'Someone';
@@ -24,11 +25,12 @@
       'Type': kind,
       'Name': name,
       'Email': email || '(not given)',
+      'Contact me': wantsReply ? 'Yes, please reply' : 'No reply needed',
       'Topic': f.topic.value,
       'Message': message,
       'Sent from': location.href
     };
-    if (email) payload._replyto = email;
+    if (email && wantsReply) payload._replyto = email;
     send.disabled = true; send.textContent = 'Sending…';
     fetch('https://formsubmit.co/ajax/' + INBOX, {
       method: 'POST',

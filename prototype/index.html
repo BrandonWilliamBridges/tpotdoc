@@ -53,8 +53,8 @@ p { margin: 0; }
 
 /* Banner + header */
 .proto-banner {
-  background: var(--accent); color: var(--accent-ink); font-size: .85rem; text-align: center;
-  padding: 6px 16px;
+  background: var(--stone); color: var(--ink); font-size: .85rem; text-align: center;
+  padding: 6px 16px; border-bottom: 1px solid var(--line);
 }
 header.site {
   position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
@@ -63,7 +63,7 @@ header.site {
 }
 header.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; flex-wrap: wrap; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
-.brand b { font-family: var(--font-display); font-size: 1.15rem; letter-spacing: .02em; }
+.brand b { font-family: var(--font-display); font-weight: 650; font-size: clamp(.98rem, 2.4vw, 1.15rem); letter-spacing: .01em; line-height: 1.2; }
 .brand span { font-size: .8rem; color: var(--muted); letter-spacing: .1em; }
 .brand img { width: 44px; height: 44px; flex: none; }
 nav.main { display: flex; gap: 18px; flex-wrap: wrap; font-size: .95rem; }
@@ -72,9 +72,11 @@ nav.main a:hover { color: var(--accent); }
 
 /* Welcome */
 .welcome { padding-block: 56px 48px; }
-.welcome .wrap { display: grid; grid-template-columns: 1.2fr .8fr; gap: 48px; align-items: center; }
-.welcome h1 { font-size: clamp(2.1rem, 5vw, 3.4rem); margin-top: 10px; }
-.welcome h1 em { font-style: italic; color: var(--accent); font-weight: 500; }
+.welcome .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
+.masthead { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+.stack { display: flex; flex-direction: column; font-size: clamp(2.2rem, 5.2vw, 3.6rem); line-height: 1.02; font-weight: 650; margin: 0; }
+.mast-logo { width: clamp(110px, 18vw, 180px); height: auto; flex: none; }
+.welcome-line { margin-top: 22px; font-family: var(--font-display); font-size: clamp(1.3rem, 2.6vw, 1.65rem); color: var(--accent); font-style: italic; }
 .welcome .lede { margin-top: 18px; max-width: 52ch; color: var(--muted); font-size: 1.12rem; }
 .welcome .cta-row { margin-top: 26px; display: flex; gap: 12px; flex-wrap: wrap; }
 .btn {
@@ -84,7 +86,7 @@ nav.main a:hover { color: var(--accent); }
 .btn.primary { background: var(--navy); color: var(--navy-ink); }
 .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
 .btn.ghost:hover { border-color: var(--ink); }
-.portrait { position: relative; max-width: 360px; justify-self: center; width: 100%; }
+.portrait { position: relative; max-width: 480px; justify-self: center; width: 100%; }
 .portrait img { display: block; width: 100%; aspect-ratio: 786/880; object-fit: cover; border-radius: 4px 120px 4px 4px; }
 .portrait figcaption { margin-top: 10px; font-size: .9rem; color: var(--muted); }
 
@@ -167,9 +169,11 @@ form.ask input, form.ask textarea, form.ask select {
 form.ask textarea { min-height: 130px; resize: vertical; }
 .radio-row { display: flex; gap: 18px; flex-wrap: wrap; font-weight: 400; }
 form.ask .radio-row label { display: flex; gap: 8px; align-items: center; font-weight: 400; }
-.radio-row input { width: auto; }
+form.ask .radio-row input[type="radio"] { width: auto; padding: 0; margin: 0; flex: none; accent-color: var(--navy); }
 .form-note { font-size: .82rem; color: var(--muted); }
 .thanks { background: var(--stone); border-radius: 4px; padding: 16px; }
+form.ask fieldset.contact-pref { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+form.ask fieldset.contact-pref legend { font-size: .92rem; font-weight: 600; margin-bottom: 4px; }
 .form-error { background: var(--stone); border-left: 3px solid #b3261e; padding: 10px 14px; font-size: .92rem; }
 form.ask label.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 form.ask { position: relative; }
@@ -241,7 +245,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
   .fruit-cards { grid-template-columns: 1fr; }
   .stones { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .steps { grid-template-columns: 1fr; }
-  .portrait { max-width: 300px; }
+  .portrait { max-width: 440px; }
 }
 @media (max-width: 480px) {
   .stones { grid-template-columns: 1fr; }
@@ -250,12 +254,13 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
 }
 </style>
 
-<div class="proto-banner">Prototype for review. Content is a draft for Yv'e to approve.</div>
+<div class="proto-banner">This site is still growing. Check back often for new lessons and prayers.</div>
 
 <header class="site">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="The Principles of the Doctrine of Christ, home"><img src="img/logo.png" alt="" width="44" height="44"><b>The Principles</b><span>TPOT DOC</span></a>
+    <a class="brand" href="#top" aria-label="The Principles of the Doctrine of Christ, home"><img src="img/logo.png" alt="" width="44" height="44"><b>The Principles Of The Doctrine Of Christ</b></a>
     <nav class="main" aria-label="Main">
+      <a href="#mission">Mission</a>
       <a href="#foundations">Foundations</a>
       <a href="#repentance">Repentance</a>
       <a href="#faith">Faith</a>
@@ -273,11 +278,15 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
   <section class="welcome">
     <div class="wrap">
       <div>
-        <p class="eyebrow">Welcome</p>
-        <h1>Welcome to the Family of God, and to <em>the principles of the doctrine of Christ.</em></h1>
+        <div class="masthead">
+          <h1 class="stack"><span>The</span> <span>Principles</span> <span>Of</span> <span>The</span> <span>Doctrine</span> <span>Of</span> <span>Christ</span></h1>
+          <img class="mast-logo" src="img/logo.png" alt="TPOT DOC logo: a teapot with a gold cross beneath an open Bible" width="180" height="180">
+        </div>
+        <p class="welcome-line">Welcome to the Family of God!</p>
         <p class="lede">If you are new to Christ, you are in the right place. Here we will explore the basics for your growth in Christ, one foundation stone at a time, straight from the Word of God.</p>
         <div class="cta-row">
-          <a class="btn primary" href="#repentance">Start with Repentance</a>
+          <a class="btn primary" href="#repentance">We start with repentance</a>
+          <a class="btn ghost" href="#mission">Our Mission</a>
           <a class="btn ghost" href="#ask">Ask a question or request prayer</a>
         </div>
       </div>
@@ -285,6 +294,21 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         <img src="img/dianna.jpg" alt="Dianna “Yv'e” Bridges smiling">
         <figcaption>Yv'e Bridges</figcaption>
       </figure>
+    </div>
+  </section>
+
+  <section class="block lesson" id="mission">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Our Mission</p>
+        <h2>TPOTDOC… What?</h2>
+        <p class="big-def">TPOTDOC stands for The Principles Of The Doctrine Of Christ: the six foundation stones every new believer builds on, named in Hebrews 6:1–2.</p>
+      </div>
+      <div class="about-body">
+        <p>Thank you for visiting this website! What a funny name, right? Well, I just wanted to let you know why the site is called TPOTDOC.</p>
+        <p>It’s based on a verse in the Bible, found in Hebrews 6:1–2. In that verse, the writer is talking about moving beyond these principles, which are also referred to as foundational. As I kept praying about building this reference site for new believers who are just coming to Christ, the Holy Spirit showed me these items in a new light, and that these are the best starting foundations for our faith in Christ.</p>
+        <p class="form-note">— Yv'e Bridges</p>
+      </div>
     </div>
   </section>
 
@@ -565,6 +589,11 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         <label for="ask-email">Email, so we can reply
           <input id="ask-email" name="email" type="email" autocomplete="email" placeholder="sarah@example.com">
         </label>
+        <fieldset class="radio-row contact-pref">
+          <legend>Would you like us to contact you?</legend>
+          <label><input type="radio" name="contact" id="contact-yes" value="yes" checked> Yes, please reply to me</label>
+          <label><input type="radio" name="contact" id="contact-no" value="no"> No reply needed, just pray</label>
+        </fieldset>
         <label class="hp" aria-hidden="true">Leave this empty
           <input id="ask-hp" name="_honey" tabindex="-1" autocomplete="off">
         </label>
@@ -880,7 +909,8 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
     var message = f.message.value.trim();
     err.hidden = true;
     if (!message) { err.textContent = 'Please write your message before sending.'; err.hidden = false; f.message.focus(); return; }
-    if (kind === 'Question' && !email) { err.textContent = 'Please add your email so Yv\'e can send you an answer.'; err.hidden = false; f.email.focus(); return; }
+    var wantsReply = f.contact.value === 'yes';
+    if (wantsReply && !email) { err.textContent = 'Please add your email so Yv\'e can reply, or choose “No reply needed.”'; err.hidden = false; f.email.focus(); return; }
     if (email && !f.email.checkValidity()) { err.textContent = 'That email address doesn\'t look complete. Please check it.'; err.hidden = false; f.email.focus(); return; }
     if (f._honey.value) return;
     var name = f.name.value.trim() || 'Someone';
@@ -891,11 +921,12 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
       'Type': kind,
       'Name': name,
       'Email': email || '(not given)',
+      'Contact me': wantsReply ? 'Yes, please reply' : 'No reply needed',
       'Topic': f.topic.value,
       'Message': message,
       'Sent from': location.href
     };
-    if (email) payload._replyto = email;
+    if (email && wantsReply) payload._replyto = email;
     send.disabled = true; send.textContent = 'Sending…';
     fetch('https://formsubmit.co/ajax/' + INBOX, {
       method: 'POST',

@@ -42,10 +42,16 @@ AUTHOR = {
 # Pages: slug -> which source sections it holds, plus its search metadata.
 PAGES = [
     {
-        "slug": "", "sections": ["welcome", "verse-band", "foundations", "next", "merch"],
+        "slug": "", "sections": ["welcome", "foundations", "next", "merch"],
         "title": f"{SITE_NAME} | For New Believers",
         "description": "Welcome to the family of God. Simple Bible lessons for new Christians on the six foundations of Hebrews 6:1-2, starting with repentance and faith.",
         "type": "home",
+    },
+    {
+        "slug": "mission", "sections": ["mission", "verse-band"],
+        "title": "Our Mission: What Does TPOTDOC Mean?",
+        "description": "TPOTDOC stands for The Principles Of The Doctrine Of Christ, the six foundations of faith in Hebrews 6:1-2, explained for new believers.",
+        "type": "mission", "nav": "Mission",
     },
     {
         "slug": "repentance", "sections": ["repentance"],
@@ -117,7 +123,7 @@ ANCHORS = {
     "fruit-of-repentance": "repentance/#fruit-of-repentance",
     "faith": "faith/", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/",
     "printables": "cards/", "churches": "churches/", "prayers": "prayers/", "about": "about/",
-    "privacy": "privacy/", "prayer-for-a-test": "prayers/#prayer-for-a-test", "prayer-when-tested": "prayers/#prayer-when-tested",
+    "privacy": "privacy/", "mission": "mission/", "prayer-for-a-test": "prayers/#prayer-for-a-test", "prayer-when-tested": "prayers/#prayer-when-tested",
 }
 
 
@@ -311,6 +317,9 @@ def page_ld(page, sections):
             "@context": "https://schema.org", "@type": "ProfilePage", "url": url,
             "mainEntity": {**AUTHOR, "image": f"{SITE_URL}/img/dianna.jpg"},
         })
+    elif page["type"] == "mission":
+        out.insert(0, {"@context": "https://schema.org", "@type": "AboutPage", "name": page["title"], "description": page["description"],
+                       "url": url, "author": AUTHOR, "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": page_url("")}})
     elif page["type"] == "privacy":
         out.insert(0, {"@context": "https://schema.org", "@type": "WebPage", "name": "Privacy", "url": url, "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": page_url("")}})
     elif page["type"] == "cards":
