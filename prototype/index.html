@@ -85,7 +85,7 @@ nav.main a:hover { color: var(--accent); }
 .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
 .btn.ghost:hover { border-color: var(--ink); }
 .portrait { position: relative; max-width: 360px; justify-self: center; width: 100%; }
-.portrait img { display: block; width: 100%; aspect-ratio: 863/928; object-fit: cover; border-radius: 4px 120px 4px 4px; }
+.portrait img { display: block; width: 100%; aspect-ratio: 786/880; object-fit: cover; border-radius: 4px 120px 4px 4px; }
 .portrait figcaption { margin-top: 10px; font-size: .9rem; color: var(--muted); }
 
 /* Scripture band */
@@ -170,6 +170,9 @@ form.ask .radio-row label { display: flex; gap: 8px; align-items: center; font-w
 .radio-row input { width: auto; }
 .form-note { font-size: .82rem; color: var(--muted); }
 .thanks { background: var(--stone); border-radius: 4px; padding: 16px; }
+.form-error { background: var(--stone); border-left: 3px solid #b3261e; padding: 10px 14px; font-size: .92rem; }
+form.ask label.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+form.ask { position: relative; }
 
 /* Next steps */
 .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
@@ -261,8 +264,8 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         </div>
       </div>
       <figure class="portrait">
-        <img src="img/dianna-mark.jpg" alt="Dianna (Yv'e) and Mark Bridges smiling together">
-        <figcaption>Yv'e &amp; Mark Bridges</figcaption>
+        <img src="img/dianna.jpg" alt="Dianna “Yv'e” Bridges smiling">
+        <figcaption>Yv'e Bridges</figcaption>
       </figure>
     </div>
   </section>
@@ -544,6 +547,9 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         <label for="ask-email">Email, so we can reply
           <input id="ask-email" name="email" type="email" autocomplete="email" placeholder="sarah@example.com">
         </label>
+        <label class="hp" aria-hidden="true">Leave this empty
+          <input id="ask-hp" name="_honey" tabindex="-1" autocomplete="off">
+        </label>
         <label for="ask-topic">Topic
           <select id="ask-topic" name="topic">
             <option>Repentance</option><option>Faith toward God</option><option>Baptisms</option>
@@ -552,11 +558,12 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
           </select>
         </label>
         <label for="ask-msg">Your message
-          <textarea id="ask-msg" name="message" placeholder="I asked Jesus into my life last week. How do I know I really repented?"></textarea>
+          <textarea id="ask-msg" name="message" required placeholder="I asked Jesus into my life last week. How do I know I really repented?"></textarea>
         </label>
-        <button class="btn primary" type="submit">Send message</button>
-        <p class="form-note">Prototype: this form does not send yet. On the live site it will go to Yv'e’s inbox.</p>
-        <div class="thanks" id="ask-thanks" hidden>Preview only: on the live site this would send your message to Yv'e, and you would see a thank-you here.</div>
+        <p class="form-error" id="ask-error" role="alert" hidden></p>
+        <button class="btn primary" type="submit" id="ask-send">Send message</button>
+        <p class="form-note">Your message goes privately to Yv'e’s inbox (delivered by FormSubmit). We never share your email.</p>
+        <div class="thanks" id="ask-thanks" role="status" hidden><strong>Thank you! Your message is on its way to Yv'e.</strong> She reads every one personally. If you asked a question, watch your inbox for her reply.</div>
       </form>
     </div>
   </section>
@@ -685,10 +692,53 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
 </footer>
 
 <script>
+  // Contact form: sends to Yv'e's inbox through FormSubmit (formsubmit.co). The address is assembled here
+  // rather than written out in the page, so spam bots scanning the HTML don't pick it up.
+  // After FormSubmit's activation email is confirmed, swap INBOX for the random alias it provides.
+  var INBOX = ['markyve77', 'gmail.com'].join('@');
   var askForm = document.getElementById('ask-form');
   if (askForm) askForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    document.getElementById('ask-thanks').hidden = false;
+    var f = askForm.elements;
+    var err = document.getElementById('ask-error');
+    var send = document.getElementById('ask-send');
+    var kind = f.kind.value === 'prayer' ? 'Prayer request' : 'Question';
+    var email = f.email.value.trim();
+    var message = f.message.value.trim();
+    err.hidden = true;
+    if (!message) { err.textContent = 'Please write your message before sending.'; err.hidden = false; f.message.focus(); return; }
+    if (kind === 'Question' && !email) { err.textContent = 'Please add your email so Yv\'e can send you an answer.'; err.hidden = false; f.email.focus(); return; }
+    if (email && !f.email.checkValidity()) { err.textContent = 'That email address doesn\'t look complete. Please check it.'; err.hidden = false; f.email.focus(); return; }
+    if (f._honey.value) return;
+    var name = f.name.value.trim() || 'Someone';
+    var payload = {
+      _subject: 'TPOT DOC ' + kind.toLowerCase() + ' from ' + name + ' (' + f.topic.value + ')',
+      _template: 'table',
+      _captcha: 'false',
+      'Type': kind,
+      'Name': name,
+      'Email': email || '(not given)',
+      'Topic': f.topic.value,
+      'Message': message,
+      'Sent from': location.href
+    };
+    if (email) payload._replyto = email;
+    send.disabled = true; send.textContent = 'Sending…';
+    fetch('https://formsubmit.co/ajax/' + INBOX, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function (r) { return r.json().then(function (d) { if (!r.ok || String(d.success) !== 'true') throw new Error(d.message || 'failed'); }); })
+      .then(function () {
+        askForm.querySelectorAll('input:not([type=radio]), textarea').forEach(function (el) { el.value = ''; });
+        document.getElementById('ask-thanks').hidden = false;
+        send.textContent = 'Sent';
+      })
+      .catch(function () {
+        err.textContent = 'Your message didn\'t go through. Please check your connection and try again in a minute.';
+        err.hidden = false;
+        send.disabled = false; send.textContent = 'Send message';
+      });
   });
 
   var faqSearch = document.getElementById('faq-q');

@@ -6,8 +6,8 @@ Live preview (GitHub Pages, served from `main` → `docs/`): https://brandonwill
 ## Layout
 - `prototype/index.html` is the single source of truth for all page content. It is in artifact format (no `<html>`/`<head>`) and is also published as a private Claude artifact.
 - `build.py` (run through `./build.sh`) generates `docs/` from it:
-  - Version A: one long page at `docs/index.html`.
-  - Version B: one page per lesson at `docs/v2/<slug>/`.
+  - One page per lesson: the home page at `docs/index.html`, and each lesson at `docs/<slug>/`. Yv'e chose this layout over one long page, and it's better for search.
+  - Redirects from the old `/v2/` comparison URLs, plus a home-page script that forwards old one-page links like `/#ask`.
   - `sitemap.xml`, `robots.txt`, `llms.txt` and `llms-full.txt`.
   - Every page gets a title, meta description, canonical URL, Open Graph tags and JSON-LD.
 - `printables/measure-of-faith/` holds the card source (`cards.js`, `cards.css`). `render.sh` regenerates the PDF and card PNGs.

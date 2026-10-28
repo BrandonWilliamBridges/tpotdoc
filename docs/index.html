@@ -24,7 +24,7 @@
 <link rel="icon" type="image/png" href="https://brandonwilliambridges.github.io/tpotdoc/img/favicon.png">
 <link rel="apple-touch-icon" href="https://brandonwilliambridges.github.io/tpotdoc/img/logo.png">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "The Principles of the Doctrine of Christ", "alternateName": "TPOTDOC", "url": "https://brandonwilliambridges.github.io/tpotdoc/", "inLanguage": "en", "description": "Welcome to the family of God. Simple Bible lessons for new Christians on the six foundations of Hebrews 6:1-2, starting with repentance and faith.", "author": {"@type": "Person", "name": "Dianna Bridges", "alternateName": "Yv'e Bridges", "description": "Bible teacher writing foundational lessons for new believers, based on Hebrews 6:1-2."}, "publisher": {"@type": "Person", "name": "Dianna Bridges", "alternateName": "Yv'e Bridges", "description": "Bible teacher writing foundational lessons for new believers, based on Hebrews 6:1-2."}, "about": [{"@type": "Thing", "name": "Repentance"}, {"@type": "Thing", "name": "Faith"}, {"@type": "Thing", "name": "Baptism"}, {"@type": "Thing", "name": "Laying on of hands"}, {"@type": "Thing", "name": "Resurrection of the dead"}, {"@type": "Thing", "name": "Eternal judgment"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I know I really repented?", "acceptedAnswer": {"@type": "Answer", "text": "If you are asking this question, God is already at work in your heart. Here is what the Word shows us: Look at what happened inside. Did you see your sin differently, feel godly sorrow, and turn toward God? Those are the three things that happen when we repent. Look for fruit over time. Real repentance shows in how we live, as the Holy Spirit grows His fruit in us. See fruit that fits repentance (Matthew 3:8; Galatians 5:22–23). Rest on God’s promise, not your feelings. “If we confess our sins, he is faithful and just to forgive us our sins” (1 John 1:9). God wrote His Word “that ye may know that ye have eternal life” (1 John 5:13)."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://brandonwilliambridges.github.io/tpotdoc/"}]}</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -112,7 +112,7 @@ nav.main a:hover { color: var(--accent); }
 .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
 .btn.ghost:hover { border-color: var(--ink); }
 .portrait { position: relative; max-width: 360px; justify-self: center; width: 100%; }
-.portrait img { display: block; width: 100%; aspect-ratio: 863/928; object-fit: cover; border-radius: 4px 120px 4px 4px; }
+.portrait img { display: block; width: 100%; aspect-ratio: 786/880; object-fit: cover; border-radius: 4px 120px 4px 4px; }
 .portrait figcaption { margin-top: 10px; font-size: .9rem; color: var(--muted); }
 
 /* Scripture band */
@@ -197,6 +197,9 @@ form.ask .radio-row label { display: flex; gap: 8px; align-items: center; font-w
 .radio-row input { width: auto; }
 .form-note { font-size: .82rem; color: var(--muted); }
 .thanks { background: var(--stone); border-radius: 4px; padding: 16px; }
+.form-error { background: var(--stone); border-left: 3px solid #b3261e; padding: 10px 14px; font-size: .92rem; }
+form.ask label.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+form.ask { position: relative; }
 
 /* Next steps */
 .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
@@ -259,41 +262,25 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
 </style>
 
 <style>
-  .compare { background: var(--navy); color: var(--navy-ink); padding-block: 14px; border-bottom: 4px solid var(--accent); }
-  .compare .wrap { display: grid; gap: 10px; }
-  .compare p { margin: 0; font-size: 1.05rem; line-height: 1.5; }
-  .compare strong.big { display: block; font-family: var(--font-display); font-size: clamp(1.25rem, 3vw, 1.6rem); font-weight: 650; }
-  .compare .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-  .compare .tabs a { color: var(--navy-ink); text-decoration: none; font-weight: 600; padding: 8px 14px; border-radius: 6px; border: 2px solid rgba(255,255,255,.45); }
-  .compare .tabs a[aria-current="page"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
   .pager { border-top: 1px solid var(--line); padding-block: 24px; }
   .pager .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .pager a { font-weight: 600; text-decoration: none; }
 </style>
+<script>(function(){var m={"repentance": "repentance/", "three-things": "repentance/#three-things", "fruit-of-repentance": "repentance/#fruit-of-repentance", "faith": "faith/", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/", "printables": "cards/", "churches": "churches/"};var h=location.hash.slice(1);if(m[h])location.replace(m[h]);})();</script>
 </head>
 <body>
-<div class="compare">
-  <div class="wrap">
-    <p><strong class="big">Yv'e, please compare these two layouts!</strong>
-    Same words, two ways to arrange them. <b>Version A</b> keeps everything on one long page. <b>Version B</b> gives each lesson its own page, which helps Google and AI assistants send people straight to the right lesson. Tap back and forth, then tell Brandon which one you like.</p>
-    <div class="tabs" role="navigation" aria-label="Choose a layout">
-      <a href="" aria-current="page">A · One long page</a>
-      <a href="v2/">B · Separate pages</a>
-    </div>
-  </div>
-</div>
 <div class="proto-banner">Prototype for review. Content is a draft for Yv'e to approve.</div>
 <header class="site">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="The Principles of the Doctrine of Christ, home"><img src="img/logo.png" alt="" width="44" height="44"><b>The Principles</b><span>TPOT DOC</span></a>
+    <a class="brand" href="" aria-label="The Principles of the Doctrine of Christ, home"><img src="img/logo.png" alt="" width="44" height="44"><b>The Principles</b><span>TPOT DOC</span></a>
     <nav class="main" aria-label="Main">
       <a href="#foundations">Foundations</a>
-      <a href="#repentance">Repentance</a>
-      <a href="#faith">Faith</a>
-      <a href="#faq">Questions</a>
-      <a href="#ask">Ask &amp; Pray</a>
-      <a href="#churches">Churches</a>
-      <a href="#printables">Cards</a>
+      <a href="repentance/">Repentance</a>
+      <a href="faith/">Faith</a>
+      <a href="questions/">Questions</a>
+      <a href="ask/">Ask &amp; Pray</a>
+      <a href="churches/">Churches</a>
+      <a href="cards/">Cards</a>
     </nav>
   </div>
 </header>
@@ -305,18 +292,17 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         <h1>Welcome to the Family of God, and to <em>the principles of the doctrine of Christ.</em></h1>
         <p class="lede">If you are new to Christ, you are in the right place. Here we will explore the basics for your growth in Christ, one foundation stone at a time, straight from the Word of God.</p>
         <div class="cta-row">
-          <a class="btn primary" href="#repentance">Start with Repentance</a>
-          <a class="btn ghost" href="#ask">Ask a question or request prayer</a>
+          <a class="btn primary" href="repentance/">Start with Repentance</a>
+          <a class="btn ghost" href="ask/">Ask a question or request prayer</a>
         </div>
       </div>
       <figure class="portrait">
-        <img src="img/dianna-mark.jpg" alt="Dianna (Yv'e) and Mark Bridges smiling together">
-        <figcaption>Yv'e &amp; Mark Bridges</figcaption>
+        <img src="img/dianna.jpg" alt="Dianna “Yv'e” Bridges smiling">
+        <figcaption>Yv'e Bridges</figcaption>
       </figure>
     </div>
   </section>
-
-  <div class="verse-band">
+<div class="verse-band">
     <div class="wrap">
       <blockquote>
         “Therefore leaving <mark>the principles of the doctrine of Christ</mark>, let us go on unto perfection; not laying again the foundation of repentance from dead works, and of faith toward God, of the doctrine of baptisms, and of laying on of hands, and of resurrection of the dead, and of eternal judgment.”
@@ -324,8 +310,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
       </blockquote>
     </div>
   </div>
-
-  <section class="block" id="foundations">
+<section class="block" id="foundations">
     <div class="wrap">
       <div class="section-head">
         <p class="eyebrow">The Foundation</p>
@@ -333,13 +318,13 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         <p>Hebrews 6 names six basics every believer stands on. We will build them out in the same order the Scripture gives them.</p>
       </div>
       <div class="stones">
-        <a class="stone open" href="#repentance">
+        <a class="stone open" href="repentance/">
           <span class="num">1</span>
           <h3>Repentance</h3>
           <span class="phrase">“repentance from dead works”</span>
           <span class="status">Read the first lesson →</span>
         </a>
-        <a class="stone open" href="#faith">
+        <a class="stone open" href="faith/">
           <span class="num">2</span>
           <h3>Faith</h3>
           <span class="phrase">“faith toward God”</span>
@@ -374,243 +359,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
       <p class="next-site">Once the foundation is laid: <em>Going on unto perfection</em>, a companion site about growing into completeness in Christ.</p>
     </div>
   </section>
-
-  <section class="block lesson" id="repentance">
-    <div class="wrap lesson-grid">
-      <article class="lesson-body">
-        <p class="eyebrow">Foundation Stone 1 · Word Study</p>
-        <h2 style="font-size: clamp(1.8rem, 3.6vw, 2.5rem);">What is repentance?</h2>
-        <p class="big-def">Repentance means changing your mind about sin and about God, and letting that change turn your whole life around.</p>
-        <p>The New Testament was first written in Greek. The word translated “repentance” is <strong>metanoia</strong>. It is built from two smaller words: <em>meta</em>, which carries the idea of “after” or “change,” and <em>noeō</em>, which means “to think” or “to understand.” Put together, it means <strong>to think differently afterward</strong>: to reconsider.</p>
-
-        <h3 id="three-things">Three things happen when we repent</h3>
-        <ul>
-          <li><strong>We see it differently.</strong> God opens our eyes, and we agree with Him that sin is wrong.</li>
-          <li><strong>We feel it.</strong> The old word for this is <em>compunction</em>: a real, godly sorrow over sin. It is not shame that crushes us. It is sorrow that leads us to God.</li>
-          <li><strong>We turn around.</strong> Repentance is a reversal of direction. We stop walking away from God and start walking with Him.</li>
-        </ul>
-
-        <figure class="scripture">
-          <p>“For godly sorrow worketh repentance to salvation not to be repented of: but the sorrow of the world worketh death.”</p>
-          <cite>2 Corinthians 7:10</cite>
-        </figure>
-
-        <h3 id="fruit-of-repentance">Fruit that fits repentance</h3>
-        <p>John the Baptist preached to the Pharisees and Sadducees. These were religious people who trusted their birthright, their family line, and their traditions to save them. John told them that real repentance shows up in how we live.</p>
-        <figure class="scripture">
-          <p>“Bring forth therefore fruits meet for repentance.”</p>
-          <cite>Matthew 3:8 · “meet” means fitting</cite>
-        </figure>
-        <p>That fruit is not something we produce by trying harder. It is what the Holy Spirit grows in us:</p>
-        <figure class="scripture">
-          <p>“But the fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith, meekness, temperance: against such there is no law.”</p>
-          <cite>Galatians 5:22–23</cite>
-        </figure>
-        <p class="check-note"><strong>Recommended reading:</strong> Matthew 3:1–10, and Galatians 5:4–26, where the apostle Paul writes to people trying to be made right with God by keeping the law.</p>
-
-        <h3>What are “dead works”?</h3>
-        <p>Hebrews calls this “repentance from dead works.” Dead works are anything that cannot give life: the sins we used to live in, and also our own efforts to earn God’s approval. We turn away from both. Our new life comes from Jesus, not from trying harder.</p>
-        <figure class="scripture">
-          <p>“How much more shall the blood of Christ … purge your conscience from dead works to serve the living God?”</p>
-          <cite>Hebrews 9:14</cite>
-        </figure>
-
-        <h3>The good news</h3>
-        <p>Repentance is not a punishment. It is a doorway. When we turn to God, He forgives and He refreshes.</p>
-        <figure class="scripture">
-          <p>“Repent ye therefore, and be converted, that your sins may be blotted out, when the times of refreshing shall come from the presence of the Lord.”</p>
-          <cite>Acts 3:19</cite>
-        </figure>
-        <figure class="scripture">
-          <p>“If we confess our sins, he is faithful and just to forgive us our sins, and to cleanse us from all unrighteousness.”</p>
-          <cite>1 John 1:9</cite>
-        </figure>
-        <p>Have a question about repentance? <a href="#ask">Send it in</a> and we will answer from the Word.</p>
-      </article>
-
-      <aside class="wordcard" aria-label="Greek word study">
-        <p class="eyebrow">The Greek word</p>
-        <p class="greek" lang="el">μετάνοια</p>
-        <p class="say">metanoia · say it <strong>met-AN-oy-ah</strong></p>
-        <dl>
-          <div><dt>Strong’s number</dt><dd>G3341 (noun, “repentance”)</dd></div>
-          <div><dt>Comes from</dt><dd>G3340 <span lang="el">μετανοέω</span>, metanoeō, “to repent” (met-an-o-EH-o)</dd></div>
-          <div><dt>Built from</dt>
-            <dd class="roots"><span class="part">G3326 meta · after, change</span> + <span class="part">G3539 noeō · to think</span></dd></div>
-          <div><dt>Plain meaning</dt><dd>To think differently afterward; to reconsider, feel real sorrow for sin, and reverse direction.</dd></div>
-        </dl>
-        <p class="journal-note">From Yv'e’s study journal, Wednesday, September 23, 2026, 5:33 a.m.</p>
-      </aside>
-    </div>
-  </section>
-
-  <section class="block" id="faith">
-    <div class="wrap lesson-grid">
-      <article class="lesson-body">
-        <p class="eyebrow">Foundation Stone 2 · Word Study</p>
-        <h2 style="font-size: clamp(1.8rem, 3.6vw, 2.5rem);">What is faith toward God?</h2>
-        <p class="big-def">Faith means being persuaded that God is true, and leaning your whole weight on Jesus to save you.</p>
-        <p>The Greek word for faith is <strong>pistis</strong>. It comes from a verb that means “to persuade.” So faith begins when God convinces your heart that He is telling the truth.</p>
-
-        <h3>Four sides of faith</h3>
-        <ul>
-          <li><strong>Conviction.</strong> You are persuaded that God and His Word are true.</li>
-          <li><strong>Reliance.</strong> You trust Christ, and Christ alone, for your salvation.</li>
-          <li><strong>Constancy.</strong> You keep holding on, day after day.</li>
-          <li><strong>The faith.</strong> The word can also mean the gospel itself: the truth we believe.</li>
-        </ul>
-
-        <h3>What did Jesus say about faith?</h3>
-        <p>A Roman officer asked Jesus to heal his servant, and said Jesus only needed to speak the word. Jesus was amazed.</p>
-        <figure class="scripture">
-          <p>“When Jesus heard it, he marvelled, and said to them that followed, Verily I say unto you, I have not found so great faith, no, not in Israel.”</p>
-          <cite>Matthew 8:10 · read Matthew 8:1–13</cite>
-        </figure>
-        <p>A woman who had been sick for twelve years believed that if she could only touch His garment, she would be healed.</p>
-        <figure class="scripture">
-          <p>“But Jesus turned him about, and when he saw her, he said, Daughter, be of good comfort; thy faith hath made thee whole. And the woman was made whole from that hour.”</p>
-          <cite>Matthew 9:22 · read Matthew 9:20–22</cite>
-        </figure>
-        <p>God has given every believer “the measure of faith” (Romans 12:3). Our <a href="#printables">Measure of Faith cards</a> help that faith grow, one verse and one prayer at a time.</p>
-      </article>
-
-      <aside class="wordcard" aria-label="Greek word study: faith">
-        <p class="eyebrow">The Greek word</p>
-        <p class="greek" lang="el">πίστις</p>
-        <p class="say">pistis · say it <strong>PIS-tis</strong></p>
-        <dl>
-          <div><dt>Strong’s number</dt><dd>G4102 (noun, “faith”)</dd></div>
-          <div><dt>Comes from</dt><dd>G3982, “to persuade”</dd></div>
-          <div><dt>Plain meaning</dt><dd>Persuasion; a firm conviction that God is true; especially reliance on Christ for salvation.</dd></div>
-          <div><dt>Also translated</dt><dd>assurance, belief, believe, faith, fidelity</dd></div>
-        </dl>
-        <p class="journal-note">From Yv'e’s study journal, Wednesday, October 14, 2026, 5:52 a.m.</p>
-      </aside>
-    </div>
-  </section>
-
-  <section class="block lesson" id="fruitful">
-    <div class="wrap fruit-wrap">
-      <div class="fruit-intro">
-        <p class="eyebrow">Word Study · Growing in Christ</p>
-        <h2 style="font-size: clamp(1.8rem, 3.6vw, 2.5rem);">Neither barren nor unfruitful</h2>
-        <p class="big-def">God did not save you to sit still. He planted a new life in you, and it is meant to grow and bear fruit.</p>
-        <p>Peter gives new believers a simple plan for growth. Start with faith, and keep adding to it:</p>
-        <ol class="ladder" aria-label="2 Peter 1:5-7, the qualities we add to our faith, in order">
-          <li><span>Faith</span></li>
-          <li><span>Virtue</span></li>
-          <li><span>Knowledge</span></li>
-          <li><span>Temperance</span></li>
-          <li><span>Patience</span></li>
-          <li><span>Godliness</span></li>
-          <li><span>Brotherly kindness</span></li>
-          <li><span>Charity (love)</span></li>
-        </ol>
-        <figure class="scripture">
-          <p>“For if these things be in you, and abound, they make you that ye shall neither be barren nor unfruitful in the knowledge of our Lord Jesus Christ.”</p>
-          <cite>2 Peter 1:8</cite>
-        </figure>
-        <p>Two Greek words in that verse show what God is keeping us from. Both begin with the little letter <em>a-</em>, which means “without,” the same way “a-” works in the English word <em>atypical</em>.</p>
-      </div>
-
-      <div class="fruit-cards">
-        <aside class="wordcard" aria-label="Greek word study: barren">
-          <p class="eyebrow">“Barren”</p>
-          <p class="greek" lang="el">ἀργός</p>
-          <p class="say">argos · say it <strong>ar-GOS</strong></p>
-          <dl>
-            <div><dt>Strong’s number</dt><dd>G692</dd></div>
-            <div><dt>Built from</dt>
-              <dd class="roots"><span class="part">a- · without</span> + <span class="part">ergon · work</span></dd></div>
-            <div><dt>Plain meaning</dt><dd>Without work: inactive, unemployed. By implication, lazy or useless. Translated <em>barren, idle, slow</em>.</dd></div>
-          </dl>
-        </aside>
-        <aside class="wordcard" aria-label="Greek word study: unfruitful">
-          <p class="eyebrow">“Unfruitful”</p>
-          <p class="greek" lang="el">ἄκαρπος</p>
-          <p class="say">akarpos · say it <strong>AK-ar-pos</strong></p>
-          <dl>
-            <div><dt>Strong’s number</dt><dd>G175</dd></div>
-            <div><dt>Built from</dt>
-              <dd class="roots"><span class="part">a- · without</span> + <span class="part">karpos · fruit</span></dd></div>
-            <div><dt>Plain meaning</dt><dd>Without fruit. Barren, whether a field that grows nothing or a life that shows nothing of God.</dd></div>
-          </dl>
-        </aside>
-      </div>
-
-      <div class="fruit-intro">
-        <h3 style="font-size: 1.35rem;">What this means for you</h3>
-        <p>Remember the first foundation stone: we repent from <em>dead works</em>, things we did to earn God’s favor. Now Peter shows the other side. Once we belong to Jesus, our faith is not meant to sit <em>without work</em> or <em>without fruit</em>. As we add these qualities day by day, God makes our lives busy with His purposes and full of His fruit.</p>
-        <p class="journal-note">From Yv'e’s study journal, October 13, 2026.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="block" id="faq">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">Questions &amp; Answers</p>
-        <h2>Has someone asked this already?</h2>
-        <p>Search the questions other new believers have asked. If you don’t find yours, <a href="#ask">send it in</a>.</p>
-      </div>
-      <label class="faq-search" for="faq-q"><span>Search questions</span>
-        <input id="faq-q" type="search" placeholder="Try “repent” or “saved”" autocomplete="off">
-      </label>
-      <div class="faq-list" id="faq-list">
-        <details class="faq-item" open>
-          <summary>How do I know I really repented?</summary>
-          <div class="faq-answer">
-            <p>If you are asking this question, God is already at work in your heart. Here is what the Word shows us:</p>
-            <ul>
-              <li><strong>Look at what happened inside.</strong> Did you see your sin differently, feel godly sorrow, and turn toward God? Those are the <a href="#three-things">three things that happen when we repent</a>.</li>
-              <li><strong>Look for fruit over time.</strong> Real repentance shows in how we live, as the Holy Spirit grows His fruit in us. See <a href="#fruit-of-repentance">fruit that fits repentance</a> (Matthew 3:8; Galatians 5:22–23).</li>
-              <li><strong>Rest on God’s promise, not your feelings.</strong> “If we confess our sins, he is faithful and just to forgive us our sins” (1 John 1:9). God wrote His Word “that ye may know that ye have eternal life” (1 John 5:13).</li>
-            </ul>
-          </div>
-        </details>
-      </div>
-      <p class="faq-empty" id="faq-empty" hidden>No questions match that yet. <a href="#ask">Ask it here</a> and we will answer from the Word.</p>
-    </div>
-  </section>
-
-  <section class="block lesson" id="ask">
-    <div class="wrap ask-grid">
-      <div class="ask-intro">
-        <img src="img/dianna.jpg" alt="Dianna “Yv'e” Bridges">
-        <p class="eyebrow">Ask &amp; Pray</p>
-        <h2 style="font-size: clamp(1.7rem, 3.5vw, 2.3rem);">Send a question or a prayer request</h2>
-        <p>Every message is read personally. You will receive an answer based on God’s Word, or a prayer prayed over you from the Scriptures.</p>
-        <p class="form-note">— Yv'e Bridges</p>
-      </div>
-      <form class="ask" id="ask-form" novalidate>
-        <div class="radio-row" role="radiogroup" aria-label="Type of message">
-          <label><input type="radio" name="kind" id="kind-question" value="question" checked> I have a question</label>
-          <label><input type="radio" name="kind" id="kind-prayer" value="prayer"> Please pray for me</label>
-        </div>
-        <label for="ask-name">First name
-          <input id="ask-name" name="name" autocomplete="given-name" placeholder="Sarah">
-        </label>
-        <label for="ask-email">Email, so we can reply
-          <input id="ask-email" name="email" type="email" autocomplete="email" placeholder="sarah@example.com">
-        </label>
-        <label for="ask-topic">Topic
-          <select id="ask-topic" name="topic">
-            <option>Repentance</option><option>Faith toward God</option><option>Baptisms</option>
-            <option>Laying on of hands</option><option>Resurrection of the dead</option><option>Eternal judgment</option>
-            <option>Something else</option>
-          </select>
-        </label>
-        <label for="ask-msg">Your message
-          <textarea id="ask-msg" name="message" placeholder="I asked Jesus into my life last week. How do I know I really repented?"></textarea>
-        </label>
-        <button class="btn primary" type="submit">Send message</button>
-        <p class="form-note">Prototype: this form does not send yet. On the live site it will go to Yv'e’s inbox.</p>
-        <div class="thanks" id="ask-thanks" hidden>Preview only: on the live site this would send your message to Yv'e, and you would see a thank-you here.</div>
-      </form>
-    </div>
-  </section>
-
-  <section class="block" id="next">
+<section class="block" id="next">
     <div class="wrap">
       <div class="section-head">
         <p class="eyebrow">Next Steps</p>
@@ -620,7 +369,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         <div class="step">
           <h3>Find a strong church</h3>
           <p>Get planted with believers who teach the Word. Start with churches Yv'e and Mark recommend, and a 24-hour prayer line.</p>
-          <a href="#churches">See churches and prayer ↓</a>
+          <a href="churches/">See churches and prayer ↓</a>
         </div>
         <div class="step">
           <h3>Share your faith</h3>
@@ -636,71 +385,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
       </div>
     </div>
   </section>
-
-  <section class="block lesson" id="churches">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">Find a Church · Pray With Others</p>
-        <h2>Churches and prayer we recommend</h2>
-        <p>God never meant for you to grow alone. Get planted in a church that preaches the Word. These churches stream their services online, so you can join from anywhere while you look for a church near you.</p>
-      </div>
-      <div class="church-list">
-        <article class="church">
-          <h3>New Beginnings Church</h3>
-          <p class="where">Bedford, Texas (Dallas–Fort Worth)</p>
-          <p>Pastors Larry &amp; Tiz Huch</p>
-          <a href="https://newbeginnings.org/" target="_blank" rel="noopener">newbeginnings.org ↗</a>
-        </article>
-        <article class="church">
-          <h3>Mercy Culture Church</h3>
-          <p class="where">Fort Worth, Texas, with campuses in Dallas, Waco, Austin, San Antonio, Orange County, Washington, D.C., and online</p>
-          <p>Pastors Landon &amp; Heather Schott</p>
-          <a href="https://mercyculture.com/" target="_blank" rel="noopener">mercyculture.com ↗</a>
-        </article>
-        <article class="church">
-          <h3>Revival Today Church</h3>
-          <p class="where">Campuses in Pittsburgh, Texas, Arizona, California and Toronto</p>
-          <p>Need prayer? Text PRAYER to 75767.</p>
-          <a href="https://www.revivaltodaychurch.com/" target="_blank" rel="noopener">revivaltodaychurch.com ↗</a>
-        </article>
-      </div>
-      <h3 class="prayer-head">Pray with others, 24/7</h3>
-      <div class="church-list">
-        <article class="church">
-          <h3>BPN Radio</h3>
-          <p class="where">A 24-hour internet prayer station from Breakout Ministries</p>
-          <p>Tune in any time, day or night, and pray along with live prayer leaders.</p>
-          <a href="http://mobile.bpnradio.com/" target="_blank" rel="noopener">bpnradio.com ↗</a>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="block" id="printables">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">Printables · Measure of Faith</p>
-        <h2>Measure of Faith cards</h2>
-        <p>“According as God hath dealt to every man the measure of faith” (Romans 12:3). Each card has a verse on one end and a prayer on the other, so you can read it from either side. Set 1 is about the assurance of salvation.</p>
-      </div>
-      <div class="card-strip" tabindex="0" aria-label="Measure of Faith cards, Set 1">
-        <img src="printables/measure-of-faith/img/card-1.png" alt="Card: Romans 12:3, the measure of faith" loading="lazy">
-        <img src="printables/measure-of-faith/img/card-2.png" alt="Card: Assurance of Salvation, Set 1, 1 John 5:13, with prayer" loading="lazy">
-        <img src="printables/measure-of-faith/img/card-3.png" alt="Card 1: Romans 3:23 and 6:23, with prayer" loading="lazy">
-        <img src="printables/measure-of-faith/img/card-4.png" alt="Card 2: John 3:16, with prayer" loading="lazy">
-        <img src="printables/measure-of-faith/img/card-5.png" alt="Card 3: Romans 10:13, with prayer" loading="lazy">
-        <img src="printables/measure-of-faith/img/card-6.png" alt="Card 4: Acts 4:12, with prayer" loading="lazy">
-        <img src="printables/measure-of-faith/img/card-7.png" alt="Card 5: Mark 16:15–16, with prayer" loading="lazy">
-        <img src="printables/measure-of-faith/img/card-8.png" alt="Card: list of the cards in Set 1, and how to use them" loading="lazy">
-      </div>
-      <div class="cta-row" style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-        <a class="btn primary" href="printables/measure-of-faith/measure-of-faith-set-1.pdf" target="_blank" rel="noopener">Print sheet (PDF)</a>
-        <span class="form-note">Letter-size card stock, 8 cards per sheet. Cut on the dashed lines.</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="block lesson" id="merch">
+<section class="block lesson" id="merch">
     <div class="wrap">
       <div class="section-head">
         <p class="eyebrow">Bridges Body Boldness</p>
@@ -724,6 +409,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
     </div>
   </section>
 </main>
+
 <footer>
   <div class="wrap">
     <span>The Principles of the Doctrine of Christ · Scripture quotations from the King James Version. Greek word studies from <em>The New Strong’s Exhaustive Concordance of the Bible</em> (Thomas Nelson Publishers, 1990).</span>
@@ -732,10 +418,53 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
   </div>
 </footer>
 <script>
+  // Contact form: sends to Yv'e's inbox through FormSubmit (formsubmit.co). The address is assembled here
+  // rather than written out in the page, so spam bots scanning the HTML don't pick it up.
+  // After FormSubmit's activation email is confirmed, swap INBOX for the random alias it provides.
+  var INBOX = ['markyve77', 'gmail.com'].join('@');
   var askForm = document.getElementById('ask-form');
   if (askForm) askForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    document.getElementById('ask-thanks').hidden = false;
+    var f = askForm.elements;
+    var err = document.getElementById('ask-error');
+    var send = document.getElementById('ask-send');
+    var kind = f.kind.value === 'prayer' ? 'Prayer request' : 'Question';
+    var email = f.email.value.trim();
+    var message = f.message.value.trim();
+    err.hidden = true;
+    if (!message) { err.textContent = 'Please write your message before sending.'; err.hidden = false; f.message.focus(); return; }
+    if (kind === 'Question' && !email) { err.textContent = 'Please add your email so Yv\'e can send you an answer.'; err.hidden = false; f.email.focus(); return; }
+    if (email && !f.email.checkValidity()) { err.textContent = 'That email address doesn\'t look complete. Please check it.'; err.hidden = false; f.email.focus(); return; }
+    if (f._honey.value) return;
+    var name = f.name.value.trim() || 'Someone';
+    var payload = {
+      _subject: 'TPOT DOC ' + kind.toLowerCase() + ' from ' + name + ' (' + f.topic.value + ')',
+      _template: 'table',
+      _captcha: 'false',
+      'Type': kind,
+      'Name': name,
+      'Email': email || '(not given)',
+      'Topic': f.topic.value,
+      'Message': message,
+      'Sent from': location.href
+    };
+    if (email) payload._replyto = email;
+    send.disabled = true; send.textContent = 'Sending…';
+    fetch('https://formsubmit.co/ajax/' + INBOX, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function (r) { return r.json().then(function (d) { if (!r.ok || String(d.success) !== 'true') throw new Error(d.message || 'failed'); }); })
+      .then(function () {
+        askForm.querySelectorAll('input:not([type=radio]), textarea').forEach(function (el) { el.value = ''; });
+        document.getElementById('ask-thanks').hidden = false;
+        send.textContent = 'Sent';
+      })
+      .catch(function () {
+        err.textContent = 'Your message didn\'t go through. Please check your connection and try again in a minute.';
+        err.hidden = false;
+        send.disabled = false; send.textContent = 'Send message';
+      });
   });
 
   var faqSearch = document.getElementById('faq-q');
