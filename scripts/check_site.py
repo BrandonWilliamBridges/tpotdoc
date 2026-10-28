@@ -58,7 +58,7 @@ for page in sorted(DOCS.rglob("*.html")):
     for href in re.findall(r'(?:href|src)="([^"#:?][^"#?]*)', s):
         if href.startswith(("http", "mailto", "tel")):
             continue
-        target = page.parent / href
+        target = DOCS / href.lstrip("/") if href.startswith("/") else page.parent / href
         if href.endswith("/"):
             target = target / "index.html"
         if not target.exists():
