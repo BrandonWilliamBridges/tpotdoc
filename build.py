@@ -2,8 +2,8 @@
 """Builds the GitHub Pages site in docs/ from prototype/index.html (the single source of truth).
 
 Outputs
-  docs/index.html            Version A: everything on one long page
-  docs/v2/...                Version B: one page per lesson, each with its own URL
+  docs/index.html, docs/<slug>/index.html   one page per lesson, each with its own URL
+  docs/v2/...                               redirects from the old comparison URLs
   docs/sitemap.xml, robots.txt, llms.txt, llms-full.txt   search + AI-search files
 
 Every page gets a title, description, canonical URL, Open Graph tags and JSON-LD structured data.
@@ -23,7 +23,6 @@ OUT = ROOT / "docs"
 SITE_URL = "https://brandonwilliambridges.github.io/tpotdoc"  # change when the real domain is live
 SITE_NAME = "The Principles of the Doctrine of Christ"
 INDEXABLE = False  # draft: every page says noindex until launch
-MULTI_DIR = "v2"   # where Version B lives while Yv'e compares the two layouts
 TODAY = datetime.date.today().isoformat()
 
 AUTHOR = {
@@ -33,7 +32,7 @@ AUTHOR = {
     "description": "Bible teacher writing foundational lessons for new believers, based on Hebrews 6:1-2.",
 }
 
-# Version B pages: slug -> which source sections it holds, plus its search metadata.
+# Pages: slug -> which source sections it holds, plus its search metadata.
 PAGES = [
     {
         "slug": "", "sections": ["welcome", "verse-band", "foundations", "next", "merch"],
@@ -86,18 +85,13 @@ PAGES = [
 ]
 LESSON_ORDER = ["repentance", "faith", "fruitful"]
 
-# In-page anchors in the source, and where they live in Version B.
+# In-page anchors in the source, and where they live on the built site (relative to the home page).
 ANCHORS = {
     "top": "", "foundations": "#foundations", "next": "#next", "merch": "#merch",
     "repentance": "repentance/", "three-things": "repentance/#three-things",
     "fruit-of-repentance": "repentance/#fruit-of-repentance",
     "faith": "faith/", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/",
     "printables": "cards/", "churches": "churches/",
-}
-
-ONE_PAGE = {
-    "title": f"{SITE_NAME} | For New Believers",
-    "description": PAGES[0]["description"],
 }
 
 
@@ -135,8 +129,7 @@ def parse(src):
 # ---------- helpers ----------
 
 def page_url(slug):
-    base = f"{SITE_URL}/{MULTI_DIR}/" if MULTI_DIR else f"{SITE_URL}/"
-    return base + (f"{slug}/" if slug else "")
+    return f"{SITE_URL}/" + (f"{slug}/" if slug else "")
 
 
 def text_of(fragment):
@@ -157,7 +150,7 @@ def faq_items(sections):
 
 
 def rewrite_links(fragment, root, home):
-    """Point source #anchors at their Version B pages; fix asset paths for the page's depth."""
+    """Point source #anchors at the page that now holds them; fix asset paths for the page's depth."""
     def fix(m):
         target = m.group(1)
         if target not in ANCHORS:
@@ -172,43 +165,21 @@ def rewrite_links(fragment, root, home):
 
 
 def promote_heading(fragment):
-    """A lesson's h2 becomes the page's single h1 in Version B."""
+    """A lesson's h2 becomes the page's single h1."""
     return re.sub(r"<h2([^>]*)>(.*?)</h2>", r"<h1\1>\2</h1>", fragment, count=1, flags=re.S)
 
 
 # ---------- page shell ----------
 
-COMPARE_CSS = """
+PAGE_CSS = """
 <style>
-  .compare { background: var(--navy); color: var(--navy-ink); padding-block: 14px; border-bottom: 4px solid var(--accent); }
-  .compare .wrap { display: grid; gap: 10px; }
-  .compare p { margin: 0; font-size: 1.05rem; line-height: 1.5; }
-  .compare strong.big { display: block; font-family: var(--font-display); font-size: clamp(1.25rem, 3vw, 1.6rem); font-weight: 650; }
-  .compare .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-  .compare .tabs a { color: var(--navy-ink); text-decoration: none; font-weight: 600; padding: 8px 14px; border-radius: 6px; border: 2px solid rgba(255,255,255,.45); }
-  .compare .tabs a[aria-current="page"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
   .pager { border-top: 1px solid var(--line); padding-block: 24px; }
   .pager .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .pager a { font-weight: 600; text-decoration: none; }
 </style>"""
 
 
-def compare_bar(root, current):
-    a_cur = ' aria-current="page"' if current == "A" else ""
-    b_cur = ' aria-current="page"' if current == "B" else ""
-    return f"""<div class="compare">
-  <div class="wrap">
-    <p><strong class="big">Yv'e, please compare these two layouts!</strong>
-    Same words, two ways to arrange them. <b>Version A</b> keeps everything on one long page. <b>Version B</b> gives each lesson its own page, which helps Google and AI assistants send people straight to the right lesson. Tap back and forth, then tell Brandon which one you like.</p>
-    <div class="tabs" role="navigation" aria-label="Choose a layout">
-      <a href="{root}"{a_cur}>A · One long page</a>
-      <a href="{root}{MULTI_DIR}/"{b_cur}>B · Separate pages</a>
-    </div>
-  </div>
-</div>"""
-
-
-def head(parts, title, description, canonical, og_image, jsonld):
+def head(parts, title, description, canonical, og_image, jsonld, extra=""):
     robots = "index, follow, max-snippet:-1, max-image-preview:large" if INDEXABLE else "noindex, nofollow"
     ld = "\n".join(f'<script type="application/ld+json">{json.dumps(obj, ensure_ascii=False)}</script>' for obj in jsonld)
     t, d = html.escape(title), html.escape(description)
@@ -241,7 +212,8 @@ def head(parts, title, description, canonical, og_image, jsonld):
 <style>:root{{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}}body{{margin:0}}img{{max-width:100%}}[hidden]{{display:none!important}}</style>
 {parts['fonts']}
 {parts['style']}
-{COMPARE_CSS}
+{PAGE_CSS}
+{extra}
 </head>
 <body>"""
 
@@ -337,35 +309,45 @@ def build():
     (OUT / ".nojekyll").touch()
     og = f"{SITE_URL}/img/og.png"
 
-    # Version A: one long page
-    one = head(parts, ONE_PAGE["title"], ONE_PAGE["description"], f"{SITE_URL}/", og,
-               [website_ld(f"{SITE_URL}/"), faq_ld(faq_items(sections))])
-    one += "\n" + compare_bar("", "A") + "\n" + parts["banner"] + "\n" + parts["header"] + "\n" + parts["main"] + "\n" + parts["footer"] + "\n" + parts["script"] + "\n</body>\n</html>\n"
-    (OUT / "index.html").write_text(one)
+    # Old one-page links (e.g. /#ask) forward to the page that now holds that section.
+    moved = {k: v for k, v in ANCHORS.items() if v and not v.startswith("#")}
+    hash_redirect = ("<script>(function(){var m=" + json.dumps(moved) +
+                     ";var h=location.hash.slice(1);if(m[h])location.replace(m[h]);})();</script>")
 
-    # Version B: one page per lesson
     for page in PAGES:
-        depth = 1 + (1 if page["slug"] else 0)
-        root = "../" * depth
-        home = "../" if page["slug"] else ""
+        root = "../" if page["slug"] else ""
         body = "\n".join(sections[k] for k in page["sections"])
         if page["slug"]:
             body = promote_heading(body)
-        body = rewrite_links(body, root, home)
-        header = rewrite_links(parts["header"], root, home)
-        nav_target = f'href="{home}{page["slug"]}/"' if page["slug"] else None
-        if nav_target:
-            header = header.replace(nav_target, nav_target + ' aria-current="page"', 1)
-        doc = head(parts, page["title"], page["description"], page_url(page["slug"]), og, page_ld(page, sections))
-        doc += "\n" + compare_bar(root, "B") + "\n" + parts["banner"] + "\n" + header
-        doc += f'\n<main id="top">\n  {body}\n</main>\n' + pager(page, home) + "\n"
-        doc += rewrite_links(parts["footer"], root, home) + "\n" + parts["script"] + "\n</body>\n</html>\n"
-        dest = OUT / MULTI_DIR / page["slug"] / "index.html" if page["slug"] else OUT / MULTI_DIR / "index.html"
+        body = rewrite_links(body, root, root)
+        header = rewrite_links(parts["header"], root, root)
+        if page["slug"]:
+            target = f'href="{root}{page["slug"]}/"'
+            header = header.replace(target, target + ' aria-current="page"', 1)
+        doc = head(parts, page["title"], page["description"], page_url(page["slug"]), og, page_ld(page, sections),
+                   extra="" if page["slug"] else hash_redirect)
+        doc += "\n" + parts["banner"] + "\n" + header
+        doc += f'\n<main id="top">\n  {body}\n</main>\n' + pager(page, root) + "\n"
+        doc += rewrite_links(parts["footer"], root, root) + "\n" + parts["script"] + "\n</body>\n</html>\n"
+        dest = OUT / page["slug"] / "index.html" if page["slug"] else OUT / "index.html"
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(doc)
 
+    # The comparison period used /v2/ URLs; keep them working by forwarding to the new addresses.
+    for page in PAGES:
+        target = page_url(page["slug"])
+        dest = OUT / "v2" / page["slug"] / "index.html" if page["slug"] else OUT / "v2" / "index.html"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Moved</title>
+<meta name="robots" content="noindex"><link rel="canonical" href="{target}">
+<meta http-equiv="refresh" content="0; url={target}">
+<script>location.replace({json.dumps(target)} + location.hash);</script>
+</head><body><p>This page moved to <a href="{target}">{target}</a>.</p></body></html>
+""")
+
     # sitemap.xml
-    urls = [f"{SITE_URL}/"] + [page_url(p["slug"]) for p in PAGES]
+    urls = [page_url(p["slug"]) for p in PAGES]
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     sm += [f"  <url><loc>{u}</loc><lastmod>{TODAY}</lastmod></url>" for u in urls]
     sm.append("</urlset>")
@@ -394,8 +376,7 @@ def build():
                  "\n\n".join(text_of(sections[k]) for k in p["sections"]), ""]
     (OUT / "llms-full.txt").write_text("\n".join(full) + "\n")
 
-    print(f"Built Version A (docs/index.html) and Version B ({len(PAGES)} pages in docs/{MULTI_DIR}/), "
-          f"sitemap, robots.txt, llms.txt. Indexable: {INDEXABLE}")
+    print(f"Built {len(PAGES)} pages, /v2/ redirects, sitemap, robots.txt, llms.txt. Indexable: {INDEXABLE}")
 
 
 if __name__ == "__main__":
