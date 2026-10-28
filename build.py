@@ -42,7 +42,7 @@ AUTHOR = {
 # Pages: slug -> which source sections it holds, plus its search metadata.
 PAGES = [
     {
-        "slug": "", "sections": ["welcome", "foundations", "next", "merch"],
+        "slug": "", "sections": ["welcome", "foundations", "next"],
         "title": f"{SITE_NAME} | For New Believers",
         "description": "Welcome to the family of God. Simple Bible lessons for new Christians on the six foundations of Hebrews 6:1-2, starting with repentance and faith.",
         "type": "home",
@@ -118,7 +118,7 @@ LESSON_ORDER = ["repentance", "faith", "fruitful"]
 
 # In-page anchors in the source, and where they live on the built site (relative to the home page).
 ANCHORS = {
-    "top": "", "foundations": "#foundations", "next": "#next", "merch": "#merch",
+    "top": "", "foundations": "#foundations", "next": "#next",
     "repentance": "repentance/", "three-things": "repentance/#three-things",
     "fruit-of-repentance": "repentance/#fruit-of-repentance",
     "faith": "faith/", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/",
