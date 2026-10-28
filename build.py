@@ -20,7 +20,8 @@ ROOT = Path(__file__).resolve().parent
 SRC = ROOT / "prototype" / "index.html"
 OUT = ROOT / "docs"
 
-SITE_URL = "https://brandonwilliambridges.github.io/tpotdoc"  # change when the real domain is live
+SITE_URL = "https://tpotdoc.com"
+CUSTOM_DOMAIN = "tpotdoc.com"  # written to docs/CNAME so GitHub Pages serves the site there
 SITE_NAME = "The Principles of the Doctrine of Christ"
 INDEXABLE = False  # draft: every page says noindex until launch
 TODAY = datetime.date.today().isoformat()
@@ -295,8 +296,7 @@ def build():
 
     if OUT.exists():
         for child in OUT.iterdir():
-            if child.name != "CNAME":
-                shutil.rmtree(child) if child.is_dir() else child.unlink()
+            shutil.rmtree(child) if child.is_dir() else child.unlink()
     (OUT / "img").mkdir(parents=True, exist_ok=True)
     for f in (ROOT / "prototype" / "img").iterdir():
         if f.suffix.lower() in (".jpg", ".png"):
@@ -307,6 +307,7 @@ def build():
     for f in (cards / "img").glob("*.png"):
         shutil.copy2(f, OUT / "printables" / "measure-of-faith" / "img" / f.name)
     (OUT / ".nojekyll").touch()
+    (OUT / "CNAME").write_text(CUSTOM_DOMAIN + "\n")
     og = f"{SITE_URL}/img/og.png"
 
     # Old one-page links (e.g. /#ask) forward to the page that now holds that section.

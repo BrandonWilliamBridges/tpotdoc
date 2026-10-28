@@ -1,7 +1,7 @@
 # The Principles of the Doctrine of Christ (TPOTDOC)
 
 A Bible-foundations site for new believers, written by Dianna "Yv'e" Bridges and built by Brandon Bridges. It is based on Hebrews 6:1-2.
-Live preview (GitHub Pages, served from `main` → `docs/`): https://brandonwilliambridges.github.io/tpotdoc/
+Live at https://tpotdoc.com (GitHub Pages, served from `main` → `docs/`; DNS on Cloudflare). tpotdoc.org forwards to it.
 
 ## Layout
 - `prototype/index.html` is the single source of truth for all page content. It is in artifact format (no `<html>`/`<head>`) and is also published as a private Claude artifact.
