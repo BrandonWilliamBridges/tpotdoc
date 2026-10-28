@@ -24,7 +24,7 @@ SITE_URL = "https://tpotdoc.com"
 CUSTOM_DOMAIN = "tpotdoc.com"  # written to docs/CNAME so GitHub Pages serves the site there
 SITE_NAME = "The Principles of the Doctrine of Christ"
 INDEXABLE = False  # draft: every page says noindex until launch
-CF_ANALYTICS_TOKEN = ""  # Cloudflare Web Analytics site token (cookie-free). Empty = no analytics script.
+CF_ANALYTICS_TOKEN = "68a88602d3054c4ab0100cb75be105e6"  # Cloudflare Web Analytics site token (cookie-free). Empty = no analytics script.
 # Content Security Policy (meta tag; GitHub Pages cannot send real headers). Only our own files, FormSubmit and
 # Cloudflare Analytics are allowed to run or receive data. Page scripts live in site.js/go.js so no inline script is needed.
 CSP = ("default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; "
