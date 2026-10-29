@@ -39,6 +39,7 @@
   --muted: #59617a;
   --line: #d5d9e4;
   --accent: #a67a1f;      /* lamp gold */
+  --highlight: rgba(250, 204, 72, .6);
   --accent-ink: #ffffff;
   --navy: #1f2d5c;        /* deep covenant blue */
   --navy-ink: #f3f5fb;
@@ -50,13 +51,13 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #10142a; --surface: #171c36; --stone: #1e2443; --ink: #e8ebf5; --muted: #a2a9c2;
-    --line: #2d3458; --accent: #d9ad52; --accent-ink: #1a1405; --navy: #26346b; --navy-ink: #f3f5fb;
+    --line: #2d3458; --accent: #d9ad52; --accent-ink: #1a1405; --highlight: rgba(217, 173, 82, .38); --navy: #26346b; --navy-ink: #f3f5fb;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #10142a; --surface: #171c36; --stone: #1e2443; --ink: #e8ebf5; --muted: #a2a9c2;
-  --line: #2d3458; --accent: #d9ad52; --accent-ink: #1a1405; --navy: #26346b; --navy-ink: #f3f5fb;
+  --line: #2d3458; --accent: #d9ad52; --accent-ink: #1a1405; --highlight: rgba(217, 173, 82, .38); --navy: #26346b; --navy-ink: #f3f5fb;
   color-scheme: dark;
 }
 
@@ -102,6 +103,8 @@ nav.main a:hover { color: var(--accent); }
 .welcome .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
 .masthead { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
 .stack { display: flex; flex-direction: column; font-size: clamp(2.2rem, 5.2vw, 3.6rem); line-height: 1.02; font-weight: 650; margin: 0; }
+/* The capitals spell TPOTDOC down the left side, marked like a highlighter stroke (Yv'e's sketch). */
+.stack .cap { background: var(--highlight); padding-inline: .04em; margin-inline: -.04em; box-decoration-break: clone; }
 .mast-logo { width: clamp(110px, 18vw, 180px); height: auto; flex: none; }
 .welcome-line { margin-top: 22px; font-family: var(--font-display); font-size: clamp(1.3rem, 2.6vw, 1.65rem); color: var(--accent); font-style: italic; }
 .welcome .lede { margin-top: 18px; max-width: 52ch; color: var(--muted); font-size: 1.12rem; }
@@ -204,6 +207,9 @@ form.ask fieldset.contact-pref legend { font-size: .92rem; font-weight: 600; mar
 .form-error { background: var(--stone); border-left: 3px solid #b3261e; padding: 10px 14px; font-size: .92rem; }
 form.ask label.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 form.ask { position: relative; }
+.bible-address { display: grid; gap: 14px; }
+.address-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, .8fr) minmax(0, 1.2fr); gap: 12px; }
+@media (max-width: 520px) { .address-row { grid-template-columns: 1fr 1fr; } .address-row label:first-child { grid-column: 1 / -1; } }
 
 /* Next steps */
 .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
@@ -312,7 +318,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
     <div class="wrap">
       <div>
         <div class="masthead">
-          <h1 class="stack"><span>The</span> <span>Principles</span> <span>Of</span> <span>The</span> <span>Doctrine</span> <span>Of</span> <span>Christ</span></h1>
+          <h1 class="stack"><span><span class="cap">T</span>he</span> <span><span class="cap">P</span>rinciples</span> <span><span class="cap">O</span>f</span> <span><span class="cap">T</span>he</span> <span><span class="cap">D</span>octrine</span> <span><span class="cap">O</span>f</span> <span><span class="cap">C</span>hrist</span></h1>
           <img class="mast-logo" src="img/logo.png" alt="TPOT DOC logo: a teapot with a gold cross and a butterfly on its lid, beneath an open Bible" width="180" height="180">
         </div>
         <p class="welcome-line">Welcome to the Family of God!</p>
@@ -406,7 +412,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
     <span>The Principles of the Doctrine of Christ · Scripture quotations from the King James Version. Greek word studies from <em>The New Strong’s Exhaustive Concordance of the Bible</em> (Thomas Nelson Publishers, 1990).</span>
     <span class="next-level">Ready for the next level? <em>Going on unto perfection</em>
       <span class="btn ghost soon" role="button" aria-disabled="true">Coming soon</span></span>
-    <span><a href="privacy/">Privacy</a> · <a href="about/">About Yv'e</a> · <span class="updated">Last updated <time datetime="2026-10-28">October 28, 2026</time></span></span>
+    <span><a href="privacy/">Privacy</a> · <a href="about/">About Yv'e</a> · <span class="updated">Last updated <time datetime="2026-10-29">October 29, 2026</time></span></span>
   </div>
 </footer>
 <script src="/site.js"></script>
