@@ -14,6 +14,7 @@ import html
 import json
 import re
 import shutil
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -31,6 +32,7 @@ CSP = ("default-src 'self'; script-src 'self' https://static.cloudflareinsights.
        "font-src 'self'; img-src 'self' data:; connect-src 'self' https://formsubmit.co https://cloudflareinsights.com; "
        "form-action 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests")
 TODAY = datetime.date.today().isoformat()
+SHOW_CARDS = False  # Measure of Faith cards are hidden while Yv'e revises them; True puts the /cards/ page back.
 
 AUTHOR = {
     "@type": "Person",
@@ -114,6 +116,8 @@ PAGES = [
         "type": "cards",
     },
 ]
+if not SHOW_CARDS:
+    PAGES = [p for p in PAGES if p["slug"] != "cards"]
 LESSON_ORDER = ["repentance", "faith", "fruitful"]
 
 # In-page anchors in the source, and where they live on the built site (relative to the home page).
@@ -194,6 +198,17 @@ def rewrite_links(fragment, root, home):
     fragment = fragment.replace('src="printables/', f'src="{root}printables/')
     fragment = fragment.replace('href="printables/', f'href="{root}printables/')
     return fragment
+
+
+def last_updated():
+    """Date the site content last changed: today if prototype/ has uncommitted edits, else its last commit."""
+    try:
+        if subprocess.run(["git", "status", "--porcelain", "prototype"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip():
+            return datetime.date.today()
+        out = subprocess.run(["git", "log", "-1", "--format=%cs", "--", "prototype"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+        return datetime.date.fromisoformat(out) if out else datetime.date.today()
+    except (OSError, subprocess.CalledProcessError, ValueError):
+        return datetime.date.today()
 
 
 def promote_heading(fragment):
@@ -354,17 +369,21 @@ def build():
     for f in (ROOT / "prototype" / "img").iterdir():
         if f.suffix.lower() in (".jpg", ".png"):
             shutil.copy2(f, OUT / "img" / f.name)
+    updated = last_updated()
+    parts["footer"] = re.sub(r'<time datetime="[^"]*">[^<]*</time>',
+                             f'<time datetime="{updated.isoformat()}">{updated.strftime("%B")} {updated.day}, {updated.year}</time>', parts["footer"])
     cards = ROOT / "printables" / "measure-of-faith"
-    (OUT / "printables" / "measure-of-faith" / "img").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(cards / "measure-of-faith-set-1.pdf", OUT / "printables" / "measure-of-faith")
-    for f in (cards / "img").glob("*.png"):
-        shutil.copy2(f, OUT / "printables" / "measure-of-faith" / "img" / f.name)
+    if SHOW_CARDS:
+        (OUT / "printables" / "measure-of-faith" / "img").mkdir(parents=True, exist_ok=True)
+        shutil.copy2(cards / "measure-of-faith-set-1.pdf", OUT / "printables" / "measure-of-faith")
+        for f in (cards / "img").glob("*.png"):
+            shutil.copy2(f, OUT / "printables" / "measure-of-faith" / "img" / f.name)
     (OUT / ".nojekyll").touch()
     (OUT / "CNAME").write_text(CUSTOM_DOMAIN + "\n")
     og = f"{SITE_URL}/img/og.png"
 
     # Old one-page links (e.g. /#ask) forward to the page that now holds that section.
-    moved = {k: v for k, v in ANCHORS.items() if v and not v.startswith("#")}
+    moved = {k: v for k, v in ANCHORS.items() if v and not v.startswith("#") and (SHOW_CARDS or k != "printables")}
     (OUT / "go.js").write_text("(function(){var m=" + json.dumps(moved) +
                                ";var h=location.hash.slice(1);if(m[h])location.replace(m[h]);})();\n")
     hash_redirect = '<script src="/go.js"></script>'
@@ -452,7 +471,7 @@ def build():
              "", "## Lessons"]
     lines += [f"- [{by_slug[s]['title'].split(' | ')[0]}]({page_url(s)}): {by_slug[s]['description']}" for s in LESSON_ORDER]
     lines += ["", "## Help for new believers"]
-    lines += [f"- [{by_slug[s]['title'].split(' | ')[0]}]({page_url(s)}): {by_slug[s]['description']}" for s in ["prayers", "questions", "ask", "churches", "cards", "about"]]
+    lines += [f"- [{by_slug[s]['title'].split(' | ')[0]}]({page_url(s)}): {by_slug[s]['description']}" for s in ["prayers", "questions", "ask", "churches", "cards", "about"] if s in by_slug]
     lines += ["", "## Optional", f"- [Full text of every lesson]({SITE_URL}/llms-full.txt): all lessons as plain text"]
     (OUT / "llms.txt").write_text("\n".join(lines) + "\n")
 
