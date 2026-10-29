@@ -181,7 +181,8 @@ def text_of(fragment):
 def faq_items(sections):
     out = []
     for m in re.finditer(r'<details class="faq-item"[^>]*>\s*<summary>(.*?)</summary>\s*<div class="faq-answer">(.*?)</div>\s*</details>', sections.get("faq", ""), re.S):
-        out.append((text_of(m.group(1)), text_of(m.group(2)).replace("\n", " ")))
+        answer = re.sub(r'<p class="draft-note">.*?</p>', "", m.group(2), flags=re.S)  # review notes stay out of structured data
+        out.append((text_of(m.group(1)), text_of(answer).replace("\n", " ")))
     return out
 
 

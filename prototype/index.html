@@ -12,6 +12,7 @@
   --muted: #59617a;
   --line: #d5d9e4;
   --accent: #a67a1f;      /* lamp gold */
+  --highlight: rgba(250, 204, 72, .6);
   --accent-ink: #ffffff;
   --navy: #1f2d5c;        /* deep covenant blue */
   --navy-ink: #f3f5fb;
@@ -23,13 +24,13 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #10142a; --surface: #171c36; --stone: #1e2443; --ink: #e8ebf5; --muted: #a2a9c2;
-    --line: #2d3458; --accent: #d9ad52; --accent-ink: #1a1405; --navy: #26346b; --navy-ink: #f3f5fb;
+    --line: #2d3458; --accent: #d9ad52; --accent-ink: #1a1405; --highlight: rgba(217, 173, 82, .38); --navy: #26346b; --navy-ink: #f3f5fb;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #10142a; --surface: #171c36; --stone: #1e2443; --ink: #e8ebf5; --muted: #a2a9c2;
-  --line: #2d3458; --accent: #d9ad52; --accent-ink: #1a1405; --navy: #26346b; --navy-ink: #f3f5fb;
+  --line: #2d3458; --accent: #d9ad52; --accent-ink: #1a1405; --highlight: rgba(217, 173, 82, .38); --navy: #26346b; --navy-ink: #f3f5fb;
   color-scheme: dark;
 }
 
@@ -75,6 +76,8 @@ nav.main a:hover { color: var(--accent); }
 .welcome .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
 .masthead { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
 .stack { display: flex; flex-direction: column; font-size: clamp(2.2rem, 5.2vw, 3.6rem); line-height: 1.02; font-weight: 650; margin: 0; }
+/* The capitals spell TPOTDOC down the left side, marked like a highlighter stroke (Yv'e's sketch). */
+.stack .cap { background: var(--highlight); padding-inline: .04em; margin-inline: -.04em; box-decoration-break: clone; }
 .mast-logo { width: clamp(110px, 18vw, 180px); height: auto; flex: none; }
 .welcome-line { margin-top: 22px; font-family: var(--font-display); font-size: clamp(1.3rem, 2.6vw, 1.65rem); color: var(--accent); font-style: italic; }
 .welcome .lede { margin-top: 18px; max-width: 52ch; color: var(--muted); font-size: 1.12rem; }
@@ -177,6 +180,9 @@ form.ask fieldset.contact-pref legend { font-size: .92rem; font-weight: 600; mar
 .form-error { background: var(--stone); border-left: 3px solid #b3261e; padding: 10px 14px; font-size: .92rem; }
 form.ask label.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 form.ask { position: relative; }
+.bible-address { display: grid; gap: 14px; }
+.address-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, .8fr) minmax(0, 1.2fr); gap: 12px; }
+@media (max-width: 520px) { .address-row { grid-template-columns: 1fr 1fr; } .address-row label:first-child { grid-column: 1 / -1; } }
 
 /* Next steps */
 .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
@@ -278,7 +284,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
     <div class="wrap">
       <div>
         <div class="masthead">
-          <h1 class="stack"><span>The</span> <span>Principles</span> <span>Of</span> <span>The</span> <span>Doctrine</span> <span>Of</span> <span>Christ</span></h1>
+          <h1 class="stack"><span><span class="cap">T</span>he</span> <span><span class="cap">P</span>rinciples</span> <span><span class="cap">O</span>f</span> <span><span class="cap">T</span>he</span> <span><span class="cap">D</span>octrine</span> <span><span class="cap">O</span>f</span> <span><span class="cap">C</span>hrist</span></h1>
           <img class="mast-logo" src="img/logo.png" alt="TPOT DOC logo: a teapot with a gold cross and a butterfly on its lid, beneath an open Bible" width="180" height="180">
         </div>
         <p class="welcome-line">Welcome to the Family of God!</p>
@@ -563,6 +569,21 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
             </ul>
           </div>
         </details>
+        <details class="faq-item" id="where-to-start-reading">
+          <summary>I’m a new believer. Where should I start reading the Bible?</summary>
+          <div class="faq-answer">
+            <p>Start with the Gospel of John. It shows you who Jesus is and what He has done for you, and it was written “that ye might believe that Jesus is the Christ, the Son of God; and that believing ye might have life through his name” (John 20:31).</p>
+            <ul>
+              <li><strong>John</strong>: the life of Jesus and why He came.</li>
+              <li><strong>Acts</strong>: what His first disciples did in the power of the Holy Spirit.</li>
+              <li><strong>1, 2 and 3 John, and Philippians</strong>: short letters about walking with God and His joy.</li>
+              <li><strong>Romans</strong>: the great teachings of the faith, laid out by Paul.</li>
+            </ul>
+            <p>Read a little every day, even one chapter, and pray before you start. When something is hard to understand, don’t be troubled. Ask the Holy Spirit to teach you (John 14:26), and <a href="#ask">send us your question</a>. This reading order comes from Billy Graham’s answer, <a href="https://billygraham.org/answers/where-should-i-begin-in-my-bible-reading" target="_blank" rel="noopener">“Where should I begin in my Bible reading?”</a></p>
+            <p>Don’t have a Bible of your own? <a href="#ask">Ask for a free one</a> and Yv'e will mail it to you (U.S. only, while supplies last).</p>
+            <p class="draft-note">Draft for Yv'e to review: this answer was written for her, based on the Billy Graham article she found.</p>
+          </div>
+        </details>
       </div>
       <p class="faq-empty" id="faq-empty" hidden>No questions match that yet. <a href="#ask">Ask it here</a> and we will answer from the Word.</p>
     </div>
@@ -593,6 +614,31 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
           <label><input type="radio" name="contact" id="contact-yes" value="yes" checked> Yes, please reply to me</label>
           <label><input type="radio" name="contact" id="contact-no" value="no"> No reply needed, just pray</label>
         </fieldset>
+        <fieldset class="radio-row contact-pref">
+          <legend>Do you have a Bible of your own?</legend>
+          <label><input type="radio" name="bible" id="bible-have" value="have"> I have a Bible</label>
+          <label><input type="radio" name="bible" id="bible-need" value="need"> I need a Bible</label>
+        </fieldset>
+        <div class="bible-address" id="bible-address" hidden>
+          <p class="form-note">Yv'e will mail you a free Bible. U.S. addresses only, while supplies last.</p>
+          <label for="bible-fullname">Full name for mailing
+            <input id="bible-fullname" name="fullname" autocomplete="name" placeholder="Sarah Johnson">
+          </label>
+          <label for="bible-street">Street address
+            <input id="bible-street" name="street" autocomplete="street-address" placeholder="123 Main St, Apt 4">
+          </label>
+          <div class="address-row">
+            <label for="bible-city">City
+              <input id="bible-city" name="city" autocomplete="address-level2">
+            </label>
+            <label for="bible-state">State
+              <input id="bible-state" name="state" autocomplete="address-level1" maxlength="2" placeholder="TX">
+            </label>
+            <label for="bible-zip">ZIP code
+              <input id="bible-zip" name="zip" autocomplete="postal-code" inputmode="numeric" maxlength="10" placeholder="75001">
+            </label>
+          </div>
+        </div>
         <label class="hp" aria-hidden="true">Leave this empty
           <input id="ask-hp" name="_honey" tabindex="-1" autocomplete="off">
         </label>
@@ -604,11 +650,11 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
           </select>
         </label>
         <label for="ask-msg">Your message
-          <textarea id="ask-msg" name="message" required placeholder="I asked Jesus into my life last week. How do I know I really repented?"></textarea>
+          <textarea id="ask-msg" name="message" placeholder="I asked Jesus into my life last week. How do I know I really repented?"></textarea>
         </label>
         <p class="form-error" id="ask-error" role="alert" hidden></p>
         <button class="btn primary" type="submit" id="ask-send">Send message</button>
-        <p class="form-note">Your message goes privately to Yv'e’s inbox (delivered by FormSubmit). We never share your email.</p>
+        <p class="form-note">Your message goes privately to Yv'e’s inbox (delivered by FormSubmit). We never share your email or address.</p>
         <div class="thanks" id="ask-thanks" role="status" hidden><strong>Thank you! Your message is on its way to Yv'e.</strong> She reads every one personally. If you asked a question, watch your inbox for her reply.</div>
       </form>
     </div>
@@ -838,9 +884,9 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
       </div>
       <div class="about-body">
         <h3>What we collect</h3>
-        <p>The only information this site gathers is what you type into the <a href="#ask">Ask &amp; Pray form</a>: your first name, your email address if you give it, the topic, and your message. Nothing is collected when you simply read the lessons.</p>
+        <p>The only information this site gathers is what you type into the <a href="#ask">Ask &amp; Pray form</a>: your first name, your email address if you give it, the topic, and your message. If you ask for a free Bible, we also collect your name and mailing address, and we use them only to mail you the Bible. Nothing is collected when you simply read the lessons.</p>
         <h3>How it is delivered</h3>
-        <p>Form messages are delivered to Yv'e’s inbox by FormSubmit (formsubmit.co), a form-delivery service. The message passes through their servers on the way. Yv'e, and anyone she personally asks to help answer prayer requests, reads it. We do not post your request publicly, and we do not share your email address with anyone else.</p>
+        <p>Form messages are delivered to Yv'e’s inbox by FormSubmit (formsubmit.co), a form-delivery service. The message passes through their servers on the way. Yv'e, and anyone she personally asks to help answer prayer requests, reads it. We do not post your request publicly, and we do not share your email or mailing address with anyone else.</p>
         <h3>Cookies and tracking</h3>
         <p>This site sets no cookies and shows no advertising. It does not use Google Fonts or other third-party services that track you. To learn which lessons are most helpful, we count page views with Cloudflare Web Analytics, which uses no cookies and does not identify you or follow you to other sites.</p>
         <h3>Links to other sites</h3>
@@ -848,8 +894,8 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         <h3>Children</h3>
         <p>This site is written for people of all ages who are new to Christ. We do not knowingly collect information from children under 13. If a child has sent us a message, a parent or guardian may ask us to delete it.</p>
         <h3>Your choices</h3>
-        <p>You may ask us at any time to delete a message you sent and any reply. Just send a note through the <a href="#ask">Ask &amp; Pray form</a>.</p>
-        <p class="form-note">Last updated October 28, 2026.</p>
+        <p>You may ask us at any time to delete a message you sent, any reply, and any mailing address you gave us. Just send a note through the <a href="#ask">Ask &amp; Pray form</a>.</p>
+        <p class="form-note">Last updated October 29, 2026.</p>
       </div>
     </div>
   </section>
@@ -870,6 +916,10 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
   // info@tpotdoc.com forwards (Cloudflare Email Routing) to Yv'e and anyone she adds as a helper.
   var INBOX = ['info', 'tpotdoc.com'].join('@');
   var askForm = document.getElementById('ask-form');
+  var bibleAddress = document.getElementById('bible-address');
+  if (askForm) askForm.querySelectorAll('input[name=bible]').forEach(function (r) {
+    r.addEventListener('change', function () { bibleAddress.hidden = askForm.elements.bible.value !== 'need'; });
+  });
   if (askForm) askForm.addEventListener('submit', function (e) {
     e.preventDefault();
     var f = askForm.elements;
@@ -878,8 +928,15 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
     var kind = f.kind.value === 'prayer' ? 'Prayer request' : 'Question';
     var email = f.email.value.trim();
     var message = f.message.value.trim();
+    var needsBible = f.bible.value === 'need';
+    var addr = ['fullname', 'street', 'city', 'state', 'zip'].map(function (k) { return f[k].value.trim(); });
     err.hidden = true;
-    if (!message) { err.textContent = 'Please write your message before sending.'; err.hidden = false; f.message.focus(); return; }
+    if (needsBible) {
+      var missing = ['fullname', 'street', 'city', 'state', 'zip'].filter(function (k, i) { return !addr[i]; })[0];
+      if (missing) { err.textContent = 'Please fill in your full mailing address so Yv\'e can send your Bible.'; err.hidden = false; f[missing].focus(); return; }
+      if (!/^\d{5}(-\d{4})?$/.test(addr[4])) { err.textContent = 'Please check your ZIP code. It should be 5 digits.'; err.hidden = false; f.zip.focus(); return; }
+    }
+    if (!message && !needsBible) { err.textContent = 'Please write your message before sending.'; err.hidden = false; f.message.focus(); return; }
     var wantsReply = f.contact.value === 'yes';
     if (wantsReply && !email) { err.textContent = 'Please add your email so Yv\'e can reply, or choose “No reply needed.”'; err.hidden = false; f.email.focus(); return; }
     if (email && !f.email.checkValidity()) { err.textContent = 'That email address doesn\'t look complete. Please check it.'; err.hidden = false; f.email.focus(); return; }
@@ -894,9 +951,14 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
       'Email': email || '(not given)',
       'Contact me': wantsReply ? 'Yes, please reply' : 'No reply needed',
       'Topic': f.topic.value,
-      'Message': message,
+      'Message': message || '(no message)',
+      'Bible': needsBible ? 'Needs a Bible' : (f.bible.value === 'have' ? 'Has a Bible' : '(not answered)'),
       'Sent from': location.href
     };
+    if (needsBible) {
+      payload._subject += ' + free Bible request';
+      payload['Mail Bible to'] = addr[0] + ', ' + addr[1] + ', ' + addr[2] + ', ' + addr[3].toUpperCase() + ' ' + addr[4];
+    }
     if (email && wantsReply) payload._replyto = email;
     send.disabled = true; send.textContent = 'Sending…';
     fetch('https://formsubmit.co/ajax/' + INBOX, {
@@ -907,6 +969,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
       .then(function () {
         askForm.querySelectorAll('input:not([type=radio]), textarea').forEach(function (el) { el.value = ''; });
         document.getElementById('ask-thanks').hidden = false;
+        if (needsBible) document.getElementById('ask-thanks').insertAdjacentHTML('beforeend', ' Your Bible request is in, and Yv\'e will mail it to the address you gave.');
         send.textContent = 'Sent';
       })
       .catch(function () {
