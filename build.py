@@ -88,7 +88,7 @@ PAGES = [
     {
         "slug": "churches", "sections": ["churches"],
         "title": "Churches and 24/7 Prayer We Recommend",
-        "description": "Find a church that preaches the Word, and pray with someone 24/7: Billy Graham, Crossroads and Family Life Radio prayer lines, and BPN Radio.",
+        "description": "Find a church that preaches the Word, and pray with someone 24/7 through the Billy Graham prayer line and BPN Radio.",
         "type": "churches", "nav": "Churches",
     },
     {
