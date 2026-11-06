@@ -1,0 +1,57 @@
+# Mirrors tpotdoc.com to BrandonWilliamBridges/website-samples/tpotdoc/ on every push to main.
+# docs/ is built by ./build.sh and committed with each change (GitHub Pages serves it), so this copies docs/.
+# .github/scripts/sync-to-samples.py does the rest: it strips anything private, adjusts links and forms for the portfolio copy, and stops if anything looks like a secret.
+# Needs the repo secret SAMPLES_TOKEN (fine-grained token: website-samples only, Contents read and write).
+name: Sync to website-samples
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-samples
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check for the SAMPLES_TOKEN secret
+        env:
+          SAMPLES_TOKEN: ${{ secrets.SAMPLES_TOKEN }}
+        run: |
+          if [ -z "$SAMPLES_TOKEN" ]; then
+            echo "::error::Add a repo secret named SAMPLES_TOKEN (Settings > Secrets and variables > Actions). See CLAUDE.md."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          path: src
+
+      - name: Collect the public site
+        run: |
+          OUT="$RUNNER_TEMP/out/tpotdoc"
+          mkdir -p "$OUT"
+          rsync -a \
+            src/docs/ "$OUT/"
+
+      - uses: actions/checkout@v4
+        with:
+          repository: BrandonWilliamBridges/website-samples
+          token: ${{ secrets.SAMPLES_TOKEN }}
+          path: samples
+
+      - name: Copy into website-samples and push
+        run: |
+          python3 src/.github/scripts/sync-to-samples.py \
+            --out "$RUNNER_TEMP/out" \
+            --samples samples \
+            --message "Sync tpotdoc from ${{ github.repository }}@${GITHUB_SHA::7}
+
+          Source commit: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"
