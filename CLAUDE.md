@@ -21,3 +21,10 @@ Live at https://tpotdoc.com (GitHub Pages, served from `main` → `docs/`; DNS o
 - Scripture is KJV. Greek and Hebrew word studies cite *The New Strong's Exhaustive Concordance* (Thomas Nelson, 1990).
 - Yv'e approves all teaching content. Mark any wording that Claude wrote, rather than took from her notes, so she can review it.
 - `INDEXABLE = False` in `build.py` keeps every page `noindex` until Yv'e approves and the site launches. Do not flip it without Brandon saying so.
+
+## Mirrored to website-samples
+This site is mirrored to [BrandonWilliamBridges/website-samples](https://github.com/BrandonWilliamBridges/website-samples) (folder `tpotdoc/`, live at https://brandonwilliambridges.github.io/website-samples/tpotdoc/) by `.github/workflows/sync-samples.yml`, which runs on every push to `main`.
+
+- **The sync workflow must keep working whenever the site changes.** It copies the committed `docs/` folder as it is, so keep committing the `./build.sh` output with each change. If you move or rename the site's output, add a build step, or add files that must not be public, update the workflow in the same change.
+- Only the public site is copied. Never let it copy `.env` files, secrets, keys, databases or real customer data. `.github/scripts/sync-to-samples.py` strips those, points links at the copy's folder, removes analytics, adds `noindex`, stops forms from sending, and halts the sync if anything still looks like a secret. The same script is in every repo that syncs, so change it everywhere at once.
+- The workflow needs the repo secret `SAMPLES_TOKEN`: a fine-grained token limited to website-samples, with Contents read and write. When it expires, make a new one and update the secret in every source repo.
