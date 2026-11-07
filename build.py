@@ -68,6 +68,12 @@ PAGES = [
         "type": "lesson", "about": "Faith", "published": "2026-10-14", "nav": "Faith",
     },
     {
+        "slug": "baptisms", "sections": ["baptisms"],
+        "title": "Hebrew Roots of Baptism: Mikveh and Tevilah",
+        "description": "Baptism was not a Christian invention: Jews immersed in a mikveh (tevilah) to be made clean. What John the Baptist's baptism meant to them.",
+        "type": "lesson", "about": "Baptism", "published": "2026-11-06", "nav": "Baptisms",
+    },
+    {
         "slug": "fruitful", "sections": ["fruitful"],
         "title": "Neither Barren nor Unfruitful: 2 Peter 1:8 Word Study",
         "description": "What 'barren' and 'unfruitful' mean in 2 Peter 1:8, and Peter's plan for growth: add to your faith virtue, knowledge, patience, godliness and love.",
@@ -118,14 +124,14 @@ PAGES = [
 ]
 if not SHOW_CARDS:
     PAGES = [p for p in PAGES if p["slug"] != "cards"]
-LESSON_ORDER = ["repentance", "faith", "fruitful"]
+LESSON_ORDER = ["repentance", "faith", "baptisms", "fruitful"]
 
 # In-page anchors in the source, and where they live on the built site (relative to the home page).
 ANCHORS = {
     "top": "", "foundations": "#foundations", "next": "#next",
     "repentance": "repentance/", "three-things": "repentance/#three-things",
     "fruit-of-repentance": "repentance/#fruit-of-repentance",
-    "faith": "faith/", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/",
+    "faith": "faith/", "baptisms": "baptisms/", "jewish-immersion": "baptisms/#jewish-immersion", "john-the-baptist": "baptisms/#john-the-baptist", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/",
     "printables": "cards/", "churches": "churches/", "prayers": "prayers/", "about": "about/",
     "privacy": "privacy/", "mission": "mission/", "prayer-for-a-test": "prayers/#prayer-for-a-test", "prayer-when-tested": "prayers/#prayer-when-tested",
 }
