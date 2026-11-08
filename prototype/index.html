@@ -12,7 +12,6 @@
   --muted: #59617a;
   --line: #d5d9e4;
   --accent: #a67a1f;      /* lamp gold */
-  --highlight: rgba(250, 204, 72, .6);
   --accent-ink: #ffffff;
   --navy: #1f2d5c;        /* deep covenant blue */
   --navy-ink: #f3f5fb;
@@ -24,13 +23,13 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #10142a; --surface: #171c36; --stone: #1e2443; --ink: #e8ebf5; --muted: #a2a9c2;
-    --line: #2d3458; --accent: #d9ad52; --accent-ink: #1a1405; --highlight: rgba(217, 173, 82, .38); --navy: #26346b; --navy-ink: #f3f5fb;
+    --line: #2d3458; --accent: #d9ad52; --accent-ink: #1a1405; --navy: #26346b; --navy-ink: #f3f5fb;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #10142a; --surface: #171c36; --stone: #1e2443; --ink: #e8ebf5; --muted: #a2a9c2;
-  --line: #2d3458; --accent: #d9ad52; --accent-ink: #1a1405; --highlight: rgba(217, 173, 82, .38); --navy: #26346b; --navy-ink: #f3f5fb;
+  --line: #2d3458; --accent: #d9ad52; --accent-ink: #1a1405; --navy: #26346b; --navy-ink: #f3f5fb;
   color-scheme: dark;
 }
 
@@ -76,8 +75,8 @@ nav.main a:hover { color: var(--accent); }
 .welcome .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
 .masthead { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
 .stack { display: flex; flex-direction: column; font-size: clamp(2.2rem, 5.2vw, 3.6rem); line-height: 1.02; font-weight: 650; margin: 0; }
-/* The capitals spell TPOTDOC down the left side, marked like a highlighter stroke (Yv'e's sketch). */
-.stack .cap { background: var(--highlight); padding-inline: .04em; margin-inline: -.04em; box-decoration-break: clone; }
+/* The capitals spell TPOTDOC down the left side in gold (Yv'e's sketch). */
+.stack .cap { color: var(--accent); }
 .mast-logo { width: clamp(110px, 18vw, 180px); height: auto; flex: none; }
 .welcome-line { margin-top: 22px; font-family: var(--font-display); font-size: clamp(1.3rem, 2.6vw, 1.65rem); color: var(--accent); font-style: italic; }
 .welcome .lede { margin-top: 18px; max-width: 52ch; color: var(--muted); font-size: 1.12rem; }
@@ -353,24 +352,24 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
           <span class="phrase">“the doctrine of baptisms”</span>
           <span class="status">Read the third lesson →</span>
         </a>
-        <div class="stone">
+        <a class="stone open" href="#laying-on-of-hands">
           <span class="num">4</span>
           <h3>Laying on of Hands</h3>
           <span class="phrase">“laying on of hands”</span>
-          <span class="status">Coming soon</span>
-        </div>
-        <div class="stone">
+          <span class="status">Read the fourth lesson →</span>
+        </a>
+        <a class="stone open" href="#resurrection">
           <span class="num">5</span>
           <h3>Resurrection</h3>
           <span class="phrase">“resurrection of the dead”</span>
-          <span class="status">Coming soon</span>
-        </div>
-        <div class="stone">
+          <span class="status">Read the fifth lesson →</span>
+        </a>
+        <a class="stone open" href="#eternal-judgment">
           <span class="num">6</span>
           <h3>Eternal Judgment</h3>
           <span class="phrase">“eternal judgment”</span>
-          <span class="status">Coming soon</span>
-        </div>
+          <span class="status">Read the sixth lesson →</span>
+        </a>
       </div>
       <div class="foundation-line" aria-hidden="true"></div>
       <p class="next-site">Once the foundation is laid: <em>Going on unto perfection</em>, a companion site about growing into completeness in Christ.</p>
@@ -530,10 +529,24 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
         <p>John also told them that Someone greater was coming, with a greater baptism:</p>
         <figure class="scripture">
           <p>“I indeed baptize you with water unto repentance: but he that cometh after me is mightier than I, whose shoes I am not worthy to bear: he shall baptize you with the Holy Ghost, and with fire.”</p>
-          <cite>Matthew 3:11</cite>
+          <cite>Matthew 3:11 · also Luke 3:16</cite>
         </figure>
-        <p class="check-note"><strong>Recommended reading:</strong> Matthew 3, Mark 1:1–11, and John 3:22–23.</p>
-        <p class="draft-note">Draft for Yv'e to review: adapted from the research on the Hebrew origins of baptism that she shared, November 2026. The Hebrews 9:10 link and the word card were added by Claude.</p>
+        <p>John’s baptism in water prepared the people. Jesus would baptize with the Holy Ghost, and that promise came true on the day of Pentecost:</p>
+        <figure class="scripture">
+          <p>“And there appeared unto them cloven tongues like as of fire, and it sat upon each of them. And they were all filled with the Holy Ghost …”</p>
+          <cite>Acts 2:3–4</cite>
+        </figure>
+        <p class="check-note"><strong>Recommended reading:</strong> Matthew 3, Mark 1:1–11, Luke 3:1–22, and John 3:22–23.</p>
+
+        <h3 id="baptized-for-the-dead">What does “baptized for the dead” mean?</h3>
+        <p>In 1 Corinthians 15, Paul writes the Bible’s great chapter on the resurrection. In the middle of it he mentions people who were “baptized for the dead”:</p>
+        <figure class="scripture">
+          <p>“Else what shall they do which are baptized for the dead, if the dead rise not at all? why are they then baptized for the dead?”</p>
+          <cite>1 Corinthians 15:29</cite>
+        </figure>
+        <p><strong>Paul was not teaching people to be baptized for someone who has died.</strong> Some in Corinth were doing this, and Paul used their own practice to make his point: why would anyone do this unless they believed the dead will rise again? Notice that Paul says “<em>they</em>,” not “we.” He is not making it a doctrine. He is showing how much the resurrection of the dead matters. If the dead do not rise, the practice means nothing, and so does our faith (1 Corinthians 15:17).</p>
+        <p>Salvation is for the living, by faith in Jesus. Each of us must believe for ourselves: “now is the accepted time; behold, now is the day of salvation” (2 Corinthians 6:2). Read more in <a href="#resurrection">Foundation Stone 5: Resurrection</a>.</p>
+        <p class="draft-note">Draft for Yv'e to review: adapted from the research on the Hebrew origins of baptism that she shared, November 2026. The Hebrews 9:10 link and the word card were added by Claude. The Pentecost paragraph and the wording of “baptized for the dead” were written by Claude from Yv'e’s position (Paul says “they,” not “we,” and uses their practice to show the importance of the resurrection), November 2026.</p>
         <p>Have a question about baptism? <a href="#ask">Send it in</a> and we will answer from the Word.</p>
       </article>
 
@@ -546,6 +559,249 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
           <div><dt>Comes from</dt><dd>H6960 qavah, “to bind together, to collect; to wait for, to expect”</dd></div>
           <div><dt>Plain meaning</dt><dd>A gathering of water, a pool; also something waited for, a hope.</dd></div>
           <div><dt>In Scripture</dt><dd>“the gathering together of the waters” (Genesis 1:10); “O LORD, the hope of Israel” (Jeremiah 17:13)</dd></div>
+        </dl>
+        <p class="journal-note">Word card drafted by Claude for Yv'e to review.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="block" id="laying-on-of-hands">
+    <div class="wrap lesson-grid">
+      <article class="lesson-body">
+        <p class="eyebrow">Foundation Stone 4 · Word Study</p>
+        <h2 style="font-size: clamp(1.8rem, 3.6vw, 2.5rem);">What is the laying on of hands?</h2>
+        <p class="big-def">The laying on of hands is placing your hands on a person while you pray, to bless them, to set them apart for God’s work, or to ask God to heal them or fill them with His Spirit.</p>
+        <figure class="scripture">
+          <p>“Of the doctrine of baptisms, and of laying on of hands, and of resurrection of the dead, and of eternal judgment.”</p>
+          <cite>Hebrews 6:2</cite>
+        </figure>
+
+        <h3 id="first-laying-on-of-hands">Where does the Bible first show it?</h3>
+        <p>The first time is in Genesis 48. Jacob, also called Israel, was old and near death. Joseph brought his two sons to be blessed. Jacob crossed his arms on purpose and put his right hand, the hand of the greater blessing, on the younger son, Ephraim.</p>
+        <figure class="scripture">
+          <p>“And Israel stretched out his right hand, and laid it upon Ephraim’s head, who was the younger, and his left hand upon Manasseh’s head, guiding his hands wittingly; for Manasseh was the firstborn.”</p>
+          <cite>Genesis 48:14</cite>
+        </figure>
+
+        <h3 id="three-old-testament-uses">Three ways it was used in the Old Testament</h3>
+        <p>In Hebrew this practice is called <strong>semikhah</strong>, from <em>samak</em> (H5564), “to lean upon.” The one laying on hands leaned his weight on the other.</p>
+        <ul>
+          <li><strong>To pass on a blessing.</strong> Jacob blessed his grandsons and spoke over their future (Genesis 48).</li>
+          <li><strong>To place sin on a sacrifice.</strong> The worshipper laid his hand on the head of the animal offered for him. His sin was counted on the substitute, which died in his place (Leviticus 1:4; 16:21).</li>
+          <li><strong>To give authority for God’s work.</strong> God told Moses to lay his hands on Joshua, to make him the next leader of Israel (Numbers 27:18–23).</li>
+        </ul>
+        <figure class="scripture">
+          <p>“And he shall put his hand upon the head of the burnt offering; and it shall be accepted for him to make atonement for him.”</p>
+          <cite>Leviticus 1:4</cite>
+        </figure>
+        <p>The sacrifices pointed to Jesus. On the cross, God laid our sin on Him, the perfect Lamb:</p>
+        <figure class="scripture">
+          <p>“All we like sheep have gone astray; we have turned every one to his own way; and the LORD hath laid on him the iniquity of us all.”</p>
+          <cite>Isaiah 53:6</cite>
+        </figure>
+        <figure class="scripture">
+          <p>“And Joshua the son of Nun was full of the spirit of wisdom; for Moses had laid his hands upon him: and the children of Israel hearkened unto him, and did as the LORD commanded Moses.”</p>
+          <cite>Deuteronomy 34:9</cite>
+        </figure>
+
+        <h3 id="laying-on-of-hands-new-testament">How did Jesus and the apostles lay on hands?</h3>
+        <ul>
+          <li><strong>To bless.</strong> “And he took them up in his arms, put his hands upon them, and blessed them” (Mark 10:16).</li>
+          <li><strong>To heal.</strong> “He laid his hands on every one of them, and healed them” (Luke 4:40). Jesus said of those who believe, “they shall lay hands on the sick, and they shall recover” (Mark 16:18).</li>
+          <li><strong>To receive the Holy Ghost.</strong> “Then laid they their hands on them, and they received the Holy Ghost” (Acts 8:17).</li>
+          <li><strong>To send people out for ministry.</strong> “And when they had fasted and prayed, and laid their hands on them, they sent them away” (Acts 13:3).</li>
+        </ul>
+        <p>Because it is so serious, Paul told Timothy not to rush it: “Lay hands suddenly on no man” (1 Timothy 5:22).</p>
+        <p class="check-note"><strong>Recommended reading:</strong> Genesis 48, Numbers 27:15–23, Acts 6:1–7, and Acts 8:14–17.</p>
+        <p class="draft-note">Draft for Yv'e to review: written by Claude from the research on the laying on of hands that she shared, November 2026. The New Testament verses, Isaiah 53:6, 1 Timothy 5:22 and the word card were added by Claude.</p>
+        <p>Have a question about the laying on of hands? <a href="#ask">Send it in</a> and we will answer from the Word.</p>
+      </article>
+
+      <aside class="wordcard" aria-label="Greek word study: laying on">
+        <p class="eyebrow">The Greek word</p>
+        <p class="greek" lang="el">ἐπίθεσις</p>
+        <p class="say">epithesis · say it <strong>ep-ITH-eh-sis</strong></p>
+        <dl>
+          <div><dt>Strong’s number</dt><dd>G1936 (noun, “laying on”)</dd></div>
+          <div><dt>Comes from</dt><dd>G2007 <span lang="el">ἐπιτίθημι</span>, epitithēmi, “to lay upon”</dd></div>
+          <div><dt>Plain meaning</dt><dd>A putting on, especially of hands, to bless or set someone apart.</dd></div>
+          <div><dt>Hebrew background</dt><dd>H5564 samak, “to lean upon, to lay”</dd></div>
+        </dl>
+        <p class="journal-note">Word card drafted by Claude for Yv'e to review.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="block lesson" id="resurrection">
+    <div class="wrap lesson-grid">
+      <article class="lesson-body">
+        <p class="eyebrow">Foundation Stone 5 · Word Study</p>
+        <h2 style="font-size: clamp(1.8rem, 3.6vw, 2.5rem);">What is the resurrection of the dead?</h2>
+        <p class="big-def">The resurrection of the dead is God’s promise that the bodies of the dead will be raised to life again, just as Jesus rose bodily from the grave.</p>
+        <p>The resurrection is not a small detail. It is where God’s whole plan of salvation is headed.</p>
+
+        <h3 id="old-testament-hope">Did believers in the Old Testament hope for it?</h3>
+        <p>Yes. Long before Jesus came, God’s people believed He would raise the dead.</p>
+        <figure class="scripture">
+          <p>“For I know that my redeemer liveth, and that he shall stand at the latter day upon the earth: And though after my skin worms destroy this body, yet in my flesh shall I see God.”</p>
+          <cite>Job 19:25–26</cite>
+        </figure>
+        <figure class="scripture">
+          <p>“And many of them that sleep in the dust of the earth shall awake, some to everlasting life, and some to shame and everlasting contempt.”</p>
+          <cite>Daniel 12:2 · see also Isaiah 26:19 and Hosea 13:14</cite>
+        </figure>
+
+        <h3 id="jesus-rose-first">Jesus rose first</h3>
+        <p>The resurrection of Jesus is the center of the Christian faith. He rose with a real body. He showed His disciples His hands and feet, and He ate with them.</p>
+        <figure class="scripture">
+          <p>“Behold my hands and my feet, that it is I myself: handle me, and see; for a spirit hath not flesh and bones, as ye see me have.”</p>
+          <cite>Luke 24:39</cite>
+        </figure>
+        <p>More than 500 people saw Him alive at one time (1 Corinthians 15:3–8). Because He rose, everyone who belongs to Him will rise too.</p>
+        <figure class="scripture">
+          <p>“But now is Christ risen from the dead, and become the firstfruits of them that slept.”</p>
+          <cite>1 Corinthians 15:20</cite>
+        </figure>
+
+        <h3 id="raised-back-to-life">People God raised back to life</h3>
+        <p>The Bible tells of people who were raised from the dead. Each one shows God’s power over death:</p>
+        <ul>
+          <li>Elijah and the widow’s son (1 Kings 17:17–24)</li>
+          <li>Elisha and the Shunammite woman’s son (2 Kings 4:32–37)</li>
+          <li>A man who touched Elisha’s bones (2 Kings 13:21)</li>
+          <li>The widow’s son at Nain (Luke 7:11–15)</li>
+          <li>Jairus’ daughter (Luke 8:49–56)</li>
+          <li>Lazarus, four days in the tomb (John 11:38–44)</li>
+          <li>Saints who came out of their graves after Jesus rose (Matthew 27:52–53)</li>
+          <li>Tabitha, also called Dorcas (Acts 9:36–42)</li>
+          <li>Eutychus, who fell from a window (Acts 20:9–12)</li>
+        </ul>
+        <p>These people later died again. Jesus is different: “Christ being raised from the dead dieth no more; death hath no more dominion over him” (Romans 6:9).</p>
+
+        <h3 id="what-jesus-taught-resurrection">What did Jesus teach about the resurrection?</h3>
+        <figure class="scripture">
+          <p>“Jesus said unto her, I am the resurrection, and the life: he that believeth in me, though he were dead, yet shall he live.”</p>
+          <cite>John 11:25</cite>
+        </figure>
+        <figure class="scripture">
+          <p>“And this is the will of him that sent me, that every one which seeth the Son, and believeth on him, may have everlasting life: and I will raise him up at the last day.”</p>
+          <cite>John 6:40</cite>
+        </figure>
+        <p>Jesus also taught that <em>everyone</em> will be raised, both the saved and the lost:</p>
+        <figure class="scripture">
+          <p>“Marvel not at this: for the hour is coming, in the which all that are in the graves shall hear his voice, And shall come forth; they that have done good, unto the resurrection of life; and they that have done evil, unto the resurrection of damnation.”</p>
+          <cite>John 5:28–29 · see also Acts 24:15</cite>
+        </figure>
+
+        <h3 id="why-the-resurrection-matters">Why does the resurrection matter?</h3>
+        <p>Paul says that without the resurrection, our faith would be empty:</p>
+        <figure class="scripture">
+          <p>“And if Christ be not raised, your faith is vain; ye are yet in your sins.”</p>
+          <cite>1 Corinthians 15:17</cite>
+        </figure>
+        <p>But Christ is raised, and so we have hope when someone we love dies in the Lord. When Jesus comes back, they will rise first:</p>
+        <figure class="scripture">
+          <p>“For the Lord himself shall descend from heaven with a shout, with the voice of the archangel, and with the trump of God: and the dead in Christ shall rise first: Then we which are alive and remain shall be caught up together with them in the clouds, to meet the Lord in the air: and so shall we ever be with the Lord.”</p>
+          <cite>1 Thessalonians 4:16–17</cite>
+        </figure>
+        <figure class="scripture">
+          <p>“In a moment, in the twinkling of an eye, at the last trump: for the trumpet shall sound, and the dead shall be raised incorruptible, and we shall be changed.”</p>
+          <cite>1 Corinthians 15:52</cite>
+        </figure>
+        <p>Paul even pointed to people who were <a href="#baptized-for-the-dead">“baptized for the dead”</a> to show how much the resurrection matters. The Bible ends with the dead raised, some to reign with Christ (Revelation 20:4–6), and all to stand before God (Revelation 20:11–13).</p>
+        <p class="check-note"><strong>Recommended reading:</strong> John 11:1–44, Luke 24, 1 Corinthians 15 (the resurrection chapter), and 1 Thessalonians 4:13–18.</p>
+        <p class="draft-note">Draft for Yv'e to review: written by Claude from the list of resurrection Scriptures that she shared, November 2026. Romans 6:9 and the word card were added by Claude.</p>
+        <p>Have a question about the resurrection? <a href="#ask">Send it in</a> and we will answer from the Word.</p>
+      </article>
+
+      <aside class="wordcard" aria-label="Greek word study: resurrection">
+        <p class="eyebrow">The Greek word</p>
+        <p class="greek" lang="el">ἀνάστασις</p>
+        <p class="say">anastasis · say it <strong>an-AS-tah-sis</strong></p>
+        <dl>
+          <div><dt>Strong’s number</dt><dd>G386 (noun, “resurrection”)</dd></div>
+          <div><dt>Comes from</dt><dd>G450 <span lang="el">ἀνίστημι</span>, anistēmi, “to stand up”</dd></div>
+          <div><dt>Built from</dt>
+            <dd class="roots"><span class="part">G303 ana · up, again</span> + <span class="part">G2476 histēmi · to stand</span></dd></div>
+          <div><dt>Plain meaning</dt><dd>A standing up again; a rising from death to life.</dd></div>
+        </dl>
+        <p class="journal-note">Word card drafted by Claude for Yv'e to review.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="block" id="eternal-judgment">
+    <div class="wrap lesson-grid">
+      <article class="lesson-body">
+        <p class="eyebrow">Foundation Stone 6 · Word Study</p>
+        <h2 style="font-size: clamp(1.8rem, 3.6vw, 2.5rem);">What is eternal judgment?</h2>
+        <p class="big-def">Eternal judgment is the final judgment of every person by Jesus Christ. His verdict lasts forever: everlasting life for those who belong to Him, and everlasting punishment for those who reject Him.</p>
+        <figure class="scripture">
+          <p>“And as it is appointed unto men once to die, but after this the judgment.”</p>
+          <cite>Hebrews 9:27</cite>
+        </figure>
+
+        <h3 id="jesus-is-the-judge">Who is the Judge?</h3>
+        <p>Jesus Himself. The Father has given Him all authority to judge.</p>
+        <figure class="scripture">
+          <p>“For the Father judgeth no man, but hath committed all judgment unto the Son: That all men should honour the Son, even as they honour the Father.”</p>
+          <cite>John 5:22–23 · see also John 5:27</cite>
+        </figure>
+
+        <h3 id="final-separation">How did Jesus describe the final judgment?</h3>
+        <p>Jesus used everyday pictures to show that at the end of the age, people will be divided into two groups:</p>
+        <ul>
+          <li><strong>Sheep and goats.</strong> When He comes in His glory, He will separate the nations “as a shepherd divideth his sheep from the goats” (Matthew 25:31–46).</li>
+          <li><strong>Wheat and tares.</strong> Good grain and weeds grow together until the harvest, and then they are separated (Matthew 13:24–30, 36–43).</li>
+          <li><strong>The net.</strong> A net gathers every kind of fish, and then the good are kept and the bad thrown away (Matthew 13:47–50).</li>
+        </ul>
+        <figure class="scripture">
+          <p>“And these shall go away into everlasting punishment: but the righteous into life eternal.”</p>
+          <cite>Matthew 25:46</cite>
+        </figure>
+
+        <h3 id="what-will-be-judged">What will be judged?</h3>
+        <ul>
+          <li><strong>Our words.</strong> “Every idle word that men shall speak, they shall give account thereof in the day of judgment” (Matthew 12:36).</li>
+          <li><strong>How we treat others.</strong> “Inasmuch as ye have done it unto one of the least of these my brethren, ye have done it unto me” (Matthew 25:40).</li>
+          <li><strong>Whether we really know Him.</strong> Calling Him “Lord, Lord” is not enough. To some He will say, “I never knew you: depart from me, ye that work iniquity” (Matthew 7:21–23).</li>
+        </ul>
+        <figure class="scripture">
+          <p>“And I saw the dead, small and great, stand before God; and the books were opened: and another book was opened, which is the book of life: and the dead were judged out of those things which were written in the books, according to their works.”</p>
+          <cite>Revelation 20:12</cite>
+        </figure>
+
+        <h3 id="what-jesus-said-about-hell">What did Jesus say about hell?</h3>
+        <p>Jesus spoke about hell more than anyone else in the Bible. He used the word <em>Gehenna</em>, the name of a valley outside Jerusalem where fires burned. He called it a place “where their worm dieth not, and the fire is not quenched” (Mark 9:44), and a place of “weeping and gnashing of teeth” (Matthew 8:12). He warned us because He does not want anyone to go there.</p>
+
+        <h3 id="no-condemnation">The good news: you do not have to fear judgment</h3>
+        <p>Jesus came to save us from judgment, not to condemn us.</p>
+        <figure class="scripture">
+          <p>“For God sent not his Son into the world to condemn the world; but that the world through him might be saved. He that believeth on him is not condemned: but he that believeth not is condemned already, because he hath not believed in the name of the only begotten Son of God.”</p>
+          <cite>John 3:17–18</cite>
+        </figure>
+        <figure class="scripture">
+          <p>“Verily, verily, I say unto you, He that heareth my word, and believeth on him that sent me, hath everlasting life, and shall not come into condemnation; but is passed from death unto life.”</p>
+          <cite>John 5:24</cite>
+        </figure>
+        <figure class="scripture">
+          <p>“There is therefore now no condemnation to them which are in Christ Jesus …”</p>
+          <cite>Romans 8:1</cite>
+        </figure>
+        <p>If you have turned to God in <a href="#repentance">repentance</a> and put your <a href="#faith">faith</a> in Jesus, you have passed from death to life. That is where these six foundations began.</p>
+        <p class="check-note"><strong>Recommended reading:</strong> Matthew 25:31–46, John 5:19–30, and Revelation 20:11–15.</p>
+        <p class="draft-note">Draft for Yv'e to review: written by Claude from the research on what Christ taught about eternal judgment that she shared, November 2026. Hebrews 9:27, Revelation 20:12, Romans 8:1 and the word card were added by Claude.</p>
+        <p>Have a question about eternal judgment? <a href="#ask">Send it in</a> and we will answer from the Word.</p>
+      </article>
+
+      <aside class="wordcard" aria-label="Greek word study: judgment">
+        <p class="eyebrow">The Greek words</p>
+        <p class="greek" lang="el">κρίμα αἰώνιον</p>
+        <p class="say">krima aiōnion · say it <strong>KREE-mah eye-OH-nee-on</strong></p>
+        <dl>
+          <div><dt>Judgment</dt><dd>G2917 krima, from G2919 krinō, “to distinguish, to decide, to judge”</dd></div>
+          <div><dt>Eternal</dt><dd>G166 aiōnios, from G165 aiōn, “an age”; lasting forever</dd></div>
+          <div><dt>Plain meaning</dt><dd>A final verdict that will never change.</dd></div>
         </dl>
         <p class="journal-note">Word card drafted by Claude for Yv'e to review.</p>
       </aside>

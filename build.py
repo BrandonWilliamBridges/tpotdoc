@@ -46,7 +46,7 @@ PAGES = [
     {
         "slug": "", "sections": ["welcome", "foundations", "next"],
         "title": f"{SITE_NAME} | For New Believers",
-        "description": "Welcome to the family of God. Simple Bible lessons for new Christians on the six foundations of Hebrews 6:1-2, starting with repentance and faith.",
+        "description": "Welcome to the family of God. Simple Bible lessons for new Christians on all six foundations of Hebrews 6:1-2, from repentance to eternal judgment.",
         "type": "home",
     },
     {
@@ -70,8 +70,26 @@ PAGES = [
     {
         "slug": "baptisms", "sections": ["baptisms"],
         "title": "Hebrew Roots of Baptism: Mikveh and Tevilah",
-        "description": "Baptism was not a Christian invention: Jews immersed in a mikveh (tevilah) to be made clean. What John the Baptist's baptism meant to them.",
+        "description": "Baptism was not a Christian invention: Jews immersed in a mikveh to be made clean. John the Baptist's baptism, and what 'baptized for the dead' means.",
         "type": "lesson", "about": "Baptism", "published": "2026-11-06", "nav": "Baptisms",
+    },
+    {
+        "slug": "laying-on-of-hands", "sections": ["laying-on-of-hands"],
+        "title": "What Is the Laying On of Hands? (Hebrews 6:2)",
+        "description": "Laying on of hands is placing hands on someone in prayer to bless, heal, commission or receive the Holy Ghost. From Genesis 48 to Acts.",
+        "type": "lesson", "about": "Laying on of hands", "published": "2026-11-08", "nav": "Laying on of Hands",
+    },
+    {
+        "slug": "resurrection", "sections": ["resurrection"],
+        "title": "What Is the Resurrection of the Dead? Bible Verses",
+        "description": "God promises the dead will be raised bodily, as Jesus rose. Old Testament hope, people raised to life, and what Jesus and Paul taught.",
+        "type": "lesson", "about": "Resurrection of the dead", "published": "2026-11-08", "nav": "Resurrection",
+    },
+    {
+        "slug": "eternal-judgment", "sections": ["eternal-judgment"],
+        "title": "What Is Eternal Judgment? What Jesus Taught",
+        "description": "Eternal judgment is Jesus' final, forever verdict on every person. What He taught about the sheep and goats, hell, and escaping condemnation.",
+        "type": "lesson", "about": "Eternal judgment", "published": "2026-11-08", "nav": "Eternal Judgment",
     },
     {
         "slug": "fruitful", "sections": ["fruitful"],
@@ -124,14 +142,15 @@ PAGES = [
 ]
 if not SHOW_CARDS:
     PAGES = [p for p in PAGES if p["slug"] != "cards"]
-LESSON_ORDER = ["repentance", "faith", "baptisms", "fruitful"]
+LESSON_ORDER = ["repentance", "faith", "baptisms", "laying-on-of-hands", "resurrection", "eternal-judgment", "fruitful"]
 
 # In-page anchors in the source, and where they live on the built site (relative to the home page).
 ANCHORS = {
     "top": "", "foundations": "#foundations", "next": "#next",
     "repentance": "repentance/", "three-things": "repentance/#three-things",
     "fruit-of-repentance": "repentance/#fruit-of-repentance",
-    "faith": "faith/", "baptisms": "baptisms/", "jewish-immersion": "baptisms/#jewish-immersion", "john-the-baptist": "baptisms/#john-the-baptist", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/",
+    "faith": "faith/", "baptisms": "baptisms/", "jewish-immersion": "baptisms/#jewish-immersion", "john-the-baptist": "baptisms/#john-the-baptist", "baptized-for-the-dead": "baptisms/#baptized-for-the-dead",
+    "laying-on-of-hands": "laying-on-of-hands/", "resurrection": "resurrection/", "eternal-judgment": "eternal-judgment/", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/",
     "printables": "cards/", "churches": "churches/", "prayers": "prayers/", "about": "about/",
     "privacy": "privacy/", "mission": "mission/", "prayer-for-a-test": "prayers/#prayer-for-a-test", "prayer-when-tested": "prayers/#prayer-when-tested",
 }
