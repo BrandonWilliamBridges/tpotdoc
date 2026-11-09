@@ -24,7 +24,7 @@
 <meta name="theme-color" content="#1f2d5c">
 <link rel="icon" type="image/png" href="https://tpotdoc.com/img/favicon.png">
 <link rel="apple-touch-icon" href="https://tpotdoc.com/img/logo.png">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": ["Article", "LearningResource"], "headline": "Hebrew Roots of Baptism: Mikveh and Tevilah", "description": "Baptism was not a Christian invention: Jews immersed in a mikveh to be made clean. John the Baptist's baptism, and what 'baptized for the dead' means.", "url": "https://tpotdoc.com/baptisms/", "mainEntityOfPage": "https://tpotdoc.com/baptisms/", "inLanguage": "en", "author": {"@type": "Person", "name": "Dianna Bridges", "alternateName": "Yv'e Bridges", "description": "Bible teacher writing foundational lessons for new believers, based on Hebrews 6:1-2."}, "publisher": {"@type": "Person", "name": "Dianna Bridges", "alternateName": "Yv'e Bridges", "description": "Bible teacher writing foundational lessons for new believers, based on Hebrews 6:1-2."}, "datePublished": "2026-11-06", "dateModified": "2026-11-08", "image": "https://tpotdoc.com/img/og.png", "about": {"@type": "Thing", "name": "Baptism"}, "educationalLevel": "Beginner", "audience": {"@type": "Audience", "audienceType": "New Christians"}, "isPartOf": {"@type": "WebSite", "name": "The Principles of the Doctrine of Christ", "url": "https://tpotdoc.com/"}, "citation": "The New Strong's Exhaustive Concordance of the Bible, Thomas Nelson Publishers, 1990"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": ["Article", "LearningResource"], "headline": "Hebrew Roots of Baptism: Mikveh and Tevilah", "description": "Baptism was not a Christian invention: Jews immersed in a mikveh to be made clean. John the Baptist's baptism, and what 'baptized for the dead' means.", "url": "https://tpotdoc.com/baptisms/", "mainEntityOfPage": "https://tpotdoc.com/baptisms/", "inLanguage": "en", "author": {"@type": "Person", "name": "Dianna Bridges", "alternateName": "Yv'e Bridges", "description": "Bible teacher writing foundational lessons for new believers, based on Hebrews 6:1-2."}, "publisher": {"@type": "Person", "name": "Dianna Bridges", "alternateName": "Yv'e Bridges", "description": "Bible teacher writing foundational lessons for new believers, based on Hebrews 6:1-2."}, "datePublished": "2026-11-06", "dateModified": "2026-11-09", "image": "https://tpotdoc.com/img/og.png", "about": {"@type": "Thing", "name": "Baptism"}, "educationalLevel": "Beginner", "audience": {"@type": "Audience", "audienceType": "New Christians"}, "isPartOf": {"@type": "WebSite", "name": "The Principles of the Doctrine of Christ", "url": "https://tpotdoc.com/"}, "citation": "The New Strong's Exhaustive Concordance of the Bible, Thomas Nelson Publishers, 1990"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://tpotdoc.com/"}, {"@type": "ListItem", "position": 2, "name": "Baptisms", "item": "https://tpotdoc.com/baptisms/"}]}</script>
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
@@ -88,14 +88,43 @@ header.site {
   background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
 }
-header.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; flex-wrap: wrap; }
-.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+header.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); min-width: 0; }
 .brand b { font-family: var(--font-display); font-weight: 650; font-size: clamp(.98rem, 2.4vw, 1.15rem); letter-spacing: .01em; line-height: 1.2; }
 .brand span { font-size: .8rem; color: var(--muted); letter-spacing: .1em; }
 .brand img { width: 44px; height: 44px; flex: none; }
-nav.main { display: flex; gap: 18px; flex-wrap: wrap; font-size: .95rem; }
-nav.main a { color: var(--ink); text-decoration: none; }
+/* Menu: the three-line button to the right of the title drops down every page, in three groups. */
+.menu { flex: none; }
+.menu > summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px;
+  min-width: 44px; min-height: 44px; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 6px;
+  color: var(--ink); font-weight: 600; font-size: .95rem; user-select: none;
+}
+.menu > summary::-webkit-details-marker { display: none; }
+.menu > summary:hover, .menu[open] > summary { border-color: var(--ink); }
+.menu > summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.menu > summary svg { display: block; flex: none; }
+.menu .icon-close, .menu[open] .icon-open { display: none; }
+.menu[open] .icon-close { display: block; }
+nav.main {
+  position: absolute; left: 0; right: 0; top: 100%;
+  background: var(--surface); border-bottom: 1px solid var(--line); box-shadow: 0 16px 32px rgb(10 15 35 / .14);
+  max-height: calc(100dvh - 140px); overflow-y: auto; overscroll-behavior: contain;
+}
+.menu-groups {
+  max-width: 1080px; margin-inline: auto; padding: 18px 20px 24px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px 40px;
+}
+.menu-head { font-size: .75rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+.menu-groups ul { list-style: none; margin: 0; padding: 0; }
+nav.main a { display: block; padding: 9px 0; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line); }
+nav.main li:last-child a { border-bottom: 0; }
 nav.main a:hover { color: var(--accent); }
+nav.main a[aria-current="page"] { color: var(--accent); font-weight: 600; }
+@media (max-width: 600px) {
+  .menu > summary { padding: 8px 10px; }
+  .menu-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
 
 /* Welcome */
 .welcome { padding-block: 56px 48px; }
@@ -299,18 +328,43 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
 <header class="site">
   <div class="wrap">
     <a class="brand" href="../" aria-label="The Principles of the Doctrine of Christ, home"><img src="../img/logo.png" alt="" width="44" height="44"><b>The Principles Of The Doctrine Of Christ</b></a>
-    <nav class="main" aria-label="Main">
-      <a href="../mission/">Mission</a>
-      <a href="../#foundations">Foundations</a>
-      <a href="../repentance/">Repentance</a>
-      <a href="../faith/">Faith</a>
-      <a href="../baptisms/" aria-current="page">Baptisms</a>
-      <a href="../questions/">Questions</a>
-      <a href="../prayers/">Prayers</a>
-      <a href="../ask/">Ask &amp; Pray</a>
-      <a href="../churches/">Churches</a>
-      <a href="../about/">About</a>
-    </nav>
+    <details class="menu">
+      <summary><span class="menu-label">Menu</span><svg class="icon-open" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><svg class="icon-close" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></summary>
+      <nav class="main" aria-label="Main">
+        <div class="menu-groups">
+          <div>
+            <p class="menu-head">Start here</p>
+            <ul>
+              <li><a href="../">Home</a></li>
+              <li><a href="../mission/">Our Mission</a></li>
+              <li><a href="../#foundations">The Six Foundations</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="menu-head">Lessons</p>
+            <ul>
+              <li><a href="../repentance/">Repentance</a></li>
+              <li><a href="../faith/">Faith</a></li>
+              <li><a href="../baptisms/" aria-current="page">Baptisms</a></li>
+              <li><a href="../laying-on-of-hands/">Laying on of Hands</a></li>
+              <li><a href="../resurrection/">Resurrection</a></li>
+              <li><a href="../eternal-judgment/">Eternal Judgment</a></li>
+              <li><a href="../fruitful/">Growing in Christ</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="menu-head">Prayer &amp; help</p>
+            <ul>
+              <li><a href="../prayers/">Prayers</a></li>
+              <li><a href="../questions/">Questions</a></li>
+              <li><a href="../ask/">Ask &amp; Pray</a></li>
+              <li><a href="../churches/">Churches</a></li>
+              <li><a href="../about/">About Yv'e</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </details>
   </div>
 </header>
 <main id="top">
@@ -395,7 +449,7 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
     <span>The Principles of the Doctrine of Christ · Scripture quotations from the King James Version. Greek word studies from <em>The New Strong’s Exhaustive Concordance of the Bible</em> (Thomas Nelson Publishers, 1990).</span>
     <span class="next-level">Ready for the next level? <em>Going on unto perfection</em>
       <span class="btn ghost soon" role="button" aria-disabled="true">Coming soon</span></span>
-    <span><a href="../privacy/">Privacy</a> · <a href="../about/">About Yv'e</a> · <span class="updated">Last updated <time datetime="2026-11-08">November 8, 2026</time></span></span>
+    <span><a href="../privacy/">Privacy</a> · <a href="../about/">About Yv'e</a> · <span class="updated">Last updated <time datetime="2026-11-09">November 9, 2026</time></span></span>
   </div>
 </footer>
 <script src="/site.js"></script>
