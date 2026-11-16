@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#3b2716">
+<title>Armor of Light: A Free Christian Card Game</title>
+<meta name="description" content="A Christian card game of pilgrimage. Build a deck from the armor of God, speak the Word, and stand firm through three illuminated books.">
+<style>
+:root{--ink:#2a1b10;--parch:#f1e3c2;--parch2:#e8d4a8;--verm:#b3301e;--lapis:#1f3f8f;--gold:#c99a2e;--gold2:#f6dc7a;--verd:#3c7a5a;--purp:#6b3b78;--ash:#8c8170;--bone:#fbf6e6;
+ --fd:'UnifrakturMaguntia','Old English Text MT',serif;--fb:'EB Garamond',Garamond,'Times New Roman',serif;--safe-b:env(safe-area-inset-bottom,0px);}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#3b2716;color:var(--ink);font-family:var(--fb);font-size:17px;overscroll-behavior:none}
+body{background:radial-gradient(ellipse at center,#4a3220 0%,#24170c 100%)}
+button{font-family:var(--fb);font-size:1rem;color:var(--ink);cursor:pointer}
+#app{position:relative;max-width:1180px;margin:0 auto;min-height:100%;height:100dvh;overflow:hidden;
+ background:radial-gradient(ellipse at 50% 40%,#f7ecd2 0%,#f1e3c2 55%,#dcc596 100%);box-shadow:0 0 60px rgba(0,0,0,.6)}
+#app::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.35;mix-blend-mode:multiply;z-index:0;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .32 0 0 0 0 .15 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E")}
+.screen{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;overflow:hidden}
+.scroll{overflow-y:auto;-webkit-overflow-scrolling:touch}
+.border{position:absolute;inset:6px;border:3px double var(--verm);border-radius:4px;pointer-events:none;z-index:2;
+ box-shadow:inset 0 0 0 5px transparent,inset 0 0 0 7px rgba(31,63,143,.55)}
+h1,h2,h3{font-family:var(--fd);font-weight:normal;margin:.2em 0;color:var(--verm);letter-spacing:.02em}
+.btn{background:linear-gradient(#fbf3dd,#e9d6a6);border:2px solid var(--ink);border-radius:6px;padding:.55em 1.1em;font-weight:600;box-shadow:0 3px 0 var(--ink);transition:transform .08s}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.btn.red{background:linear-gradient(#d9533c,#a2281a);color:var(--bone);border-color:#4a0f08}
+.btn.blue{background:linear-gradient(#3a63c0,#1f3f8f);color:var(--bone);border-color:#0e1d45}
+.btn.gold{background:linear-gradient(var(--gold2),var(--gold));border-color:#5a4210}
+.btn[disabled]{opacity:.45;filter:grayscale(.6);cursor:not-allowed}
+.btn.small{padding:.3em .7em;font-size:.88rem}
+.iconbtn{background:rgba(251,246,230,.7);border:2px solid var(--ink);border-radius:50%;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0;font-weight:700;font-size:1.1rem}
+.ic{width:24px;height:24px;vertical-align:middle;flex:none}
+.drop{float:left;font-family:var(--fd);font-size:3.4em;line-height:.8;margin:.08em .12em 0 0;padding:.08em .14em;color:var(--bone);background:var(--lapis);border:2px solid var(--gold);border-radius:3px;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.verse{font-style:italic;background:rgba(251,246,230,.65);border-left:4px solid var(--gold);padding:.5em .8em;margin:.6em 0;border-radius:2px}
+.verse .ref{display:block;font-style:normal;font-variant:small-caps;color:var(--verm);font-size:.9em;margin-top:.2em}
+.center{text-align:center}
+.muted{color:#6a5a44}
+.row{display:flex;gap:.6em;align-items:center;flex-wrap:wrap}
+/* title */
+.title-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 18px calc(24px + var(--safe-b));gap:.6em;text-align:center}
+.title-big{font-family:var(--fd);font-size:clamp(2.8rem,10vw,5.6rem);color:var(--verm);line-height:1;text-shadow:0 2px 0 rgba(201,154,46,.6)}
+.title-big b{color:var(--lapis);font-weight:normal}
+.title-sub{font-style:italic;font-size:1.1rem;max-width:34em}
+.menu{display:flex;flex-direction:column;gap:.6em;width:min(320px,90%);margin-top:.6em}
+.seals{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:560px}
+.seal{width:26px;height:26px;border-radius:50%;border:2px solid var(--ink);background:#d8c8a8;opacity:.35;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:.8rem;color:var(--bone)}
+.seal.on{opacity:1;background:radial-gradient(circle at 35% 35%,var(--gold2),var(--gold) 60%,#8a6416);color:var(--verm)}
+/* top bar */
+.topbar{display:flex;align-items:center;gap:8px;padding:10px 14px 6px;z-index:3;flex-wrap:wrap}
+.stat{display:inline-flex;align-items:center;gap:4px;font-weight:700;background:rgba(251,246,230,.75);border:1.5px solid var(--ink);border-radius:14px;padding:2px 9px 2px 4px;font-size:.95rem;white-space:nowrap}
+.relics{display:flex;gap:4px;overflow-x:auto;flex:1;min-width:60px;padding:2px}
+.relic{flex:none;width:32px;height:32px;border-radius:50%;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:1.05rem;color:var(--bone);background:var(--verm);box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);cursor:pointer;padding:0}
+.relic.k-start{background:var(--lapis)}.relic.k-event{background:var(--verd)}.relic.k-fruit{background:radial-gradient(circle at 35% 35%,var(--gold2),var(--gold) 60%,#8a6416);color:var(--verm)}
+.relic.pulse{animation:pulse .7s 2}
+@keyframes pulse{50%{transform:scale(1.35)}}
+/* map */
+.map-wrap{flex:1;position:relative;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.map-page{position:relative;margin:0 auto;width:min(100%,560px)}
+.map-page svg.lines{position:absolute;inset:0;width:100%;height:100%}
+.node{position:absolute;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;border:2.5px solid var(--ink);background:var(--bone);display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.node .ic{width:28px;height:28px}
+.node.done{background:#cdb98e;opacity:.8}
+.node.here{outline:4px solid var(--gold);outline-offset:2px}
+.node.avail{animation:avail 1.2s infinite;border-color:var(--verm);border-width:3px}
+.node.boss{width:76px;height:76px}.node.boss .ic{width:46px;height:46px}
+.node.locked{opacity:.55}
+@keyframes avail{50%{transform:translate(-50%,-50%) scale(1.13);box-shadow:0 0 0 6px rgba(201,154,46,.45)}}
+.map-head{padding:4px 16px 0;text-align:center}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:center;font-size:.85rem;padding:4px 10px 8px}
+.legend span{display:inline-flex;align-items:center;gap:3px}
+/* battle */
+.arena{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:clamp(4px,2vw,26px);padding:6px 8px 0;min-height:0;flex-wrap:nowrap}
+.foe{position:relative;display:flex;flex-direction:column;align-items:center;width:clamp(96px,28vw,190px);cursor:pointer;transition:transform .2s,opacity .5s;padding:2px;border-radius:10px}
+.foe .foe-art{width:100%;max-height:clamp(84px,22vh,190px);animation:bob 3.2s ease-in-out infinite}
+.foe:nth-child(2) .foe-art{animation-delay:-1s}.foe:nth-child(3) .foe-art{animation-delay:-2s}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.foe.target{background:rgba(201,154,46,.28);box-shadow:0 0 0 3px var(--gold)}
+.foe.targetable .foe-art{filter:drop-shadow(0 0 6px var(--gold))}
+.foe.hit{animation:shake .35s}
+.foe.gone{opacity:0;transform:translateY(-40px) scale(.8);pointer-events:none}
+@keyframes shake{20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.fname{font-weight:700;font-size:.85rem;text-align:center;line-height:1.1;margin-top:2px}
+.bar{position:relative;width:100%;height:16px;border:1.5px solid var(--ink);border-radius:8px;background:#e2d2ae;overflow:hidden;margin-top:3px}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(#d9533c,#a2281a);transition:width .35s}
+.bar.hp i{background:linear-gradient(#6aa06e,#3c7a5a)}
+.bar b{position:relative;display:block;text-align:center;font-size:.75rem;line-height:13px;color:var(--bone);text-shadow:0 1px 1px #000}
+.blk{position:absolute;left:-10px;top:-6px;display:flex;align-items:center;justify-content:center;width:28px;height:28px;font-size:.78rem;font-weight:700;color:var(--bone);
+ background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 L28 7 Q28 22 16 30 Q4 22 4 7Z' fill='%231f3f8f' stroke='%232a1b10' stroke-width='2'/%3E%3C/svg%3E")}
+.intent{display:flex;align-items:center;gap:2px;background:var(--bone);border:1.5px solid var(--ink);border-radius:14px;padding:1px 8px 1px 3px;font-weight:700;font-size:.9rem;margin-bottom:2px;white-space:nowrap}
+.intent.k-strike{color:var(--verm)}
+.sts{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin-top:3px;min-height:18px}
+.st{font-size:.72rem;font-weight:700;border:1.2px solid var(--ink);border-radius:9px;padding:0 5px;background:var(--bone);white-space:nowrap}
+.st.bad{background:#e9c6c0}.st.good{background:#cfe0c8}.st.pw{background:#f3e2a8}
+.say{position:absolute;top:-8px;left:50%;transform:translate(-50%,-100%);background:var(--bone);border:1.5px solid var(--ink);border-radius:10px;padding:3px 8px;font-size:.82rem;font-style:italic;width:max-content;max-width:180px;z-index:5;animation:fadeup 2.4s forwards;pointer-events:none}
+.player-row{display:flex;align-items:center;gap:10px;padding:4px 12px;z-index:3;flex-wrap:wrap}
+.pilgrim{position:relative;width:64px;height:64px;flex:none}
+.pilgrim svg{width:64px;height:64px}
+.pilgrim.hit{animation:shake .35s}
+.pinfo{flex:1;min-width:140px}
+.grace{position:relative;width:58px;height:58px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:1.7rem;color:var(--ink);
+ background:radial-gradient(circle at 40% 35%,#fffbe6,var(--gold2) 45%,var(--gold) 80%,#8a6416);border:2.5px solid var(--ink);box-shadow:0 0 14px rgba(246,220,122,.8)}
+.grace small{font-family:var(--fb);font-size:.7rem;position:absolute;bottom:-14px;font-weight:700;white-space:nowrap}
+.endturn{min-width:110px}
+.piles{display:flex;gap:6px}
+.pile{background:rgba(251,246,230,.75);border:1.5px solid var(--ink);border-radius:8px;padding:2px 7px;font-size:.8rem;font-weight:700;display:flex;align-items:center;gap:3px}
+.hand-wrap{position:relative;height:clamp(150px,27vh,214px);z-index:4;padding-bottom:var(--safe-b)}
+.hand{position:absolute;left:0;right:0;bottom:calc(6px + var(--safe-b));display:flex;justify-content:center;align-items:flex-end;padding:0 10px}
+.hint{position:absolute;left:0;right:0;top:-24px;text-align:center;font-style:italic;font-size:.92rem;color:var(--verm);font-weight:600;pointer-events:none;text-shadow:0 1px 0 var(--bone)}
+/* cards */
+.card{position:relative;flex:none;width:var(--cw,118px);height:calc(var(--cw,118px)*1.42);border-radius:9px;border:2.5px solid var(--ink);background:linear-gradient(#fbf3dd,#efdeb4);
+ box-shadow:0 4px 10px rgba(0,0,0,.35);display:flex;flex-direction:column;padding:5px 6px;font-size:calc(var(--cw,118px)*.098);line-height:1.15;cursor:pointer;transition:transform .15s,margin .15s;user-select:none;-webkit-user-select:none}
+.hand .card{margin:0 calc(var(--ov,0px)*-1)}
+.hand .card.sel{transform:translateY(-26px) scale(1.12);z-index:10}
+.hand .card:not(.sel):hover{transform:translateY(-10px);z-index:9}
+.card.unplayable{filter:saturate(.5) brightness(.92)}
+.card .cost{position:absolute;left:-9px;top:-9px;width:calc(var(--cw,118px)*.27);height:calc(var(--cw,118px)*.27);border-radius:50%;background:radial-gradient(circle at 35% 35%,#e0604a,var(--verm) 60%,#6a1408);border:2px solid var(--ink);color:var(--bone);font-family:var(--fd);font-size:calc(var(--cw,118px)*.17);display:flex;align-items:center;justify-content:center;z-index:2}
+.card .cost.low{background:radial-gradient(circle at 35% 35%,#7ac07e,var(--verd) 60%,#1e4a30)}
+.card .nm{font-weight:700;text-align:center;font-size:1.05em;line-height:1.05;min-height:2.2em;display:flex;align-items:center;justify-content:center;padding:0 .4em 0 .9em}
+.card .pic{position:relative;height:30%;margin:2px 0;border:1.5px solid var(--ink);border-radius:4px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card .pic .ini{font-family:var(--fd);font-size:2.6em;color:var(--bone);text-shadow:0 2px 0 rgba(0,0,0,.4);z-index:1}
+.card .pic .em{position:absolute;right:3px;bottom:2px;width:32%;height:auto;opacity:.95}
+.card.t-word .pic{background:linear-gradient(135deg,#c8432c,#8a1f12)}
+.card.t-guard .pic{background:linear-gradient(135deg,#3a63c0,#18306e)}
+.card.t-grace .pic{background:linear-gradient(135deg,#e8c25a,#9a7218)}
+.card.t-burden .pic{background:linear-gradient(135deg,#7a7468,#4a453c)}
+.card .tx{flex:1;text-align:center;font-size:.98em;display:flex;align-items:center;justify-content:center;padding:0 1px}
+.card .tx b{color:var(--verm)}
+.card .tx b.up{color:var(--verd)}
+.card .tx b.down{color:#7a4a9a}
+.card .tp{font-size:.78em;text-align:center;font-variant:small-caps;color:#6a5a44;border-top:1px solid rgba(42,27,16,.3);padding-top:1px}
+.card.up{border-color:#8a6416;box-shadow:0 0 0 2px var(--gold2),0 4px 10px rgba(0,0,0,.35);background:linear-gradient(#fff8e0,#f3dfa0)}
+.card.up .nm::after{content:' ✦';color:var(--gold)}
+.card.big{--cw:min(64vw,250px);cursor:default}
+.card.tmp{background:linear-gradient(#e9e2d0,#d4cab2)}
+/* panels */
+.panel{background:rgba(251,246,230,.92);border:2px solid var(--ink);border-radius:8px;padding:14px 16px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.content{flex:1;overflow-y:auto;padding:14px 16px calc(18px + var(--safe-b));-webkit-overflow-scrolling:touch}
+.content-in{max-width:760px;margin:0 auto}
+.cards-row{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;padding:10px 0}
+.choice{display:block;width:100%;text-align:left;margin:.45em 0;background:linear-gradient(#fbf3dd,#ecd9aa);border:2px solid var(--ink);border-radius:8px;padding:.6em .9em;box-shadow:0 3px 0 var(--ink)}
+.choice b{display:block;font-size:1.05rem}
+.choice span{font-size:.92rem;color:#5a4a34}
+.choice[disabled]{opacity:.5}
+.choice:active:not([disabled]){transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.vignette{width:min(220px,50vw);display:block;margin:0 auto;border:3px double var(--verm);border-radius:6px;background:#efe0bc}
+.reward-item{display:flex;align-items:center;gap:10px;width:100%;margin:.4em 0;text-align:left}
+.reward-item.taken{opacity:.5}
+.overlay{position:absolute;inset:0;z-index:50;background:rgba(36,23,12,.66);display:flex;align-items:center;justify-content:center;padding:14px}
+.overlay .panel{max-width:760px;width:100%;max-height:92%;overflow-y:auto;position:relative}
+.overlay .close{position:absolute;right:10px;top:10px}
+.grid-cards{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;padding:8px 4px 4px;--cw:104px}
+.calling{display:flex;gap:10px;align-items:center;text-align:left;width:100%}
+.calling svg{width:84px;height:84px;flex:none;background:#efe0bc;border:2px solid var(--ink);border-radius:8px}
+.calling.locked{opacity:.55}
+.calling.on{outline:4px solid var(--gold);outline-offset:2px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:6px 0 10px}
+.tabs .btn.on{background:linear-gradient(var(--gold2),var(--gold))}
+.vlist .v{padding:.45em 0;border-bottom:1px dashed rgba(42,27,16,.3)}
+.vlist .v.miss{color:#9a8a72}
+.beast{display:inline-flex;flex-direction:column;align-items:center;width:112px;margin:6px;font-size:.82rem;text-align:center;vertical-align:top}
+.beast svg{width:90px;height:90px;background:#efe0bc;border:2px solid var(--ink);border-radius:8px}
+.beast.miss svg{filter:grayscale(1) brightness(.5);opacity:.4}
+/* fx */
+.float{position:absolute;z-index:60;font-family:var(--fd);font-size:2rem;pointer-events:none;text-shadow:0 2px 0 var(--bone),0 0 6px var(--bone);animation:fadeup 1.1s forwards}
+.float.dmg{color:var(--verm)}.float.blk{color:var(--lapis)}.float.heal{color:var(--verd)}.float.gold{color:#8a6416}
+@keyframes fadeup{0%{opacity:0;transform:translate(-50%,0) scale(.7)}15%{opacity:1;transform:translate(-50%,-10px) scale(1.1)}100%{opacity:0;transform:translate(-50%,-60px)}}
+.toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);z-index:70;width:min(92%,560px);background:linear-gradient(#fbf3dd,#efdeb4);border:2px solid var(--ink);border-radius:8px;padding:10px 14px;box-shadow:0 6px 18px rgba(0,0,0,.4);font-style:italic;animation:toast 5.5s forwards;cursor:pointer}
+.toast .ref{display:block;font-style:normal;font-variant:small-caps;color:var(--verm)}
+.toast.plain{font-style:normal;text-align:center;font-weight:600}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,-14px)}8%{opacity:1;transform:translate(-50%,0)}88%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
+.flash{position:absolute;inset:0;z-index:40;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(179,48,30,.5));animation:flash .5s forwards}
+@keyframes flash{to{opacity:0}}
+.banner{font-family:var(--fd);font-size:clamp(2rem,7vw,3.4rem);color:var(--verm);text-align:center;margin:.1em 0}
+.kbd{display:inline-block;border:1.5px solid var(--ink);border-bottom-width:3px;border-radius:4px;padding:0 6px;font-weight:700;font-size:.88rem;background:var(--bone);min-width:1.6em;text-align:center}
+.ctl td{padding:4px 8px;vertical-align:top}
+.watchsel{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+@media (max-width:560px){
+ html,body{font-size:16px}
+ .hand .card{--cw:88px}
+ .topbar{padding:8px 10px 4px;gap:5px}
+ .stat{font-size:.85rem}
+ .relic{width:28px;height:28px;font-size:.9rem}
+ .grace{width:50px;height:50px;font-size:1.45rem}
+ .pilgrim,.pilgrim svg{width:50px;height:50px}
+ .foe{width:clamp(88px,31vw,150px)}
+ .endturn{min-width:92px}
+}
+@media (max-height:620px){.hand .card{--cw:84px}.hand-wrap{height:140px}.foe .foe-art{max-height:80px}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+.foe.fleeing{pointer-events:none;animation:flee .9s forwards}
+@keyframes flee{0%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-46px) scale(.75) rotate(-6deg)}}
+.homelink{color:var(--lapis);font-weight:600;text-decoration:underline;font-size:.95rem;margin-top:4px}
+.float.word{font-family:var(--fb);font-weight:700;font-style:italic;font-size:1.15rem}
+.toast.low{top:auto;bottom:calc(16px + var(--safe-b))}
+.scroll,.map-wrap,.content{scrollbar-color:rgba(42,27,16,.35) transparent;scrollbar-width:thin}
+
+</style>
+<link rel="stylesheet" href="../fonts/fonts.css">
+<meta name="robots" content="noindex, nofollow">
+<meta name="author" content="Brandon Bridges">
+<link rel="canonical" href="https://tpotdoc.com/games/armor-of-light/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Principles of the Doctrine of Christ">
+<meta property="og:title" content="Armor of Light: A Free Christian Card Game">
+<meta property="og:description" content="A Christian card game of pilgrimage. Build a deck from the armor of God, speak the Word, and stand firm through three illuminated books.">
+<meta property="og:url" content="https://tpotdoc.com/games/armor-of-light/">
+<meta property="og:image" content="https://tpotdoc.com/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="https://tpotdoc.com/img/favicon.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "Armor of Light", "description": "A Christian card game of pilgrimage. Build a deck from the armor of God, speak the Word, and stand firm through three illuminated books.", "url": "https://tpotdoc.com/games/armor-of-light/", "author": {"@type": "Person", "name": "Brandon Bridges"}, "genre": "Card game", "gamePlatform": "Web browser", "applicationCategory": "Game", "operatingSystem": "Any", "isAccessibleForFree": true, "inLanguage": "en", "image": "https://tpotdoc.com/img/og.png", "isPartOf": {"@type": "WebSite", "name": "The Principles of the Doctrine of Christ", "url": "https://tpotdoc.com/"}}</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "68a88602d3054c4ab0100cb75be105e6"}'></script>
+</head>
+<body>
+<h1 style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">Armor of Light</h1>
+<div id="app"></div>
+<script>
+'use strict';
+(function(){
+// ===== Scripture (English Standard Version) =====
+const ESV_NOTICE='Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway, a publishing ministry of Good News Publishers. ESV Text Edition: 2025. The ESV text may not be quoted in any publication made available to the public by a Creative Commons license. The ESV text may not be translated in whole or in part into any other language. Used by permission. All rights reserved.';
+const ESV_TRADEMARK='The “ESV” and “English Standard Version” are registered trademarks of Crossway.';
+const VERSES={
+'Romans 13:12':'The night is far gone; the day is at hand. So then let us cast off the works of darkness and put on the armor of light.',
+'Ephesians 6:11':'Put on the whole armor of God, that you may be able to stand against the schemes of the devil.',
+'Ephesians 6:12':'For we do not wrestle against flesh and blood, but against the rulers, against the authorities, against the cosmic powers over this present darkness, against the spiritual forces of evil in the heavenly places.',
+'Ephesians 6:13':'Therefore take up the whole armor of God, that you may be able to withstand in the evil day, and having done all, to stand firm.',
+'Ephesians 6:14':'Stand therefore, having fastened on the belt of truth, and having put on the breastplate of righteousness,',
+'Ephesians 6:15':'and, as shoes for your feet, having put on the readiness given by the gospel of peace.',
+'Ephesians 6:16':'In all circumstances take up the shield of faith, with which you can extinguish all the flaming darts of the evil one;',
+'Ephesians 6:17':'and take the helmet of salvation, and the sword of the Spirit, which is the word of God,',
+'Ephesians 6:18':'praying at all times in the Spirit, with all prayer and supplication. To that end, keep alert with all perseverance, making supplication for all the saints,',
+'James 4:7':'Submit yourselves therefore to God. Resist the devil, and he will flee from you.',
+'Romans 12:21':'Do not be overcome by evil, but overcome evil with good.',
+'1 Corinthians 10:13':'No temptation has overtaken you that is not common to man. God is faithful, and he will not let you be tempted beyond your ability, but with the temptation he will also provide the way of escape, that you may be able to endure it.',
+'John 16:33':'I have said these things to you, that in me you may have peace. In the world you will have tribulation. But take heart; I have overcome the world.',
+'2 Timothy 4:7':'I have fought the good fight, I have finished the race, I have kept the faith.',
+'Revelation 12:9':'And the great dragon was thrown down, that ancient serpent, who is called the devil and Satan, the deceiver of the whole world—he was thrown down to the earth, and his angels were thrown down with him.',
+'Revelation 12:11':'And they have conquered him by the blood of the Lamb and by the word of their testimony, for they loved not their lives even unto death.',
+'Revelation 21:4':'He will wipe away every tear from their eyes, and death shall be no more, neither shall there be mourning, nor crying, nor pain anymore, for the former things have passed away.',
+'Revelation 21:5':'And he who was seated on the throne said, “Behold, I am making all things new.” Also he said, “Write this down, for these words are trustworthy and true.”',
+'1 Corinthians 15:57':'But thanks be to God, who gives us the victory through our Lord Jesus Christ.',
+'1 John 4:4':'Little children, you are from God and have overcome them, for he who is in you is greater than he who is in the world.',
+'Hebrews 12:1':'Therefore, since we are surrounded by so great a cloud of witnesses, let us also lay aside every weight, and sin which clings so closely, and let us run with endurance the race that is set before us,',
+'Hebrews 4:12':'For the word of God is living and active, sharper than any two-edged sword, piercing to the division of soul and of spirit, of joints and of marrow, and discerning the thoughts and intentions of the heart.',
+'Isaiah 40:31':'but they who wait for the LORD shall renew their strength; they shall mount up with wings like eagles; they shall run and not be weary; they shall walk and not faint.',
+'Matthew 4:4':'But he answered, “It is written, “‘Man shall not live by bread alone, but by every word that comes from the mouth of God.’”',
+'Micah 7:8':'Rejoice not over me, O my enemy; when I fall, I shall rise; when I sit in darkness, the LORD will be a light to me.',
+'Psalm 37:24':'though he fall, he shall not be cast headlong, for the LORD upholds his hand.',
+'Psalm 130:6':'my soul waits for the Lord more than watchmen for the morning, more than watchmen for the morning.',
+// Callings
+'Psalm 23:1':'The LORD is my shepherd; I shall not want.',
+'Matthew 4:19':'And he said to them, “Follow me, and I will make you fishers of men.”',
+'Matthew 13:52':'And he said to them, “Therefore every scribe who has been trained for the kingdom of heaven is like a master of a house, who brings out of his treasure what is new and what is old.”',
+// Books
+'Matthew 4:1':'Then Jesus was led up by the Spirit into the wilderness to be tempted by the devil.',
+'Matthew 5:14':'You are the light of the world. A city set on a hill cannot be hidden.',
+'Mark 4:39':'And he awoke and rebuked the wind and said to the sea, “Peace! Be still!” And the wind ceased, and there was a great calm.',
+// Bosses
+'Exodus 20:3':'You shall have no other gods before me.',
+'1 John 5:21':'Little children, keep yourselves from idols.',
+'Proverbs 16:18':'Pride goes before destruction, and a haughty spirit before a fall.',
+'James 4:6':'But he gives more grace. Therefore it says, “God opposes the proud but gives grace to the humble.”',
+// Foes
+'Proverbs 6:6':'Go to the ant, O sluggard; consider her ways, and be wise.',
+'Philippians 2:14':'Do all things without grumbling or disputing,',
+'Song of Solomon 2:15':'Catch the foxes for us, the little foxes that spoil the vineyards, for our vineyards are in blossom.',
+'Proverbs 14:30':'A tranquil heart gives life to the flesh, but envy makes the bones rot.',
+'Matthew 7:15':'Beware of false prophets, who come to you in sheep’s clothing but inwardly are ravenous wolves.',
+'Matthew 6:34':'Therefore do not be anxious about tomorrow, for tomorrow will be anxious for itself. Sufficient for the day is its own trouble.',
+'Philippians 2:3':'Do nothing from selfish ambition or conceit, but in humility count others more significant than yourselves.',
+'Luke 12:15':'And he said to them, “Take care, and be on your guard against all covetousness, for one’s life does not consist in the abundance of his possessions.”',
+'Proverbs 16:28':'A dishonest man spreads strife, and a whisperer separates close friends.',
+'Proverbs 12:15':'The way of a fool is right in his own eyes, but a wise man listens to advice.',
+'1 Peter 5:8':'Be sober-minded; be watchful. Your adversary the devil prowls around like a roaring lion, seeking someone to devour.',
+'Matthew 6:24':'No one can serve two masters, for either he will hate the one and love the other, or he will be devoted to the one and despise the other. You cannot serve God and money.',
+'Matthew 6:19':'Do not lay up for yourselves treasures on earth, where moth and rust destroy and where thieves break in and steal,',
+'Matthew 6:20':'but lay up for yourselves treasures in heaven, where neither moth nor rust destroys and where thieves do not break in and steal.',
+'1 Thessalonians 5:5':'For you are all children of light, children of the day. We are not of the night or of the darkness.',
+'Isaiah 43:2':'When you pass through the waters, I will be with you; and through the rivers, they shall not overwhelm you; when you walk through fire you shall not be burned, and the flame shall not consume you.',
+'Psalm 42:11':'Why are you cast down, O my soul, and why are you in turmoil within me? Hope in God; for I shall again praise him, my salvation and my God.',
+'Luke 10:19':'Behold, I have given you authority to tread on serpents and scorpions, and over all the power of the enemy, and nothing shall hurt you.',
+'James 1:6':'But let him ask in faith, with no doubting, for the one who doubts is like a wave of the sea that is driven and tossed by the wind.',
+'Mark 9:24':'Immediately the father of the child cried out and said, “I believe; help my unbelief!”',
+'Ephesians 4:26':'Be angry and do not sin; do not let the sun go down on your anger,',
+// Fruits of the Spirit
+'Galatians 5:22':'But the fruit of the Spirit is love, joy, peace, patience, kindness, goodness, faithfulness,',
+'Galatians 5:23':'gentleness, self-control; against such things there is no law.',
+'1 Corinthians 13:7':'Love bears all things, believes all things, hopes all things, endures all things.',
+'Nehemiah 8:10':'Then he said to them, “Go your way. Eat the fat and drink sweet wine and send portions to anyone who has nothing ready, for this day is holy to our Lord. And do not be grieved, for the joy of the LORD is your strength.”',
+'Philippians 4:7':'And the peace of God, which surpasses all understanding, will guard your hearts and your minds in Christ Jesus.',
+'Romans 12:12':'Rejoice in hope, be patient in tribulation, be constant in prayer.',
+'Ephesians 4:32':'Be kind to one another, tenderhearted, forgiving one another, as God in Christ forgave you.',
+'Psalm 23:6':'Surely goodness and mercy shall follow me all the days of my life, and I shall dwell in the house of the LORD forever.',
+'Lamentations 3:22':'The steadfast love of the LORD never ceases; his mercies never come to an end;',
+'Lamentations 3:23':'they are new every morning; great is your faithfulness.',
+'Proverbs 15:1':'A soft answer turns away wrath, but a harsh word stirs up anger.',
+'Proverbs 25:28':'A man without self-control is like a city broken into and left without walls.',
+// Treasures
+'Matthew 17:20':'He said to them, “Because of your little faith. For truly, I say to you, if you have faith like a grain of mustard seed, you will say to this mountain, ‘Move from here to there,’ and it will move, and nothing will be impossible for you.”',
+'Matthew 14:20':'And they all ate and were satisfied. And they took up twelve baskets full of the broken pieces left over.',
+'Luke 21:3':'And he said, “Truly, I tell you, this poor widow has put in more than all of them.',
+'Mark 14:6':'But Jesus said, “Leave her alone. Why do you trouble her? She has done a beautiful thing to me.',
+'Matthew 25:13':'Watch therefore, for you know neither the day nor the hour.',
+'Psalm 23:4':'Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me; your rod and your staff, they comfort me.',
+'Luke 5:6':'And when they had done this, they enclosed a large number of fish, and their nets were breaking.',
+'Habakkuk 2:2':'And the LORD answered me: “Write the vision; make it plain on tablets, so he may run who reads it.',
+'Matthew 6:11':'Give us this day our daily bread,',
+'Matthew 5:13':'You are the salt of the earth, but if salt has lost its taste, how shall its saltiness be restored? It is no longer good for anything except to be thrown out and trampled under people’s feet.',
+'Matthew 25:21':'His master said to him, ‘Well done, good and faithful servant. You have been faithful over a little; I will set you over much. Enter into the joy of your master.’',
+'Matthew 13:46':'who, on finding one pearl of great value, went and sold all that he had and bought it.',
+'Genesis 9:13':'I have set my bow in the cloud, and it shall be a sign of the covenant between me and the earth.',
+'Genesis 8:11':'And the dove came back to him in the evening, and behold, in her mouth was a freshly plucked olive leaf. So Noah knew that the waters had subsided from the earth.',
+'Luke 10:34':'He went to him and bound up his wounds, pouring on oil and wine. Then he set him on his own animal and brought him to an inn and took care of him.',
+'Daniel 3:25':'He answered and said, “But I see four men unbound, walking in the midst of the fire, and they are not hurt; and the appearance of the fourth is like a son of the gods.”',
+'Psalm 150:3':'Praise him with trumpet sound; praise him with lute and harp!',
+'2 Kings 2:13':'And he took up the cloak of Elijah that had fallen from him and went back and stood on the bank of the Jordan.',
+'Psalm 118:22':'The stone that the builders rejected has become the cornerstone.',
+'Hebrews 6:19':'We have this as a sure and steadfast anchor of the soul, a hope that enters into the inner place behind the curtain,',
+// Parables and stories
+'Luke 10:33':'But a Samaritan, as he journeyed, came to where he was, and when he saw him, he had compassion.',
+'Luke 15:8':'Or what woman, having ten silver coins, if she loses one coin, does not light a lamp and sweep the house and seek diligently until she finds it?',
+'Matthew 13:45':'Again, the kingdom of heaven is like a merchant in search of fine pearls,',
+'Matthew 13:23':'As for what was sown on good soil, this is the one who hears the word and understands it. He indeed bears fruit and yields, in one case a hundredfold, in another sixty, and in another thirty.',
+'Luke 15:20':'And he arose and came to his father. But while he was still a long way off, his father saw him and felt compassion, and ran and embraced him and kissed him.',
+'Exodus 3:5':'Then he said, “Do not come near; take your sandals off your feet, for the place on which you are standing is holy ground.”',
+'Exodus 16:4':'Then the LORD said to Moses, “Behold, I am about to rain bread from heaven for you, and the people shall go out and gather a day’s portion every day, that I may test them, whether they will walk in my law or not.',
+'Genesis 28:12':'And he dreamed, and behold, there was a ladder set up on the earth, and the top of it reached to heaven. And behold, the angels of God were ascending and descending on it!',
+'1 Kings 19:12':'And after the earthquake a fire, but the LORD was not in the fire. And after the fire the sound of a low whisper.',
+'Luke 19:8':'And Zacchaeus stood and said to the Lord, “Behold, Lord, the half of my goods I give to the poor. And if I have defrauded anyone of anything, I restore it fourfold.”',
+'Daniel 6:22':'My God sent his angel and shut the lions’ mouths, and they have not harmed me, because I was found blameless before him; and also before you, O king, I have done no harm.',
+'John 4:14':'but whoever drinks of the water that I will give him will never be thirsty again. The water that I will give him will become in him a spring of water welling up to eternal life.',
+// Rest, scriptorium, the cross
+'Matthew 11:28':'Come to me, all who labor and are heavy laden, and I will give you rest.',
+'Matthew 11:30':'For my yoke is easy, and my burden is light.',
+'Psalm 23:2':'He makes me lie down in green pastures. He leads me beside still waters.',
+'Psalm 23:3':'He restores my soul. He leads me in paths of righteousness for his name’s sake.',
+'Psalm 45:1':'My heart overflows with a pleasing theme; I address my verses to the king; my tongue is like the pen of a ready scribe.',
+'1 Peter 5:7':'casting all your anxieties on him, because he cares for you.',
+// Cards
+'Philippians 4:6':'do not be anxious about anything, but in everything by prayer and supplication with thanksgiving let your requests be made known to God.',
+'1 Samuel 17:40':'Then he took his staff in his hand and chose five smooth stones from the brook and put them in his shepherd’s pouch. His sling was in his hand, and he approached the Philistine.',
+'1 Samuel 17:45':'Then David said to the Philistine, “You come to me with a sword and with a spear and with a javelin, but I come to you in the name of the LORD of hosts, the God of the armies of Israel, whom you have defied.',
+'Luke 15:4':'What man of you, having a hundred sheep, if he has lost one of them, does not leave the ninety-nine in the open country, and go after the one that is lost, until he finds it?',
+'Psalm 33:3':'Sing to him a new song; play skillfully on the strings, with loud shouts.',
+'John 21:6':'He said to them, “Cast the net on the right side of the boat, and you will find some.” So they cast it, and now they were not able to haul it in, because of the quantity of fish.',
+'Matthew 14:29':'He said, “Come.” So Peter got out of the boat and walked on the water and came to Jesus.',
+'Matthew 16:18':'And I tell you, you are Peter, and on this rock I will build my church, and the gates of hell shall not prevail against it.',
+'Luke 5:4':'And when he had finished speaking, he said to Simon, “Put out into the deep and let down your nets for a catch.”',
+'Luke 5:10':'and so also were James and John, sons of Zebedee, who were partners with Simon. And Jesus said to Simon, “Do not be afraid; from now on you will be catching men.”',
+'1 Thessalonians 5:11':'Therefore encourage one another and build one another up, just as you are doing.',
+'1 Timothy 6:12':'Fight the good fight of the faith. Take hold of the eternal life to which you were called and about which you made the good confession in the presence of many witnesses.',
+'1 Corinthians 9:24':'Do you not know that in a race all the runners run, but only one receives the prize? So run that you may obtain it.',
+'Matthew 18:22':'Jesus said to him, “I do not say to you seven times, but seventy-seven times.',
+'Ecclesiastes 4:12':'And though a man might prevail against one who is alone, two will withstand him—a threefold cord is not quickly broken.',
+'Acts 16:25':'About midnight Paul and Silas were praying and singing hymns to God, and the prisoners were listening to them,',
+'Matthew 26:41':'Watch and pray that you may not enter into temptation. The spirit indeed is willing, but the flesh is weak.',
+'2 Timothy 2:22':'So flee youthful passions and pursue righteousness, faith, love, and peace, along with those who call on the Lord from a pure heart.',
+'Romans 12:2':'Do not be conformed to this world, but be transformed by the renewal of your mind, that by testing you may discern what is the will of God, what is good and acceptable and perfect.',
+'2 Corinthians 10:5':'We destroy arguments and every lofty opinion raised against the knowledge of God, and take every thought captive to obey Christ,',
+'2 Corinthians 12:9':'But he said to me, “My grace is sufficient for you, for my power is made perfect in weakness.” Therefore I will boast all the more gladly of my weaknesses, so that the power of Christ may rest upon me.',
+'Philippians 4:13':'I can do all things through him who strengthens me.',
+'Psalm 46:10':'Be still, and know that I am God. I will be exalted among the nations, I will be exalted in the earth!',
+'Psalm 46:1':'God is our refuge and strength, a very present help in trouble.',
+'Matthew 5:44':'But I say to you, Love your enemies and pray for those who persecute you,',
+'Matthew 5:16':'In the same way, let your light shine before others, so that they may see your good works and give glory to your Father who is in heaven.',
+'Joshua 6:20':'So the people shouted, and the trumpets were blown. As soon as the people heard the sound of the trumpet, the people shouted a great shout, and the wall fell down flat, so that the people went up into the city, every man straight before him, and they captured the city.',
+'James 1:2':'Count it all joy, my brothers, when you meet trials of various kinds,',
+'Philippians 4:4':'Rejoice in the Lord always; again I will say, rejoice.',
+'Acts 17:2':'And Paul went in, as was his custom, and on three Sabbath days he reasoned with them from the Scriptures,',
+};
+
+// ===== Content: callings, cards, treasures, foes, encounters, parables =====
+const CALLINGS={
+  shepherd:{id:'shepherd',name:'The Shepherd',hp:75,relic:'staff',start:'stones',ref:'Psalm 23:1',
+    blurb:'Steady and sheltering. Strong shields, gentle healing, and stones that strike more than once.',unlock:null},
+  fisher:{id:'fisher',name:'The Fisher',hp:70,relic:'net',start:'net',ref:'Matthew 4:19',
+    blurb:'Bold and daring. Casts the net over every foe at once and walks on the water when it counts.',unlock:'Overcome the Golden Calf at the end of the first book.'},
+  scribe:{id:'scribe',name:'The Scribe',hp:66,relic:'quill',start:'vision',ref:'Matthew 13:52',
+    blurb:'Patient and wise. Draws many cards, strings them together, and writes long letters that land hard.',unlock:'Bring the Tower of Babel low at the end of the second book.'},
+};
+const TYPE_NAMES={word:'Word',guard:'Guard',grace:'Grace',burden:'Burden'};
+// v: base values, u: illuminated (upgraded) values. Text uses {d} truth, {b} shield, other {keys} raw.
+const CARDS={
+ // starting cards
+ sword:{name:'Sword of the Spirit',type:'word',cost:1,tg:'foe',r:'start',pool:'all',v:{d:6},u:{d:9},ref:'Ephesians 6:17',text:'Deal {d} truth.',play:(g,v,t)=>E.hit(g,t,v.d)},
+ shield:{name:'Shield of Faith',type:'guard',cost:1,tg:'self',r:'start',pool:'all',v:{b:5},u:{b:8},ref:'Ephesians 6:16',text:'Gain {b} shield.',play:(g,v)=>E.shield(g,v.b)},
+ stones:{name:'Five Smooth Stones',type:'word',cost:1,tg:'foe',r:'start',pool:'shepherd',v:{d:2,h:3},u:{d:3,h:3},ref:'1 Samuel 17:40',text:'Deal {d} truth {h} times.',play:(g,v,t)=>E.hit(g,t,v.d,v.h)},
+ net:{name:'Cast the Net',type:'word',cost:1,tg:'all',r:'start',pool:'fisher',v:{d:4},u:{d:7},ref:'Luke 5:6',text:'Deal {d} truth to every foe.',play:(g,v)=>E.hitAll(g,v.d)},
+ vision:{name:'Write the Vision',type:'guard',cost:1,tg:'self',r:'start',pool:'scribe',v:{b:3,n:2},u:{b:4,n:3},ref:'Habakkuk 2:2',text:'Gain {b} shield. Draw {n} cards.',play:(g,v)=>{E.shield(g,v.b);E.draw(g,v.n);}},
+ // shared
+ belt:{name:'Belt of Truth',type:'grace',cost:1,tg:'self',r:'u',pool:'all',v:{n:2},u:{n:3},ref:'Ephesians 6:14',text:'Gain {n} Might for this battle.',play:(g,v)=>E.apply(g,'p','might',v.n)},
+ breastplate:{name:'Breastplate of Righteousness',type:'guard',cost:2,tg:'self',r:'c',pool:'all',v:{b:11,t:3},u:{b:14,t:4},ref:'Ephesians 6:14',text:'Gain {b} shield. Until your next turn, any foe that strikes you loses {t} hold.',play:(g,v)=>{E.shield(g,v.b);E.apply(g,'p','breast',v.t);}},
+ shoes:{name:'Shoes of the Gospel of Peace',type:'guard',cost:1,tg:'self',r:'c',pool:'all',v:{b:5},u:{b:7},ref:'Ephesians 6:15',text:'Gain {b} shield. Draw 1 card.',play:(g,v)=>{E.shield(g,v.b);E.draw(g,1);}},
+ helmet:{name:'Helmet of Salvation',type:'grace',cost:2,tg:'self',r:'u',pool:'all',v:{n:4},u:{n:6},ref:'Ephesians 6:17',text:'At the start of each of your turns, gain {n} shield.',play:(g,v)=>E.power(g,'helmet',v.n)},
+ written:{name:'It Is Written',type:'word',cost:1,tg:'foe',r:'c',pool:'all',v:{d:8},u:{d:11},ref:'Matthew 4:4',text:'Deal {d} truth. If that foe means to strike, it is Humbled for 1 turn.',play:(g,v,t)=>{const f=E.foe(g,t);const s=f&&f.intent&&f.intent.d;E.hit(g,t,v.d);if(s&&f&&!f.gone)E.apply(g,f,'weak',1);}},
+ twoedged:{name:'Two-Edged Word',type:'word',cost:2,tg:'foe',r:'c',pool:'all',v:{d:12,n:2},u:{d:16,n:3},ref:'Hebrews 4:12',text:'Deal {d} truth. The foe is Exposed for {n} turns.',play:(g,v,t)=>{E.hit(g,t,v.d);const f=E.foe(g,t);if(f&&!f.gone)E.apply(g,f,'vuln',v.n);}},
+ watch:{name:'Watch and Pray',type:'guard',cost:1,tg:'self',r:'c',pool:'all',v:{b:6},u:{b:9},ref:'Matthew 26:41',text:'Gain {b} shield. Draw 1 more card next turn.',play:(g,v)=>{E.shield(g,v.b);g.B.next.draw++;}},
+ prayer:{name:'Prayer and Supplication',type:'guard',cost:1,tg:'self',r:'u',pool:'all',v:{n:3},u:{n:4},ref:'Philippians 4:6',text:'Draw {n} cards.',play:(g,v)=>E.draw(g,v.n)},
+ flee:{name:'Flee and Pursue',type:'guard',cost:1,tg:'self',r:'c',pool:'all',v:{b:7},u:{b:10},ref:'2 Timothy 2:22',text:'Gain {b} shield. Cast off your Doubt and Fear.',play:(g,v)=>{E.shield(g,v.b);g.B.p.st.weak=0;g.B.p.st.vuln=0;}},
+ renew:{name:'Renewing of the Mind',type:'guard',cost:0,tg:'self',r:'u',pool:'all',v:{n:1},u:{n:2},ex:true,ref:'Romans 12:2',text:'Cast off your Doubt, Fear and Weariness. Draw {n}. Offered.',play:(g,v)=>{const s=g.B.p.st;s.weak=0;s.vuln=0;s.weary=0;E.draw(g,v.n);}},
+ captive:{name:'Every Thought Captive',type:'word',cost:1,tg:'foe',r:'c',pool:'all',v:{d:7,n:1},u:{d:9,n:2},ref:'2 Corinthians 10:5',text:'Deal {d} truth. The foe is Humbled for {n} turns.',play:(g,v,t)=>{E.hit(g,t,v.d);const f=E.foe(g,t);if(f&&!f.gone)E.apply(g,f,'weak',v.n);}},
+ light:{name:'Let Your Light Shine',type:'word',cost:1,tg:'all',r:'u',pool:'all',v:{d:4},u:{d:6},ref:'Matthew 5:16',text:'Deal {d} truth to every foe. Each is Exposed for 1 turn.',play:(g,v)=>{E.hitAll(g,v.d);E.live(g).forEach(f=>E.apply(g,f,'vuln',1));}},
+ goodfight:{name:'Fight the Good Fight',type:'word',cost:2,tg:'foe',r:'u',pool:'all',v:{d:5},u:{d:7},ref:'1 Timothy 6:12',text:'Deal {d} truth twice. Gain 1 Might.',play:(g,v,t)=>{E.hit(g,t,v.d,2);E.apply(g,'p','might',1);}},
+ race:{name:'Run the Race',type:'word',cost:0,tg:'foe',r:'c',pool:'all',v:{d:3},u:{d:5},ref:'1 Corinthians 9:24',text:'Deal {d} truth. Draw 1 card.',play:(g,v,t)=>{E.hit(g,t,v.d);E.draw(g,1);}},
+ cord:{name:'Threefold Cord',type:'guard',cost:2,tg:'self',r:'c',pool:'all',v:{b:4},u:{b:5},ref:'Ecclesiastes 4:12',text:'Gain {b} shield three times.',play:(g,v)=>{E.shield(g,v.b);E.shield(g,v.b);E.shield(g,v.b);}},
+ bestill:{name:'Be Still',type:'guard',cost:1,tg:'self',r:'u',pool:'all',v:{b:5},u:{b:8},ref:'Psalm 46:10',text:'Gain {b} shield. Gain 1 extra grace next turn.',play:(g,v)=>{E.shield(g,v.b);g.B.next.grace++;}},
+ refuge:{name:'Refuge and Strength',type:'guard',cost:2,tg:'self',r:'u',pool:'all',v:{b:9},u:{b:12},ref:'Psalm 46:1',text:'Gain {b} shield. Gain 1 Peace for this battle.',play:(g,v)=>{E.shield(g,v.b);E.apply(g,'p','peace',1);}},
+ jericho:{name:'The Walls Fall Down',type:'word',cost:2,tg:'all',r:'r',pool:'all',v:{d:9},u:{d:13},ref:'Joshua 6:20',text:'Every foe loses all its shield. Then deal {d} truth to every foe.',play:(g,v)=>{E.live(g).forEach(f=>f.block=0);E.hitAll(g,v.d);}},
+ loveenemies:{name:'Love Your Enemies',type:'guard',cost:1,tg:'none',r:'u',pool:'all',v:{n:2},u:{n:3},ex:true,ref:'Matthew 5:44',text:'Every foe is Humbled for {n} turns. Offered.',play:(g,v)=>E.live(g).forEach(f=>E.apply(g,f,'weak',v.n))},
+ joy:{name:'Count It All Joy',type:'grace',cost:1,tg:'self',r:'r',pool:'all',v:{n:1},u:{n:1},uc:0,ref:'James 1:2',text:'For this battle, whenever a strike takes your resolve, gain {n} Might.',play:(g,v)=>E.power(g,'joy',v.n)},
+ weakness:{name:'Strength in Weakness',type:'word',cost:1,tg:'foe',r:'u',pool:'all',v:{d:8},u:{d:11},ref:'2 Corinthians 12:9',text:'Deal {d} truth. Twice as much if your resolve is below half.',play:(g,v,t)=>{const p=g.player;E.hit(g,t,p.hp*2<p.max?v.d*2:v.d);}},
+ allthings:{name:'Through Him Who Strengthens',type:'grace',cost:1,tg:'self',r:'r',pool:'all',v:{n:2},u:{n:3},ex:true,ref:'Philippians 4:13',text:'Gain 1 grace and {n} Might. Offered.',play:(g,v)=>{g.B.grace++;E.apply(g,'p','might',v.n);}},
+ seventy:{name:'Seventy-Seven Times',type:'word',cost:1,tg:'foe',r:'u',pool:'all',v:{d:4},u:{d:6},ref:'Matthew 18:22',text:'Deal {d} truth, plus 4 for every time you have already played this in the battle.',dyn:(g,c,v)=>({d:v.d+4*((g.B&&g.B.count[c.uid])||0)}),play:(g,v,t,c)=>{E.hit(g,t,v.d);g.B.count[c.uid]=(g.B.count[c.uid]||0)+1;}},
+ mercies:{name:'New Every Morning',type:'guard',cost:1,tg:'self',r:'r',pool:'all',v:{h:5},u:{h:8},ex:true,ref:'Lamentations 3:23',text:'Regain {h} resolve. Offered.',play:(g,v)=>E.heal(g,v.h)},
+ wings:{name:'Wings like Eagles',type:'guard',cost:1,tg:'self',r:'u',pool:'all',v:{b:3},u:{b:5},ref:'Isaiah 40:31',text:'Gain {b} shield. Draw 2 cards.',play:(g,v)=>{E.shield(g,v.b);E.draw(g,2);}},
+ testimony:{name:'Word of Their Testimony',type:'word',cost:2,tg:'foe',r:'r',pool:'all',v:{d:4},u:{d:5},ref:'Revelation 12:11',text:'Deal {d} truth for each card you have played this turn, counting this one.',dyn:(g,c,v)=>({d:v.d*((g.B?g.B.played:0)+1)}),play:(g,v,t)=>E.hit(g,t,v.d)},
+ softanswer:{name:'A Soft Answer',type:'guard',cost:0,tg:'foe',r:'c',pool:'all',v:{n:1},u:{n:2},ref:'Proverbs 15:1',text:'The foe is Humbled for {n} turns.',play:(g,v,t)=>{const f=E.foe(g,t);if(f)E.apply(g,f,'weak',v.n);}},
+ keepalert:{name:'Keep Alert',type:'grace',cost:2,tg:'self',r:'r',pool:'all',v:{n:1},u:{n:1},uc:1,ref:'Ephesians 6:18',text:'For this battle, draw {n} more card at the start of each turn.',play:(g,v)=>E.power(g,'alert',v.n)},
+ layaside:{name:'Lay Aside Every Weight',type:'guard',cost:1,tg:'self',r:'u',pool:'all',v:{},u:{},uc:0,ref:'Hebrews 12:1',text:'Offer every Burden, Worry and Distraction in your hand. Draw a card for each.',play:(g)=>{const B=g.B;const bad=B.hand.filter(c=>CARDS[c.id].type==='burden');bad.forEach(c=>E.offer(g,c));E.draw(g,bad.length);}},
+ hymn:{name:'Hymns at Midnight',type:'grace',cost:1,tg:'self',r:'u',pool:'scribe',v:{b:2},u:{b:3},ref:'Acts 16:25',text:'For this battle, whenever you play a Word card, gain {b} shield.',play:(g,v)=>E.power(g,'hymn',v.b)},
+ // shepherd
+ seeklost:{name:'Seek the Lost One',type:'word',cost:1,tg:'none',r:'c',pool:'shepherd',v:{d:10},u:{d:14},ref:'Luke 15:4',text:'Deal {d} truth to the foe with the least hold.',play:(g,v)=>{const L=E.live(g);if(!L.length)return;const f=L.reduce((a,b)=>b.hp<a.hp?b:a);E.hit(g,f.uid,v.d);}},
+ rodstaff:{name:'Your Rod and Your Staff',type:'guard',cost:1,tg:'foe',r:'c',pool:'shepherd',v:{b:7},u:{b:10},ref:'Psalm 23:4',text:'Gain {b} shield. The foe is Humbled for 1 turn.',play:(g,v,t)=>{E.shield(g,v.b);const f=E.foe(g,t);if(f)E.apply(g,f,'weak',1);}},
+ stillwaters:{name:'Beside Still Waters',type:'guard',cost:1,tg:'self',r:'u',pool:'shepherd',v:{h:2,b:4},u:{h:3,b:6},ref:'Psalm 23:2',text:'Regain {h} resolve. Gain {b} shield.',play:(g,v)=>{E.heal(g,v.h);E.shield(g,v.b);}},
+ nameofthelord:{name:'In the Name of the Lord',type:'word',cost:2,tg:'foe',r:'u',pool:'shepherd',v:{d:20},u:{d:27},ex:true,ref:'1 Samuel 17:45',text:'Deal {d} truth. Offered.',play:(g,v,t)=>E.hit(g,t,v.d)},
+ myshepherd:{name:'The Lord Is My Shepherd',type:'grace',cost:1,tg:'self',r:'r',pool:'shepherd',v:{h:1},u:{h:2},ref:'Psalm 23:1',text:'For this battle, regain {h} resolve at the end of each of your turns.',play:(g,v)=>E.power(g,'shep',v.h)},
+ newsong:{name:'Sing a New Song',type:'guard',cost:0,tg:'self',r:'u',pool:'shepherd',v:{n:3},u:{n:4},ref:'Psalm 33:3',text:'Gain {n} Might until the end of this turn. Draw 1 card.',play:(g,v)=>{E.apply(g,'p','might',v.n);g.B.p.st.song=(g.B.p.st.song||0)+v.n;E.draw(g,1);}},
+ goodness:{name:'Goodness and Mercy',type:'guard',cost:2,tg:'self',r:'c',pool:'shepherd',v:{b:8},u:{b:11},ref:'Psalm 23:6',text:'Gain {b} shield now and {b} more at the start of your next turn.',play:(g,v)=>{const n=E.shield(g,v.b);g.B.next.block+=n;}},
+ // fisher
+ rightside:{name:'The Right Side of the Boat',type:'word',cost:1,tg:'all',r:'u',pool:'fisher',v:{d:3},u:{d:4},ref:'John 21:6',text:'Deal {d} truth to every foe, twice.',play:(g,v)=>{E.hitAll(g,v.d);E.hitAll(g,v.d);}},
+ walkwater:{name:'Walk on the Water',type:'word',cost:0,tg:'foe',r:'c',pool:'fisher',v:{d:10},u:{d:14},ref:'Matthew 14:29',text:'Deal {d} truth. You lose 3 resolve.',play:(g,v,t)=>{E.hit(g,t,v.d);E.lose(g,3);}},
+ peacestill:{name:'Peace! Be Still!',type:'guard',cost:2,tg:'none',r:'u',pool:'fisher',v:{b:8},u:{b:11},ref:'Mark 4:39',text:'Gain {b} shield. Every foe loses 2 Might and is Humbled for 1 turn.',play:(g,v)=>{E.shield(g,v.b);E.live(g).forEach(f=>{f.st.might=(f.st.might||0)-2;E.apply(g,f,'weak',1);});}},
+ rock:{name:'On This Rock',type:'grace',cost:2,tg:'self',r:'r',pool:'fisher',v:{b:6},u:{b:10},ref:'Matthew 16:18',text:'For this battle, your shield no longer fades at the start of your turn. Gain {b} shield.',play:(g,v)=>{E.power(g,'rock',1);E.shield(g,v.b);}},
+ followme:{name:'Follow Me',type:'guard',cost:0,tg:'self',r:'c',pool:'fisher',v:{n:2},u:{n:2},ex:true,uex:false,ref:'Matthew 4:19',text:'Draw {n} cards.',play:(g,v)=>E.draw(g,v.n)},
+ catchingmen:{name:'Catching Men',type:'word',cost:1,tg:'foe',r:'c',pool:'fisher',v:{d:8},u:{d:11},ref:'Luke 5:10',text:'Deal {d} truth. If the foe flees, gain 8 talents.',play:(g,v,t)=>{const f=E.foe(g,t);E.hit(g,t,v.d);if(f&&f.gone)E.talents(g,8);}},
+ deep:{name:'Into the Deep',type:'guard',cost:1,tg:'self',r:'u',pool:'fisher',v:{n:2},u:{n:3},ref:'Luke 5:4',text:'Draw {n} cards. Gain 1 extra grace next turn.',play:(g,v)=>{E.draw(g,v.n);g.B.next.grace++;}},
+ // scribe
+ encourage:{name:'Letter of Encouragement',type:'guard',cost:1,tg:'self',r:'c',pool:'scribe',v:{b:4},u:{b:6},ref:'1 Thessalonians 5:11',text:'Gain {b} shield. Gain 1 Peace for this battle.',play:(g,v)=>{E.shield(g,v.b);E.apply(g,'p','peace',1);}},
+ newold:{name:'Treasures New and Old',type:'guard',cost:1,tg:'self',r:'u',pool:'scribe',v:{},u:{},uc:0,ref:'Matthew 13:52',text:'Bring a random card back from your discard pile. It costs nothing this turn.',play:(g)=>{const B=g.B;if(!B.discard.length)return;const i=Math.floor(E.rand(g)*B.discard.length);const c=B.discard.splice(i,1)[0];c.free=1;B.hand.push(c);E.fx(g,{k:'draw'});}},
+ longletter:{name:'A Long Letter',type:'word',cost:2,tg:'foe',r:'u',pool:'scribe',v:{d:3},u:{d:4},ref:'Psalm 45:1',text:'Deal {d} truth for each other card in your hand.',dyn:(g,c,v)=>({d:v.d*(g.B?Math.max(0,g.B.hand.length-1):0)}),play:(g,v,t)=>E.hit(g,t,v.d)},
+ reasoned:{name:'Reasoned from the Scriptures',type:'word',cost:1,tg:'foe',r:'c',pool:'scribe',v:{d:3},u:{d:4},ref:'Acts 17:2',text:'Deal {d} truth three times.',play:(g,v,t)=>E.hit(g,t,v.d,3)},
+ rejoice:{name:'Rejoice Always',type:'grace',cost:1,tg:'self',r:'r',pool:'scribe',v:{},u:{},uc:0,ref:'Philippians 4:4',text:'For this battle, the third card you play each turn gives you 1 grace back.',play:(g)=>E.power(g,'rejoice',1)},
+ thoughts:{name:'Destroy Arguments',type:'word',cost:1,tg:'foe',r:'c',pool:'scribe',v:{d:7},u:{d:10},ref:'2 Corinthians 10:5',text:'The foe loses all its shield. Then deal {d} truth.',play:(g,v,t)=>{const f=E.foe(g,t);if(f)f.block=0;E.hit(g,t,v.d);}},
+ // burdens
+ burden:{name:'Burden',type:'burden',cost:-1,tg:'none',r:'x',pool:'none',v:{},u:{},ref:'Hebrews 12:1',text:'Cannot be played. A weight that clings closely.'},
+ worry:{name:'Worry',type:'burden',cost:-1,tg:'none',r:'x',pool:'none',v:{},u:{},ref:'Matthew 6:34',text:'Cannot be played. If it is in your hand at the end of your turn, lose 2 resolve.'},
+ distraction:{name:'Distraction',type:'burden',cost:1,tg:'self',r:'x',pool:'none',v:{},u:{},ex:true,ref:'Matthew 6:24',text:'Does nothing. Offered.',play:()=>{}},
+};
+for(const k in CARDS)CARDS[k].id=k;
+
+const TREASURES={
+ staff:{name:'Shepherd’s Staff',ref:'Psalm 23:4',text:'After each battle, regain 6 resolve.',kind:'start'},
+ net:{name:'Fisher’s Net',ref:'Luke 5:6',text:'On the first turn of each battle, draw 2 more cards.',kind:'start'},
+ quill:{name:'Scribe’s Quill',ref:'Habakkuk 2:2',text:'On the first turn of each battle, gain 1 more grace and draw 1 more card.',kind:'start'},
+ mustard:{name:'Mustard Seed',ref:'Matthew 17:20',text:'Begin each battle with 1 Might.',kind:'t'},
+ loaves:{name:'Five Loaves and Two Fish',ref:'Matthew 14:20',text:'When you receive this, your greatest resolve rises by 8 and you regain 8.',kind:'t'},
+ mite:{name:'The Widow’s Mite',ref:'Luke 21:3',text:'The first Guard card you play in each battle gives 6 more shield.',kind:'event'},
+ alabaster:{name:'Alabaster Jar',ref:'Mark 14:6',text:'Whenever a card is Offered, regain 2 resolve.',kind:'t'},
+ lamp:{name:'Lamp and Oil',ref:'Matthew 25:13',text:'On the third turn of each battle, gain 1 grace and draw 2 cards.',kind:'t'},
+ manna:{name:'Jar of Manna',ref:'Matthew 6:11',text:'At the start of each battle, regain 3 resolve.',kind:'t'},
+ salt:{name:'Salt of the Earth',ref:'Matthew 5:13',text:'In each battle, the first strike against you takes 6 less.',kind:'t'},
+ purse:{name:'Purse of Talents',ref:'Matthew 25:21',text:'You gain half again as many talents after battles.',kind:'event'},
+ pearl:{name:'Pearl of Great Price',ref:'Matthew 13:46',text:'When you receive this, your greatest resolve rises by 12. After each battle, you see one more card to choose from.',kind:'event'},
+ rainbow:{name:'Rainbow of the Covenant',ref:'Genesis 9:13',text:'Once, when your resolve would fall to 0, you are held up with a third of it instead.',kind:'t'},
+ dove:{name:'Dove with an Olive Leaf',ref:'Genesis 8:11',text:'At the start of each battle, every foe is Humbled for 1 turn.',kind:'t'},
+ oilwine:{name:'Oil and Wine',ref:'Luke 10:34',text:'After each battle, regain 4 resolve.',kind:'event'},
+ robe:{name:'Unsinged Robe',ref:'Daniel 3:25',text:'No single blow can take more than 15 of your resolve.',kind:'event'},
+ trumpet:{name:'Trumpet of Praise',ref:'Psalm 150:3',text:'Every tenth card you play deals 10 truth to every foe.',kind:'t'},
+ mantle:{name:'Elijah’s Cloak',ref:'2 Kings 2:13',text:'On the first turn of each battle, gain 6 shield and draw 1 more card.',kind:'t'},
+ cornerstone:{name:'The Cornerstone',ref:'Psalm 118:22',text:'At the start of each battle, gain 10 shield.',kind:'t'},
+ anchor:{name:'Anchor of Hope',ref:'Hebrews 6:19',text:'If you end your turn with no shield, gain 6 shield.',kind:'t'},
+ // fruits of the Spirit (book rewards)
+ love:{name:'Love',ref:'1 Corinthians 13:7',text:'Your greatest resolve rises by 10, and you regain all of it now.',kind:'fruit'},
+ joyf:{name:'Joy',ref:'Nehemiah 8:10',text:'Gain 1 more grace at the start of every turn.',kind:'fruit'},
+ peacef:{name:'Peace',ref:'Philippians 4:7',text:'Begin each battle with 2 Peace.',kind:'fruit'},
+ patience:{name:'Patience',ref:'Romans 12:12',text:'Unused grace carries over to your next turn, up to 2.',kind:'fruit'},
+ kindness:{name:'Kindness',ref:'Ephesians 4:32',text:'Whenever a foe flees, regain 4 resolve.',kind:'fruit'},
+ goodnessf:{name:'Goodness',ref:'Psalm 23:6',text:'Draw 1 more card at the start of every turn.',kind:'fruit'},
+ faithful:{name:'Faithfulness',ref:'Lamentations 3:22',text:'At the start of each turn, gain shield equal to the turn number, up to 8.',kind:'fruit'},
+ gentle:{name:'Gentleness',ref:'Proverbs 15:1',text:'At the start of each battle, every foe is Humbled for 2 turns.',kind:'fruit'},
+ selfcontrol:{name:'Self-Control',ref:'Proverbs 25:28',text:'When you draw a Burden, Worry or Distraction, it is Offered and you draw another card.',kind:'fruit'},
+};
+for(const k in TREASURES)TREASURES[k].id=k;
+const FRUITS=Object.keys(TREASURES).filter(k=>TREASURES[k].kind==='fruit');
+
+// Foe moves: k = kind shown as intent: strike, shield, buff, debuff, curse, hidden. d=damage h=hits b=block
+const FOES={
+ // Book I: the Wilderness
+ snail:{name:'Snail of Sloth',hp:[40,44],art:'snail',ref:'Proverbs 6:6',desc:'It would rather you did nothing at all.',
+  moves:{yawn:{n:'Yawn',k:'debuff',b:6,fx:(g,f)=>E.apply(g,'p','weary',1),tip:'Makes you Weary and gains 6 shield'},crawl:{n:'Slow Crawl',k:'strike',d:9},shell:{n:'Retreat into the Shell',k:'shield',b:12,fx:(g,f)=>E.apply(g,f,'might',1),tip:'Gains 12 shield and 1 Might'}},
+  ai:(f,g)=>f.turn===1?'yawn':E.pick(g,f,['crawl','crawl','shell'],2)},
+ locust:{name:'Grumbling Locust',hp:[11,15],art:'locust',ref:'Philippians 2:14',desc:'Small, many, and never satisfied.',
+  moves:{chew:{n:'Chew',k:'strike',d:5},murmur:{n:'Murmur',k:'debuff',d:2,fx:(g,f)=>E.apply(g,'p','weak',1),tip:'Strikes for a little and fills you with Doubt'}},
+  ai:(f,g)=>E.pick(g,f,['chew','chew','murmur'],2)},
+ fox:{name:'Little Fox',hp:[17,21],art:'fox',ref:'Song of Solomon 2:15',desc:'Small things that spoil the vineyard.',
+  moves:{nibble:{n:'Nibble',k:'strike',d:3,h:2},spoil:{n:'Spoil the Vine',k:'curse',d:4,fx:(g,f)=>E.addCard(g,'distraction','discard'),tip:'Strikes and slips a Distraction into your discard pile'}},
+  ai:(f,g)=>f.turn===1?(E.rand(g)<.5?'nibble':'spoil'):(f.last==='nibble'?'spoil':'nibble')},
+ asp:{name:'Asp of Envy',hp:[36,40],art:'asp',ref:'Proverbs 14:30',desc:'It watches what others have, and bites.',
+  moves:{coil:{n:'Coil',k:'buff',b:6,fx:(g,f)=>E.apply(g,f,'might',2),tip:'Gains 2 Might and 6 shield'},bite:{n:'Bite',k:'strike',d:8},venom:{n:'Envious Venom',k:'debuff',d:4,fx:(g,f)=>E.apply(g,'p','vuln',2),tip:'Strikes and fills you with Fear for 2 turns'}},
+  ai:(f,g)=>f.turn===1?'coil':E.pick(g,f,['bite','bite','venom','coil'],1)},
+ wolf:{name:'Wolf in Sheep’s Clothing',hp:[78,82],art:'wolf',elite:1,ref:'Matthew 7:15',desc:'Gentle to look at, until it is not.',
+  moves:{fleece:{n:'Gentle Bleating',k:'hidden',b:10,fx:(g,f)=>E.apply(g,f,'might',1),tip:'What does it really intend?'},reveal:{n:'Cast Off the Fleece',k:'buff',fx:(g,f)=>{f.data.revealed=1;E.apply(g,f,'might',2);E.say(g,f,'The fleece falls away!');},tip:'Shows its true nature and gains 2 Might'},ravenous:{n:'Ravenous',k:'strike',d:14},tear:{n:'Tear',k:'strike',d:6,h:2},howl:{n:'Howl',k:'buff',b:10,fx:(g,f)=>E.apply(g,f,'might',2),tip:'Gains 2 Might and 10 shield'}},
+  ai:(f,g)=>{if(!f.data.revealed){if(f.turn>=3||f.hp*2<f.max)return 'reveal';return 'fleece';}return E.cycle(f,['ravenous','tear','howl']);}},
+ thorns:{name:'Thorns of Worry',hp:[66,70],art:'thorns',elite:1,thorns:3,ref:'Matthew 6:34',desc:'Its thorns prick every hand that strikes it.',
+  moves:{choke:{n:'Choke the Word',k:'curse',fx:(g,f)=>{E.addCard(g,'worry','draw');E.addCard(g,'worry','draw');},tip:'Shuffles 2 Worry cards into your draw pile'},prick:{n:'Prick',k:'strike',d:5,h:2},grow:{n:'Grow Thicker',k:'shield',b:12,fx:(g,f)=>{f.st.thorns=(f.st.thorns||0)+1;},tip:'Gains 12 shield and 1 more thorn'}},
+  ai:(f,g)=>E.cycle(f,['choke','prick','grow','prick'])},
+ calf:{name:'The Golden Calf',hp:[128,128],art:'calf',boss:1,ref:'Exodus 20:3',ref2:'1 John 5:21',desc:'A god made with hands, shining and empty.',
+  moves:{gleam:{n:'Dazzling Gleam',k:'debuff',b:14,fx:(g,f)=>E.apply(g,'p','weak',2),tip:'Gains 14 shield and fills you with Doubt for 2 turns'},revelry:{n:'Revelry',k:'strike',d:5,h:3},offering:{n:'Demand an Offering',k:'curse',fx:(g,f)=>{E.addCard(g,'distraction','draw');E.addCard(g,'distraction','draw');E.apply(g,f,'might',1);},tip:'Shuffles 2 Distractions into your draw pile and gains 1 Might'},trample:{n:'Trample',k:'strike',d:18}},
+  ai:(f,g)=>E.cycle(f,['gleam','revelry','offering','trample']),
+  onHalf:(g,f)=>{E.apply(g,f,'might',2);E.say(g,f,'The people shout before the calf!');}},
+ // Book II: the City
+ peacock:{name:'Peacock of Pride',hp:[52,56],art:'peacock',ref:'Philippians 2:3',desc:'It spreads its tail so you will look at nothing else.',
+  moves:{display:{n:'Display',k:'buff',b:10,fx:(g,f)=>E.apply(g,f,'might',2),tip:'Gains 2 Might and 10 shield'},peck:{n:'Peck',k:'strike',d:11},scorn:{n:'Scorn',k:'debuff',d:4,fx:(g,f)=>E.apply(g,'p','weak',2),tip:'Strikes and fills you with Doubt for 2 turns'}},
+  ai:(f,g)=>f.turn%3===1?'display':E.pick(g,f,['peck','scorn'],1)},
+ magpie:{name:'Magpie of Greed',hp:[44,48],art:'magpie',ref:'Luke 12:15',desc:'It wants what is yours, and what is not.',
+  moves:{snatch:{n:'Snatch',k:'strike',d:9,fx:(g,f)=>{const n=Math.min(12,g.player.talents);g.player.talents-=n;f.data.stolen=(f.data.stolen||0)+n;if(n)E.say(g,f,'Snatched '+n+' talents!');},tip:'Strikes and steals up to 12 talents (you get them back if it flees)'},hoard:{n:'Hoard',k:'shield',b:14},flutter:{n:'Flutter',k:'strike',d:4,h:2}},
+  ai:(f,g)=>E.pick(g,f,['snatch','snatch','hoard','flutter'],1)},
+ goose:{name:'Gossiping Goose',hp:[26,30],art:'goose',ref:'Proverbs 16:28',desc:'What it whispers, everyone hears.',
+  moves:{whisper:{n:'Whisper',k:'debuff',d:3,fx:(g,f)=>E.apply(g,'p','vuln',1),tip:'Strikes and fills you with Fear'},honk:{n:'Honk',k:'strike',d:8},strife:{n:'Spread Strife',k:'buff',fx:(g,f)=>E.live(g).forEach(o=>E.apply(g,o,'might',1)),tip:'Every foe gains 1 Might'}},
+  ai:(f,g)=>E.pick(g,f,['whisper','honk','honk','strife'],1)},
+ goat:{name:'Goat of Stubbornness',hp:[66,70],art:'goat',ref:'Proverbs 12:15',desc:'It will not be moved, and it will not listen.',
+  moves:{butt:{n:'Head Butt',k:'strike',d:14},digin:{n:'Dig In',k:'shield',b:16},ram:{n:'Ram',k:'strike',d:7,h:2}},
+  ai:(f,g)=>E.pick(g,f,['butt','digin','ram'],1)},
+ lion:{name:'The Roaring Lion',hp:[115,120],art:'lion',elite:1,ref:'1 Peter 5:8',desc:'It prowls around, seeking someone to devour.',
+  moves:{prowl:{n:'Prowl',k:'buff',b:12,fx:(g,f)=>E.apply(g,f,'might',2),tip:'Gains 2 Might and 12 shield'},roar:{n:'Roar',k:'debuff',fx:(g,f)=>{E.apply(g,'p','weak',2);E.apply(g,'p','vuln',2);},tip:'Fills you with Doubt and Fear for 2 turns'},devour:{n:'Seek to Devour',k:'strike',d:24}},
+  ai:(f,g)=>E.cycle(f,['prowl','roar','devour'])},
+ coffer:{name:'Mammon’s Coffer',hp:[100,104],art:'coffer',elite:1,ref:'Matthew 6:24',desc:'Gold that wants to be served.',
+  moves:{gild:{n:'Gild Itself',k:'shield',b:22},clink:{n:'Clink of Coins',k:'strike',d:6,h:2,dyn:(g)=>Math.floor(g.player.talents/40),tip:'Strikes twice, 1 harder for every 40 talents you carry'},weigh:{n:'Weigh You Down',k:'curse',d:6,fx:(g,f)=>{E.addCard(g,'burden','discard',0,1);E.addCard(g,'burden','discard',0,1);},tip:'Strikes and adds 2 Burdens to your discard pile for this battle'}},
+  ai:(f,g)=>E.cycle(f,['gild','clink','weigh','clink'])},
+ babel:{name:'The Tower of Babel',hp:[220,220],art:'babel',boss:1,breakVuln:2,ref:'Proverbs 16:18',ref2:'James 4:6',desc:'Pride built to the heavens. Break its shield and it is Exposed.',
+  moves:{build:{n:'Build Higher',k:'buff',b:18,fx:(g,f)=>{E.apply(g,f,'might',1);f.data.h=(f.data.h||0)+1;},tip:'Gains 18 shield and 1 Might. Break the shield to Expose it!'},stones:{n:'Cast Down Bricks',k:'strike',d:7,h:3},confound:{n:'Confound Your Words',k:'curse',fx:(g,f)=>{E.addCard(g,'distraction','draw');E.addCard(g,'distraction','draw');E.apply(g,'p','weak',1);},tip:'Shuffles 2 Distractions into your draw pile and fills you with Doubt'},lofty:{n:'A Haughty Spirit',k:'strike',d:28}},
+  ai:(f,g)=>E.cycle(f,['build','stones','confound','build','lofty'])},
+ // Book III: the Sea and the Night
+ moth:{name:'Moth',hp:[38,42],art:'moth',ref:'Matthew 6:19',desc:'It eats away at treasures laid up on earth.',
+  moves:{devour:{n:'Eat Away',k:'debuff',d:7,fx:(g,f)=>E.apply(g,'p','vuln',1),tip:'Strikes and fills you with Fear'},flutter:{n:'Flutter',k:'strike',d:4,h:2}},
+  ai:(f,g)=>E.pick(g,f,['devour','flutter'],1)},
+ rust:{name:'Rust',hp:[42,46],art:'rust',ref:'Matthew 6:20',desc:'It corrodes the things we trust in.',
+  moves:{corrode:{n:'Corrode',k:'strike',d:9,pre:(g,f)=>{g.B.p.block=0;},tip:'Eats away all your shield, then strikes'},tarnish:{n:'Tarnish',k:'debuff',b:8,fx:(g,f)=>E.apply(g,'p','weak',1),tip:'Gains 8 shield and fills you with Doubt'}},
+  ai:(f,g)=>E.pick(g,f,['corrode','tarnish'],1)},
+ owl:{name:'Owl of the Night',hp:[66,70],art:'owl',ref:'1 Thessalonians 5:5',desc:'It hunts in the dark and hates the dawn.',
+  moves:{gloom:{n:'Gloom',k:'debuff',fx:(g,f)=>{E.apply(g,'p','weary',2);E.apply(g,'p','weak',1);},tip:'Makes you Weary and fills you with Doubt'},swoop:{n:'Swoop',k:'strike',d:18},perch:{n:'Perch',k:'shield',b:15}},
+  ai:(f,g)=>f.turn===1?'gloom':E.cycle(f,['swoop','perch','swoop','gloom'])},
+ wave:{name:'Wave of Fear',hp:[60,64],art:'wave',grow:1,ref:'Isaiah 43:2',desc:'It rises higher every turn you let it.',
+  moves:{crash:{n:'Crash',k:'strike',d:9,h:2},undertow:{n:'Undertow',k:'debuff',d:5,fx:(g,f)=>E.apply(g,'p','vuln',2),tip:'Strikes and fills you with Fear for 2 turns'}},
+  ai:(f,g)=>E.pick(g,f,['crash','undertow'],1)},
+ jackal:{name:'Jackal of Despair',hp:[32,36],art:'jackal',ref:'Psalm 42:11',desc:'It howls that there is no hope.',
+  moves:{howl:{n:'Howl in the Night',k:'curse',d:4,fx:(g,f)=>E.addCard(g,'worry','draw'),tip:'Strikes and shuffles a Worry into your draw pile'},snap:{n:'Snap',k:'strike',d:10}},
+  ai:(f,g)=>E.pick(g,f,['howl','snap','snap'],1)},
+ scorpion:{name:'The Scorpion',hp:[135,140],art:'scorpion',elite:1,ref:'Luke 10:19',desc:'You have been given authority to tread on it.',
+  moves:{sting:{n:'Sting',k:'debuff',d:15,fx:(g,f)=>E.apply(g,'p','weak',2),tip:'Strikes hard and fills you with Doubt for 2 turns'},carapace:{n:'Carapace',k:'shield',b:24},lash:{n:'Tail Lash',k:'strike',d:8,h:3}},
+  ai:(f,g)=>E.cycle(f,['carapace','sting','lash'])},
+ whatif:{name:'Doubt: “What If?”',hp:[50,54],art:'head1',elite:1,ref:'James 1:6',desc:'One head of the many-headed Doubt.',
+  moves:{whisper:{n:'What If?',k:'debuff',fx:(g,f)=>{E.apply(g,'p','weak',2);E.apply(g,'p','vuln',1);},tip:'Fills you with Doubt and Fear'},nip:{n:'Nip',k:'strike',d:7}},
+  ai:(f,g)=>E.cycle(f,['whisper','nip']),onAllyGone:(g,f)=>E.apply(g,f,'might',2)},
+ why:{name:'Doubt: “Why?”',hp:[50,54],art:'head2',elite:1,ref:'Mark 9:24',desc:'One head of the many-headed Doubt.',
+  moves:{bite:{n:'Why?',k:'strike',d:13},gnash:{n:'Gnash',k:'strike',d:5,h:2}},
+  ai:(f,g)=>E.cycle(f,['bite','gnash']),onAllyGone:(g,f)=>E.apply(g,f,'might',2)},
+ how:{name:'Doubt: “How?”',hp:[50,54],art:'head3',elite:1,ref:'Mark 9:24',desc:'One head of the many-headed Doubt.',
+  moves:{cover:{n:'How Could It Be?',k:'shield',fx:(g,f)=>E.live(g).forEach(o=>{o.block+=10;}),tip:'Every head gains 10 shield'},snap:{n:'Snap',k:'strike',d:9}},
+  ai:(f,g)=>E.cycle(f,['cover','snap']),onAllyGone:(g,f)=>E.apply(g,f,'might',2)},
+ serpent:{name:'The Ancient Serpent',hp:[340,340],art:'serpent',boss:1,ref:'Revelation 12:9',ref2:'Revelation 12:11',desc:'The deceiver of the whole world. Your Shield of Faith quenches its flaming darts.',
+  moves:{darts:{n:'Flaming Darts',k:'strike',d:5,h:4,tip:'Four flaming darts. Shield of Faith gives 5 more shield against them!'},deceive:{n:'Deceive',k:'curse',fx:(g,f)=>{E.addCard(g,'distraction','draw');E.addCard(g,'distraction','draw');E.apply(g,'p','weak',2);},tip:'Shuffles 2 Distractions into your draw pile and fills you with Doubt'},coil:{n:'Coil',k:'buff',b:26,fx:(g,f)=>E.apply(g,f,'might',3),tip:'Gains 26 shield and 3 Might'},accuse:{n:'Accuse',k:'strike',d:34}},
+  ai:(f,g)=>E.cycle(f,['darts','deceive','coil','accuse']),
+  onHalf:(g,f)=>{f.block=0;E.power(g,'lamb',1);E.say(g,f,'Thrown down by the blood of the Lamb!');E.fx(g,{k:'verse',ref:'Revelation 12:11'});}},
+};
+for(const k in FOES)FOES[k].id=k;
+
+const BOOKS=[
+ {name:'The Wilderness',sub:'The First Book',ref:'Matthew 4:1',tint:'#6b7f3a',boss:'calf',
+  early:[['locust','locust'],['snail'],['fox','fox']],late:[['asp'],['fox','fox','locust'],['locust','locust','locust'],['asp','locust'],['snail','fox']],elites:[['wolf'],['thorns']],
+  intro:'The road leaves the town and runs out into dry country. The narrow way begins here, where Jesus himself was tempted, and where every pilgrim learns that the Word is a sword.'},
+ {name:'The City on a Hill',sub:'The Second Book',ref:'Matthew 5:14',tint:'#8a5a2b',boss:'babel',
+  early:[['peacock'],['magpie'],['goose','goose']],late:[['goat'],['goose','goose','goose'],['peacock','magpie'],['goat','goose'],['magpie','goose']],elites:[['lion'],['coffer']],
+  intro:'The city is bright and busy, and full of things that call for your heart: pride, greed, gossip, gold. A city set on a hill cannot be hidden. Neither can a pilgrim who carries a light.'},
+ {name:'The Sea and the Night',sub:'The Third Book',ref:'Mark 4:39',tint:'#2c4a7a',boss:'serpent',
+  early:[['owl'],['moth','rust'],['wave']],late:[['jackal','jackal'],['owl','moth'],['wave','jackal'],['rust','moth','jackal'],['wave','rust']],elites:[['scorpion'],['whatif','why','how']],
+  intro:'The last road runs down to the shore and out across dark water. The wind rises. Fear and despair come out at night. But the One who stilled the storm walks this way too, and the night is far gone.'},
+];
+
+const BLESSINGS=[
+ {id:'talents',t:'A purse from a stranger',d:'Gain 90 talents.',go:g=>E.talents(g,90)},
+ {id:'resolve',t:'Bread for the road',d:'Your greatest resolve rises by 8.',go:g=>{g.player.max+=8;g.player.hp+=8;}},
+ {id:'treasure',t:'A gift left at the gate',d:'Receive a random treasure.',go:g=>E.giveRelic(g,E.randomRelic(g))},
+ {id:'illumine',t:'A lamp lit early',d:'Illuminate 2 random cards in your deck.',go:g=>E.upgradeRandom(g,2)},
+ {id:'laydown',t:'A light pack',d:'Lay down a card of your choice.',go:g=>E.startPick(g,'remove',1,'Lay down a card')},
+ {id:'rare',t:'An old scroll',d:'Choose 1 of 3 rare cards.',go:g=>{g.cardOffer={cards:E.cardChoices(g,3,'rare'),from:'blessing'};}},
+];
+
+// Parables: choices return result text. can(g) optional.
+const PARABLES={
+ samaritan:{t:'The Jericho Road',ref:'Luke 10:33',art:'p_road',
+  text:'A man lies beaten beside the road, half dead. Two travelers have already passed by on the other side.',
+  ch:[{t:'Bind his wounds',d:'Lose 8 resolve. Receive Oil and Wine.',go:g=>{E.lose(g,8,1);E.giveRelic(g,'oilwine');return 'You pour on oil and wine and lift him onto your own shoulders. Love costs something, and it is worth it.';}},
+      {t:'Pay for his lodging',d:'Lose 35 talents. Your greatest resolve rises by 5.',can:g=>g.player.talents>=35,go:g=>{g.player.talents-=35;g.player.max+=5;g.player.hp+=5;return 'You leave coins with the innkeeper. “Take care of him,” you say. Your own heart feels stronger for it.';}},
+      {t:'Pass by on the other side',d:'Add a Burden to your deck.',go:g=>{E.addDeck(g,'burden');return 'You hurry past. The road is quiet, but something heavy settles on you, and it does not leave.';}}]},
+ coin:{t:'The Lost Coin',ref:'Luke 15:8',art:'p_coin',
+  text:'A woman has lit a lamp and is sweeping every corner of her house. One silver coin of her ten is missing.',
+  ch:[{t:'Help her search',d:'Lose 5 resolve. Gain 45 talents.',go:g=>{E.lose(g,5,1);E.talents(g,45);return 'On your knees you find it in the dust. She calls her neighbors to rejoice, and presses a gift into your hands.';}},
+      {t:'Hold the lamp for her',d:'Illuminate a random card.',go:g=>{const c=E.upgradeRandom(g,1);return c?'By the lamplight a card of yours shines brighter: '+c+'.':'All your cards already shine.';}},
+      {t:'Wish her well and go on',d:'Nothing happens.',go:g=>'You go on your way.'}]},
+ pearl:{t:'The Pearl Merchant',ref:'Matthew 13:45',art:'p_pearl',
+  text:'A merchant opens his hand to show you one pearl, more lovely than anything you have seen. “I sold all I had for this,” he says. “Now I am offering it to you.”',
+  ch:[{t:'Give everything you have',d:'Lose all your talents (at least 60). Receive the Pearl of Great Price.',can:g=>g.player.talents>=60,go:g=>{g.player.talents=0;E.giveRelic(g,'pearl');return 'Your purse is empty and your hands are full. Some treasures are worth everything.';}},
+      {t:'Admire it and walk on',d:'Nothing happens.',go:g=>'You thank him, and remember its glow for a long while.'}]},
+ sower:{t:'The Sower',ref:'Matthew 13:23',art:'p_sower',
+  text:'A sower walks the field scattering seed. Some falls on the path, some among rocks and thorns, and some on good soil.',
+  ch:[{t:'Be good soil',d:'Illuminate a card of your choice.',go:g=>{E.startPick(g,'upgrade',1,'Illuminate a card');return 'You listen, and the word takes root.';}},
+      {t:'Pull up the thorns',d:'Lose 6 resolve. Lay down a card of your choice.',go:g=>{E.lose(g,6,1);E.startPick(g,'remove',1,'Lay down a card');return 'Your hands are scratched, but the ground is clear.';}},
+      {t:'Keep to the path',d:'Nothing happens.',go:g=>'You walk on, and the birds follow the sower.'}]},
+ prodigal:{t:'The Road Home',ref:'Luke 15:20',art:'p_father',
+  text:'Far down the road, a ragged son is coming home. Before he can say a word, his father is running to meet him, arms wide.',
+  ch:[{t:'Join the feast',d:'Regain all your resolve.',go:g=>{E.heal(g,999,1);E.seal(g,'prodigal');return 'The fattened calf, music and dancing. “This my son was dead, and is alive again.” You eat until your heart is full.';}},
+      {t:'Remember your own return',d:'Lay down a card of your choice.',go:g=>{E.startPick(g,'remove',1,'Lay down a card');return 'You were a long way off once too.';}}]},
+ widow:{t:'Two Small Coins',ref:'Luke 21:3',art:'p_widow',
+  text:'At the offering box the rich give large gifts. Then a poor widow drops in two small copper coins, all she has to live on.',
+  ch:[{t:'Give all your talents',d:'Lose all your talents (at least 1). Receive the Widow’s Mite.',can:g=>g.player.talents>0,go:g=>{g.player.talents=0;E.giveRelic(g,'mite');E.seal(g,'widow');return 'You give it all. Nobody notices but One, and that is enough.';}},
+      {t:'Give 20 talents',d:'Lose 20 talents. Regain 12 resolve.',can:g=>g.player.talents>=20,go:g=>{g.player.talents-=20;E.heal(g,12,1);return 'A cheerful gift, and a light heart.';}},
+      {t:'Watch quietly',d:'Nothing happens.',go:g=>'You watch her walk away, and you will not forget her.'}]},
+ talents:{t:'The Master’s Talents',ref:'Matthew 25:21',art:'p_talents',
+  text:'A master going on a journey entrusts his servants with his money. One servant is digging a hole to bury his share.',
+  ch:[{t:'Trade with what you have',d:'Lose 40 talents. Receive the Purse of Talents.',can:g=>g.player.talents>=40,go:g=>{g.player.talents-=40;E.giveRelic(g,'purse');return '“Well done, good and faithful servant.” What you were given will grow.';}},
+      {t:'Lend him a hand',d:'Gain 25 talents.',go:g=>{E.talents(g,25);return 'You help him dig it back up and talk him into trading. He shares the first profit with you.';}}]},
+ bush:{t:'The Burning Bush',ref:'Exodus 3:5',art:'p_bush',
+  text:'On the mountainside a bush is blazing with fire, yet it is not burned up. A voice calls your name.',
+  ch:[{t:'Take off your sandals',d:'Illuminate 2 random cards.',go:g=>{E.upgradeRandom(g,2);return 'You stand barefoot on holy ground, and you are sent on with new light.';}},
+      {t:'Turn aside to see',d:'Choose 1 of 3 cards, at least uncommon.',go:g=>{g.cardOffer={cards:E.cardChoices(g,3,'good'),from:'event'};return 'You come closer, and you are given something to carry.';}}]},
+ manna:{t:'Bread from Heaven',ref:'Exodus 16:4',art:'p_manna',
+  text:'In the morning the ground is covered with something fine and white, like frost. It is bread, enough for today.',
+  ch:[{t:'Gather a day’s portion',d:'Regain a quarter of your resolve.',go:g=>{E.heal(g,Math.ceil(g.player.max/4),1);return 'Enough for today. Tomorrow there will be enough for tomorrow.';}},
+      {t:'Gather far more than enough',d:'Gain 50 talents. Add a Burden to your deck.',go:g=>{E.talents(g,50);E.addDeck(g,'burden');return 'You sell the extra in the next town. By evening what you kept has bred worms and stinks, and the weight of it stays with you.';}}]},
+ ladder:{t:'Jacob’s Ladder',ref:'Genesis 28:12',art:'p_ladder',
+  text:'You lie down with a stone for a pillow and dream of a stairway reaching from earth to heaven, with angels going up and down.',
+  ch:[{t:'Pray at the foot of it',d:'Your greatest resolve rises by 6.',go:g=>{g.player.max+=6;g.player.hp+=6;return '“Surely the LORD is in this place.” You wake up stronger.';}},
+      {t:'Watch the angels',d:'Choose 1 of 3 cards, at least uncommon.',go:g=>{g.cardOffer={cards:E.cardChoices(g,3,'good'),from:'event'};return 'One of them pauses beside you on the way down.';}}]},
+ whisper:{t:'A Low Whisper',ref:'1 Kings 19:12',art:'p_cave',
+  text:'A great wind, then an earthquake, then a fire sweep past the mouth of the cave where you shelter. Then there is a low whisper.',
+  ch:[{t:'Listen',d:'Lay down a Burden or Worry from your deck. If you have none, illuminate a random card.',go:g=>{const i=g.player.deck.findIndex(c=>CARDS[c.id].type==='burden');if(i>=0){const c=g.player.deck.splice(i,1)[0];return 'You lay down your '+CARDS[c.id].name+'. You did not know how heavy it was.';}const n=E.upgradeRandom(g,1);return n?'The whisper makes your '+n+' shine.':'You listen, and you are at peace.';}},
+      {t:'Rest in the cave',d:'Regain a third of your resolve.',go:g=>{E.heal(g,Math.ceil(g.player.max/3),1);return 'You sleep, and an angel touches you and says, “Arise and eat.”';}}]},
+ furnace:{t:'The Fiery Furnace',ref:'Daniel 3:25',art:'p_fire',
+  text:'Three young men have refused to bow to the golden image and are thrown into a furnace heated seven times hotter. Through the flames you see a fourth figure walking with them.',
+  ch:[{t:'Walk into the fire with them',d:'Lose 12 resolve. Receive the Unsinged Robe.',go:g=>{E.lose(g,12,1);E.giveRelic(g,'robe');return 'The fire is hot, but it has no power over you. When you step out, your robe does not even smell of smoke.';}},
+      {t:'Pray for them from outside',d:'Regain 8 resolve.',go:g=>{E.heal(g,8,1);return 'They walk out unharmed, and the king himself praises their God.';}}]},
+ zacchaeus:{t:'The Sycamore Tree',ref:'Luke 19:8',art:'p_tree',
+  text:'A small man, a chief tax collector, climbs down from a sycamore tree. Jesus is coming to his house today, and he is giving back fourfold everything he took.',
+  ch:[{t:'Give back what you owe',d:'Lose 25 talents. Lay down a card of your choice.',can:g=>g.player.talents>=25,go:g=>{g.player.talents-=25;E.startPick(g,'remove',1,'Lay down a card');return 'Salvation has come to this house, and it feels lighter.';}},
+      {t:'Share his table',d:'Regain 10 resolve. Choose 1 of 3 cards.',go:g=>{E.heal(g,10,1);g.cardOffer={cards:E.cardChoices(g,3,'normal'),from:'event'};return 'The meal is loud and joyful, the kind where everyone is welcome.';}}]},
+ lions:{t:'The Lions’ Den',ref:'Daniel 6:22',art:'p_lions',
+  text:'A faithful man has been thrown to the lions for praying at his open window. At dawn you hear his voice from the den: he is alive.',
+  ch:[{t:'Pray at your window',d:'Add an illuminated Watch and Pray to your deck.',go:g=>{E.addDeck(g,'watch',1);return 'Three times a day, as was his custom. You learn the habit too.';}},
+      {t:'Stand at the mouth of the den',d:'Face a Trial for a treasure.',go:g=>{E.queueFight(g,'elite');return 'Something stirs in the dark of the den. Stand firm.';}}]},
+ livingwater:{t:'The Well at Noon',ref:'John 4:14',art:'p_well',
+  text:'At a well in the heat of the day, a woman is drawing water alone. A traveler is speaking with her about water that ends thirst forever.',
+  ch:[{t:'Drink and listen',d:'Regain half your resolve.',go:g=>{E.heal(g,Math.ceil(g.player.max/2),1);return 'Never thirsty again. You go on refreshed.';}},
+      {t:'Draw water for her',d:'Gain 20 talents. Illuminate a random card.',go:g=>{E.talents(g,20);E.upgradeRandom(g,1);return 'She runs back into town to tell everyone what she heard.';}}]},
+};
+for(const k in PARABLES)PARABLES[k].id=k;
+
+const SEALS={
+ resist:{t:'Resist, and It Flees',d:'Make a foe flee.'},
+ calf:{t:'The Idol Ground to Powder',d:'Overcome the Golden Calf.'},
+ babel:{t:'The Tower Brought Low',d:'Overcome the Tower of Babel.'},
+ serpent:{t:'The Serpent Thrown Down',d:'Finish a pilgrimage.'},
+ shepherd:{t:'The Good Shepherd’s Flock',d:'Finish a pilgrimage as the Shepherd.'},
+ fisher:{t:'Fishers of Men',d:'Finish a pilgrimage as the Fisher.'},
+ scribe:{t:'Trained for the Kingdom',d:'Finish a pilgrimage as the Scribe.'},
+ armor:{t:'The Whole Armor of God',d:'Carry the belt, breastplate, shoes, shield, helmet and sword in one deck.'},
+ fruits:{t:'All Nine Fruits',d:'Receive every fruit of the Spirit, across all your pilgrimages.'},
+ widow:{t:'All She Had',d:'Give all your talents at the offering box.'},
+ prodigal:{t:'Welcome Home',d:'Join the father’s feast.'},
+ noguard:{t:'Bold as a Lion',d:'Overcome a Trial without playing a Guard card.'},
+ bigword:{t:'Sharper Than Any Sword',d:'Deal 40 or more truth with a single card.'},
+ light:{t:'Travel Light',d:'Finish a pilgrimage with 16 or fewer cards.'},
+ watch1:{t:'Keep Watch',d:'Finish a pilgrimage in the first Watch of the Night.'},
+ watch5:{t:'Until the Morning',d:'Finish a pilgrimage in the fifth Watch of the Night.'},
+ psalter:{t:'A Full Psalter',d:'Gather 75 verses into your Psalter.'},
+ daily:{t:'Daily Bread',d:'Finish a Daily Pilgrimage.'},
+};
+const WATCHES=[
+ {n:'No Watch',d:'The pilgrimage as written.'},
+ {n:'The First Watch',d:'Foes have a tenth more hold.'},
+ {n:'The Second Watch',d:'Trials and bosses begin with 1 Might.'},
+ {n:'The Third Watch',d:'You begin carrying a Burden.'},
+ {n:'The Fourth Watch',d:'Wells restore less, and books end with less rest.'},
+ {n:'The Fifth Watch',d:'Bosses have a fifth more hold and strike harder.'},
+];
+
+// ===== Art: illuminated-manuscript drawings as inline SVG =====
+const INK='#2a1b10',VERM='#b3301e',LAPIS='#1f3f8f',GOLD='#c99a2e',VERD='#3c7a5a',OCHRE='#b07a2a',ROSE='#c56b7a',PURP='#6b3b78',BONE='#fbf6e6',ASH='#8c8170',PARCH='#f1e3c2';
+const S=(w)=>`stroke="${INK}" stroke-width="${w||2.4}" stroke-linejoin="round" stroke-linecap="round"`;
+const eye=(x,y,r,col)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${BONE}" ${S(1.6)}/><circle cx="${x+r*.2}" cy="${y}" r="${r*.5}" fill="${col||INK}"/>`;
+const sleepy=(x,y,r)=>`<path d="M${x-r} ${y} Q${x} ${y+r*.9} ${x+r} ${y}" fill="none" ${S(1.8)}/>`;
+const GRAD=`<defs><linearGradient id="gld" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6dc7a"/><stop offset=".45" stop-color="#c99a2e"/><stop offset="1" stop-color="#8a6416"/></linearGradient>
+<radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6c8" stop-opacity=".95"/><stop offset="1" stop-color="#fff6c8" stop-opacity="0"/></radialGradient></defs>`;
+const ART={
+ snail:()=>`<ellipse cx="60" cy="100" rx="46" ry="5" fill="${INK}" opacity=".12"/>
+  <path d="M14 98 Q20 80 44 82 L96 84 Q108 86 106 98 Z" fill="#a8b59a" ${S()}/>
+  <path d="M20 84 L14 62 M28 82 L26 60" fill="none" ${S(2)}/>${sleepy(14,60,5)}${sleepy(26,58,5)}
+  <circle cx="72" cy="62" r="28" fill="${OCHRE}" ${S()}/><path d="M72 62 m0 -4 a4 4 0 1 1 -4 4 a9 9 0 1 1 9 9 a15 15 0 1 1 -15 -15 a21 21 0 1 1 21 21" fill="none" ${S(2)}/>
+  <text x="40" y="34" font-family="serif" font-size="13" fill="${LAPIS}" font-style="italic">z z z</text>`,
+ locust:()=>`<path d="M30 70 Q60 56 98 64 Q104 70 98 76 Q60 84 30 78 Z" fill="#7d9a3c" ${S()}/>
+  <path d="M46 64 Q70 30 104 46 Q80 60 56 66" fill="#d9e3b8" opacity=".85" ${S(1.6)}/>
+  <circle cx="30" cy="72" r="11" fill="#8fae48" ${S()}/>${eye(26,69,4)}<path d="M22 79 Q27 76 32 79" fill="none" ${S(1.6)}/>
+  <path d="M24 62 Q14 40 6 36 M30 61 Q28 38 22 30" fill="none" ${S(1.8)}/>
+  <path d="M70 78 L84 98 L100 96 M56 80 L52 98 M42 79 L34 96" fill="none" ${S(2.2)}/>`,
+ fox:()=>`<path d="M84 80 Q112 70 112 46 Q100 64 78 66" fill="#d2691e" ${S()}/><path d="M108 50 Q112 46 112 40 Q104 46 104 52Z" fill="${BONE}" ${S(1.4)}/>
+  <path d="M30 70 Q40 56 64 60 Q86 64 86 82 Q70 94 40 90 Z" fill="#d97a2b" ${S()}/>
+  <path d="M38 90 L36 104 M50 92 L50 104 M70 90 L72 104 M80 86 L84 102" fill="none" ${S(2.2)}/>
+  <path d="M12 58 Q20 40 36 42 Q50 48 44 64 Q32 72 12 58Z" fill="#e0843a" ${S()}/>
+  <path d="M22 44 L20 26 L32 40 M36 42 L42 26 L44 46" fill="#e0843a" ${S(2)}/>${eye(30,52,4)}<path d="M12 58 Q18 62 24 60" fill="none" ${S(1.6)}/><circle cx="12" cy="57" r="2.4" fill="${INK}"/>`,
+ asp:()=>`<path d="M20 98 Q60 112 100 98 Q110 86 90 82 Q60 76 34 86 Q20 92 40 94 Q70 98 84 90" fill="none" stroke="${INK}" stroke-width="15" stroke-linecap="round"/>
+  <path d="M20 98 Q60 112 100 98 Q110 86 90 82 Q60 76 34 86 Q20 92 40 94 Q70 98 84 90" fill="none" stroke="#5e8a3a" stroke-width="10" stroke-linecap="round"/>
+  <path d="M84 90 Q92 60 70 44 Q56 34 60 22" fill="none" stroke="${INK}" stroke-width="15" stroke-linecap="round"/><path d="M84 90 Q92 60 70 44 Q56 34 60 22" fill="none" stroke="#6f9e44" stroke-width="10" stroke-linecap="round"/>
+  <ellipse cx="58" cy="20" rx="15" ry="10" fill="#6f9e44" ${S()}/>${eye(55,17,4,'#3c7a2a')}<path d="M44 22 L34 24 L28 20 M34 24 L28 28" fill="none" stroke="${VERM}" stroke-width="2"/>
+  <path d="M40 100 l4 -4 l4 4 M60 103 l4 -4 l4 4 M80 99 l4 -4 l4 4" fill="none" stroke="${GOLD}" stroke-width="2"/>`,
+ wolf:(f)=>{const rev=f&&f.data&&f.data.revealed;return `<path d="M26 66 Q40 50 76 54 Q100 58 102 78 Q96 92 60 92 Q34 92 26 80Z" fill="#7a7f86" ${S()}/>
+  <path d="M100 66 Q116 58 114 44 Q106 58 96 60" fill="#7a7f86" ${S()}/>
+  <path d="M36 90 L34 106 M50 92 L50 106 M78 92 L80 106 M92 88 L96 104" fill="none" ${S(2.4)}/>
+  <path d="M8 56 Q16 36 36 38 Q50 44 44 62 Q30 72 8 56Z" fill="#8a9098" ${S()}/>
+  <path d="M20 40 L22 22 L32 36 M36 38 L46 22 L44 42" fill="#8a9098" ${S(2)}/>
+  ${rev?`${eye(30,48,4,VERM)}<path d="M8 56 L14 62 L18 56 L22 62 L26 57" fill="${BONE}" ${S(1.4)}/>`:`${sleepy(30,48,4)}`}
+  ${rev?'':`<g fill="${BONE}" ${S(1.6)}><circle cx="44" cy="58" r="10"/><circle cx="58" cy="54" r="11"/><circle cx="72" cy="56" r="11"/><circle cx="86" cy="62" r="10"/><circle cx="52" cy="70" r="10"/><circle cx="68" cy="70" r="11"/><circle cx="84" cy="74" r="9"/><circle cx="30" cy="40" r="7"/><circle cx="20" cy="44" r="6"/></g>`}`;},
+ thorns:()=>`<g fill="none" stroke="${INK}" stroke-width="7" stroke-linecap="round"><path d="M60 104 Q40 70 18 60 M60 104 Q80 64 104 54 M60 104 Q56 60 40 26 M60 104 Q70 54 86 22 M60 104 Q30 90 12 92 M60 104 Q92 90 110 94"/></g>
+  <g fill="none" stroke="#3f5a2a" stroke-width="4" stroke-linecap="round"><path d="M60 104 Q40 70 18 60 M60 104 Q80 64 104 54 M60 104 Q56 60 40 26 M60 104 Q70 54 86 22 M60 104 Q30 90 12 92 M60 104 Q92 90 110 94"/></g>
+  <g fill="${VERM}" ${S(1.2)}><path d="M30 64 l-6 -6 l9 1z M44 46 l-8 -3 l7 -4z M80 62 l6 -7 l1 9z M78 40 l8 -2 l-4 7z M26 92 l-4 -7 l8 3z M96 92 l4 -7 l-8 3z M50 34 l-7 -1 l5 -6z M70 30 l7 -1 l-5 -6z"/></g>
+  <ellipse cx="60" cy="74" rx="16" ry="12" fill="#2f4420" ${S()}/>${eye(54,72,4,VERM)}${eye(67,72,4,VERM)}<path d="M53 81 Q60 77 67 81" fill="none" ${S(1.6)}/>`,
+ calf:()=>`<rect x="18" y="94" width="84" height="14" rx="2" fill="${ASH}" ${S()}/><path d="M24 94 h72" stroke="${BONE}" stroke-width="2"/>
+  <g fill="url(#gld)" ${S()}><path d="M30 64 Q34 46 60 48 Q84 48 90 62 Q92 76 86 80 L84 94 L76 94 L76 80 L46 80 L46 94 L38 94 L38 80 Q30 76 30 64Z"/>
+  <path d="M84 56 Q98 44 108 48 Q108 64 92 70Z"/><path d="M90 48 Q92 36 102 32 Q100 42 96 48Z"/><path d="M102 48 Q112 38 116 40 Q114 48 106 52Z"/></g>
+  <circle cx="100" cy="56" r="2.6" fill="${INK}"/><path d="M30 64 Q20 70 24 84" fill="none" ${S(2.4)}/>
+  <g stroke="#f6dc7a" stroke-width="2" opacity=".9"><path d="M60 40 L60 26 M40 44 L32 32 M80 44 L88 32 M22 56 L10 52 M98 30 L104 18"/></g>`,
+ peacock:()=>`<g ${S(1.6)}>${[...Array(9)].map((_,i)=>{const a=(-160+i*17.5)*Math.PI/180;const x=60+Math.cos(a)*48,y=78+Math.sin(a)*48;return `<path d="M60 78 L${x.toFixed(1)} ${y.toFixed(1)}" stroke="${VERD}" stroke-width="5"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8" fill="${VERD}"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${GOLD}"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.2" fill="${LAPIS}"/>`;}).join('')}</g>
+  <path d="M50 104 Q44 80 56 66 Q62 56 64 66 Q74 82 66 104Z" fill="${LAPIS}" ${S()}/><path d="M58 66 Q56 48 62 40 Q70 40 66 52 Q64 60 64 66" fill="#2c57b8" ${S()}/>
+  ${eye(64,46,2.6)}<path d="M68 47 L74 49 L68 51" fill="${GOLD}" ${S(1.2)}/><path d="M62 40 L58 28 M64 40 L64 27 M66 40 L70 29" stroke="${INK}" stroke-width="1.4"/><circle cx="58" cy="28" r="2" fill="${GOLD}"/><circle cx="64" cy="27" r="2" fill="${GOLD}"/><circle cx="70" cy="29" r="2" fill="${GOLD}"/>`,
+ magpie:()=>`<path d="M74 70 L114 92 L110 98 L70 80Z" fill="${INK}"/><path d="M30 66 Q34 48 54 48 Q76 50 80 68 Q76 86 54 86 Q36 84 30 66Z" fill="${BONE}" ${S()}/>
+  <path d="M40 54 Q60 44 78 62 Q66 76 46 70Z" fill="${INK}"/><path d="M50 62 Q64 58 74 66" stroke="#3a5fb0" stroke-width="3" fill="none"/>
+  <circle cx="32" cy="52" r="14" fill="${INK}"/>${eye(28,48,3.4)}<path d="M18 52 L6 56 L18 58Z" fill="${INK}"/>
+  <circle cx="6" cy="60" r="7" fill="url(#gld)" ${S(1.4)}/><path d="M50 86 L46 102 M58 86 L60 102" fill="none" ${S(2.2)}/>`,
+ goose:()=>`<path d="M26 78 Q30 60 58 62 Q90 64 98 82 Q86 98 54 96 Q30 94 26 78Z" fill="${BONE}" ${S()}/><path d="M62 70 Q80 66 92 80" fill="none" ${S(1.6)}/>
+  <path d="M38 66 Q34 44 40 30 Q46 20 54 26 Q52 40 50 64" fill="${BONE}" ${S()}/>${eye(46,28,3)}
+  <path d="M54 30 L68 26 L66 32 L54 34Z" fill="#e88b2a" ${S(1.6)}/><path d="M72 22 q6 -6 12 0 q6 6 12 0" fill="none" stroke="${LAPIS}" stroke-width="2"/>
+  <path d="M50 96 L48 106 L42 108 M64 96 L66 106 L72 108" fill="none" stroke="#e88b2a" stroke-width="3"/>`,
+ goat:()=>`<path d="M30 60 Q50 50 84 56 Q100 62 98 80 Q90 92 60 90 Q36 90 30 78Z" fill="#9a6b45" ${S()}/>
+  <path d="M38 88 L36 106 M50 90 L50 106 M78 90 L80 106 M90 86 L94 104" fill="none" ${S(2.6)}/>
+  <path d="M12 52 Q14 34 32 36 Q42 40 40 56 Q30 68 16 64Z" fill="#a87a52" ${S()}/>
+  <path d="M28 38 Q34 18 50 24 Q56 34 44 40 Q40 32 36 36" fill="${ASH}" ${S(2)}/>${eye(28,46,3.6,'#b07a2a')}<path d="M18 64 L16 78 L24 66" fill="#d8c7a8" ${S(1.6)}/>
+  <path d="M96 64 Q104 56 106 62" fill="none" ${S(2)}/>`,
+ lion:()=>`<path d="M44 74 Q54 60 86 64 Q108 70 106 88 Q98 100 70 98 Q48 98 44 86Z" fill="#d6a23e" ${S()}/>
+  <path d="M104 80 Q116 76 116 62" fill="none" ${S(2.4)}/><circle cx="116" cy="60" r="4" fill="${VERM}" ${S(1.4)}/>
+  <path d="M52 96 L50 108 M64 98 L64 108 M88 98 L90 108 M100 94 L104 106" fill="none" ${S(2.6)}/>
+  <circle cx="36" cy="58" r="30" fill="${VERM}" ${S()}/><g fill="#9c2a1a">${[...Array(12)].map((_,i)=>{const a=i*30*Math.PI/180;return `<circle cx="${(36+Math.cos(a)*27).toFixed(1)}" cy="${(58+Math.sin(a)*27).toFixed(1)}" r="7"/>`;}).join('')}</g>
+  <circle cx="36" cy="58" r="19" fill="#e2b04a" ${S()}/>${eye(29,52,3.4,VERM)}${eye(43,52,3.4,VERM)}
+  <path d="M26 64 Q36 80 46 64Z" fill="#5a1410" ${S(1.8)}/><path d="M28 64 L31 69 L34 64 M38 64 L41 69 L44 64" fill="${BONE}"/>`,
+ coffer:()=>`<rect x="20" y="52" width="80" height="44" rx="4" fill="#7a4a24" ${S()}/><path d="M20 52 Q60 24 100 52Z" fill="#8a5a2c" ${S()}/>
+  <path d="M20 66 H100 M20 82 H100" stroke="${GOLD}" stroke-width="3"/><rect x="52" y="60" width="16" height="18" rx="2" fill="url(#gld)" ${S(1.6)}/>
+  ${eye(56,68,2.6,VERM)}${eye(64,68,2.6,VERM)}<g fill="url(#gld)" ${S(1.4)}><ellipse cx="30" cy="46" rx="8" ry="4"/><ellipse cx="46" cy="40" rx="8" ry="4"/><ellipse cx="74" cy="38" rx="8" ry="4"/><ellipse cx="92" cy="46" rx="8" ry="4"/><ellipse cx="60" cy="34" rx="8" ry="4"/></g>
+  <path d="M30 96 L26 108 M90 96 L94 108" fill="none" ${S(3)}/>`,
+ babel:(f)=>{const h=Math.min(5,(f&&f.data&&f.data.h)||0);const tiers=4+h;let s='';for(let i=0;i<tiers;i++){const w=96-i*(80/tiers),y=108-(i+1)*(92/tiers);s+=`<rect x="${(60-w/2).toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${(92/tiers).toFixed(1)}" fill="${i%2?'#c48a52':'#b5733e'}" ${S(1.8)}/>`;
+   for(let j=0;j<3;j++)s+=`<rect x="${(60-w/2+8+j*(w-16)/3).toFixed(1)}" y="${(y+3).toFixed(1)}" width="5" height="${Math.max(3,92/tiers-7).toFixed(1)}" fill="${INK}" opacity=".55"/>`;}
+   return s+`<path d="M18 26 q10 -10 20 0 q8 -8 16 0" fill="${BONE}" ${S(1.4)} opacity=".9"/><path d="M74 18 q10 -10 20 0 q8 -8 16 0" fill="${BONE}" ${S(1.4)} opacity=".9"/>`;},
+ moth:()=>`<path d="M60 60 Q30 20 10 40 Q8 66 58 66Z" fill="#a39a88" ${S()}/><path d="M60 60 Q90 20 110 40 Q112 66 62 66Z" fill="#a39a88" ${S()}/>
+  <path d="M58 66 Q26 70 22 96 Q44 98 60 72Z" fill="#8c8270" ${S()}/><path d="M62 66 Q94 70 98 96 Q76 98 60 72Z" fill="#8c8270" ${S()}/>
+  <circle cx="34" cy="46" r="7" fill="${PARCH}" ${S(1.4)}/><circle cx="86" cy="46" r="7" fill="${PARCH}" ${S(1.4)}/><circle cx="34" cy="46" r="3" fill="${INK}"/><circle cx="86" cy="46" r="3" fill="${INK}"/>
+  <ellipse cx="60" cy="68" rx="6" ry="20" fill="#6e6656" ${S()}/>${eye(57,52,2.2)}${eye(63,52,2.2)}<path d="M57 48 Q50 30 42 28 M63 48 Q70 30 78 28" fill="none" ${S(1.6)}/>`,
+ rust:()=>`<path d="M22 80 Q18 52 44 46 Q56 30 76 40 Q100 42 100 66 Q110 86 88 98 Q60 108 36 98 Q20 94 22 80Z" fill="#a4532a" ${S()}/>
+  <g fill="#7a3a1c"><circle cx="40" cy="62" r="5"/><circle cx="82" cy="58" r="6"/><circle cx="62" cy="88" r="5"/><circle cx="88" cy="84" r="4"/><circle cx="34" cy="86" r="4"/></g>
+  ${eye(52,66,5,'#e0a040')}${eye(72,66,5,'#e0a040')}<path d="M50 82 Q62 76 74 82" fill="none" ${S(1.8)}/>
+  <path d="M30 98 q2 8 0 12 M96 92 q2 8 -1 12" stroke="#a4532a" stroke-width="4" stroke-linecap="round"/>`,
+ owl:()=>`<circle cx="94" cy="24" r="14" fill="${BONE}" ${S(1.6)}/><circle cx="100" cy="20" r="12" fill="#2a2f4a"/>
+  <path d="M30 104 Q24 60 40 40 Q60 26 80 40 Q96 60 90 104Z" fill="#4a3a5e" ${S()}/><path d="M40 40 L34 22 L48 34 M80 40 L86 22 L72 34" fill="#4a3a5e" ${S(2)}/>
+  <circle cx="48" cy="56" r="12" fill="#f0c43a" ${S()}/><circle cx="72" cy="56" r="12" fill="#f0c43a" ${S()}/><circle cx="48" cy="56" r="5.5" fill="${INK}"/><circle cx="72" cy="56" r="5.5" fill="${INK}"/>
+  <path d="M56 66 L60 74 L64 66Z" fill="${OCHRE}" ${S(1.4)}/><path d="M40 82 q6 4 10 0 q6 4 10 0 q6 4 10 0 q6 4 10 0" fill="none" stroke="#2d2340" stroke-width="2"/>
+  <path d="M44 104 l-2 6 M52 104 l0 6 M68 104 l0 6 M76 104 l2 6" fill="none" stroke="${OCHRE}" stroke-width="3"/>`,
+ wave:()=>`<path d="M8 104 Q10 60 40 40 Q70 22 96 36 Q114 48 106 66 Q96 76 84 64 Q82 52 70 54 Q56 60 64 76 Q72 96 112 104Z" fill="#2c5fa8" ${S()}/>
+  <path d="M40 40 Q70 22 96 36 Q114 48 106 66" fill="none" stroke="${BONE}" stroke-width="5" stroke-linecap="round"/>
+  <path d="M16 100 Q24 76 40 70 M30 102 Q40 84 54 82" fill="none" stroke="#9cc4e8" stroke-width="3"/>
+  ${eye(86,46,4,LAPIS)}${eye(98,52,3.4,LAPIS)}<g fill="${BONE}" ${S(1)}><circle cx="104" cy="30" r="3"/><circle cx="112" cy="40" r="2.4"/><circle cx="92" cy="28" r="2.2"/></g>`,
+ jackal:()=>`<circle cx="96" cy="22" r="12" fill="${BONE}" ${S(1.6)}/>
+  <path d="M36 76 Q44 60 78 64 Q98 68 98 84 Q90 94 62 94 Q40 94 36 86Z" fill="#b38a52" ${S()}/><path d="M96 74 Q110 80 112 96" fill="none" ${S(3)}/>
+  <path d="M44 92 L40 108 M54 94 L54 108 M80 94 L82 108 M90 90 L94 106" fill="none" ${S(2.4)}/>
+  <path d="M40 70 Q30 50 34 34 Q44 28 50 40 Q54 56 48 70Z" fill="#c09660" ${S()}/><path d="M34 34 L22 16 L30 18 L34 10 L42 30" fill="#c09660" ${S(1.8)}/>
+  <path d="M36 32 L40 18 L46 32" fill="#c09660" ${S(1.6)}/>${sleepy(40,40,3)}<path d="M28 20 q-6 -6 -4 -14 M22 26 q-8 -2 -10 -10" fill="none" stroke="${LAPIS}" stroke-width="1.8"/>`,
+ scorpion:()=>`<ellipse cx="56" cy="80" rx="30" ry="14" fill="#7a1e14" ${S()}/><path d="M80 78 Q100 70 104 50 Q106 30 90 26 Q82 26 82 34" fill="none" stroke="${INK}" stroke-width="11" stroke-linecap="round"/>
+  <path d="M80 78 Q100 70 104 50 Q106 30 90 26 Q82 26 82 34" fill="none" stroke="#9a2a1c" stroke-width="7" stroke-linecap="round"/><path d="M82 34 L74 40 L84 42Z" fill="${INK}"/>
+  <path d="M30 76 Q14 66 16 52 M30 84 Q12 92 12 104" fill="none" ${S(3)}/><path d="M16 52 Q6 46 10 38 Q18 40 20 48 M12 104 Q4 104 4 96" fill="#9a2a1c" ${S(2)}/>
+  <path d="M40 92 L34 104 M50 94 L48 106 M62 94 L64 106 M72 92 L78 104" fill="none" ${S(2)}/>${eye(36,74,3,'#e0a040')}${eye(44,72,3,'#e0a040')}`,
+ head1:()=>headArt('#7a6a8e','?'),head2:()=>headArt('#5e5a78','?!'),head3:()=>headArt('#8a7aa0','??'),
+ serpent:()=>`<path d="M10 100 Q30 76 56 92 Q80 106 98 86 Q112 70 96 58 Q80 48 70 60" fill="none" stroke="${INK}" stroke-width="20" stroke-linecap="round"/>
+  <path d="M10 100 Q30 76 56 92 Q80 106 98 86 Q112 70 96 58 Q80 48 70 60" fill="none" stroke="${VERM}" stroke-width="14" stroke-linecap="round"/>
+  <path d="M18 92 l4 -6 M34 86 l3 -7 M52 90 l2 -7 M72 96 l2 -7 M92 84 l4 -6" stroke="${GOLD}" stroke-width="2"/>
+  <path d="M60 56 Q30 30 8 40 Q22 50 18 62 Q36 56 52 64Z" fill="#7a1e14" ${S(2)}/><path d="M78 52 Q100 24 118 30 Q104 40 108 52 Q92 48 82 58Z" fill="#7a1e14" ${S(2)}/>
+  <path d="M70 60 Q60 40 62 24 Q66 12 80 14 Q92 18 86 30 Q80 40 82 56" fill="${VERM}" ${S()}/>
+  <path d="M62 22 L56 10 L64 16 M76 14 L78 2 L82 14" fill="${GOLD}" ${S(1.4)}/>${eye(72,22,3.6,'#e8c040')}
+  <path d="M86 26 L98 30 L104 26 M98 30 L104 34" fill="none" stroke="${GOLD}" stroke-width="2"/>`,
+ pilgrim:(cl)=>{const robe=cl==='fisher'?LAPIS:cl==='scribe'?PURP:VERD;return `<circle cx="50" cy="28" r="12" fill="#e6c49a" ${S()}/><path d="M38 22 Q50 8 62 22 Q60 14 50 12 Q40 14 38 22Z" fill="#6b4226" ${S(1.4)}/>
+  <circle cx="45" cy="28" r="1.6" fill="${INK}"/><circle cx="55" cy="28" r="1.6" fill="${INK}"/><path d="M46 34 Q50 37 54 34" fill="none" ${S(1.4)}/>
+  <path d="M34 96 Q32 60 40 44 Q50 40 60 44 Q68 60 66 96Z" fill="${robe}" ${S()}/><path d="M44 44 L50 60 L56 44" fill="none" stroke="${GOLD}" stroke-width="2"/>
+  ${cl==='fisher'?`<path d="M70 40 L90 96" ${S(2.6)}/><path d="M74 46 Q92 56 86 80 Q74 70 74 46Z" fill="none" stroke="${OCHRE}" stroke-width="1.6"/><path d="M76 52 L86 60 M78 62 L88 70 M80 50 L84 76" stroke="${OCHRE}" stroke-width="1.2"/>`
+   :cl==='scribe'?`<rect x="64" y="56" width="22" height="28" rx="2" fill="${BONE}" ${S(1.8)}/><path d="M68 62 H82 M68 68 H82 M68 74 H78" stroke="${INK}" stroke-width="1.2"/><path d="M84 46 L72 66" stroke="${INK}" stroke-width="2"/><path d="M84 46 Q92 38 94 44 Q88 46 84 46Z" fill="${BONE}" ${S(1.2)}/>`
+   :`<path d="M74 98 L74 34 Q74 22 84 22 Q94 24 90 34" fill="none" stroke="#6b4226" stroke-width="4" stroke-linecap="round"/><g fill="${BONE}" ${S(1.4)}><circle cx="20" cy="86" r="7"/><circle cx="28" cy="82" r="7"/><circle cx="26" cy="92" r="7"/><circle cx="14" cy="92" r="6"/></g><circle cx="10" cy="84" r="5" fill="${INK}"/>`}`;},
+};
+function headArt(col,mark){return `<path d="M60 110 Q50 80 54 56" fill="none" stroke="${INK}" stroke-width="16" stroke-linecap="round"/><path d="M60 110 Q50 80 54 56" fill="none" stroke="${col}" stroke-width="10" stroke-linecap="round"/>
+  <path d="M34 50 Q36 26 58 24 Q82 26 84 48 Q80 66 58 68 Q36 66 34 50Z" fill="${col}" ${S()}/>${eye(48,44,5,VERM)}${eye(68,44,5,VERM)}
+  <path d="M46 58 Q58 52 70 58" fill="none" ${S(1.8)}/><text x="60" y="18" text-anchor="middle" font-family="serif" font-weight="bold" font-size="18" fill="${LAPIS}">${mark}</text>`;}
+const svgWrap=(inner,cls,vb)=>`<svg class="${cls||''}" viewBox="${vb||'0 0 120 120'}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${GRAD}${inner}</svg>`;
+const foeSvg=f=>svgWrap(ART[FOES[f.id].art](f),'foe-art');
+// small icons (viewBox 0 0 32 32)
+const IC={
+ fight:`<path d="M6 26 L22 10 L26 6 L24 12 L10 28Z" fill="#d9d4c8" ${S(1.6)}/><path d="M6 20 L12 26 M4 28 L8 24" ${S(2.2)}/>`,
+ elite:`<path d="M16 3 L20 12 L29 12 L22 18 L25 28 L16 22 L7 28 L10 18 L3 12 L12 12Z" fill="${VERM}" ${S(1.6)}/>`,
+ well:`<path d="M6 14 H26 V28 H6Z" fill="#9a8a72" ${S(1.6)}/><path d="M6 19 H26 M6 24 H26 M12 14 V28 M20 14 V28" stroke="${INK}" stroke-width="1"/><path d="M8 14 L8 5 H24 V14 M16 5 V11" fill="none" ${S(1.6)}/><path d="M13 11 H19 V15 H13Z" fill="${LAPIS}" ${S(1.2)}/>`,
+ shop:`<path d="M8 28 Q6 18 10 16 H22 Q26 18 24 28Z" fill="${INK}"/><path d="M20 14 L28 2 Q30 4 22 16Z" fill="${BONE}" ${S(1.4)}/>`,
+ event:`<path d="M6 8 Q6 4 10 4 H26 V24 Q26 28 22 28 H6Z" fill="${BONE}" ${S(1.6)}/><path d="M10 10 H22 M10 15 H22 M10 20 H18" stroke="${VERM}" stroke-width="1.6"/>`,
+ treasure:`<path d="M4 14 H28 V28 H4Z" fill="#8a5a2c" ${S(1.6)}/><path d="M4 14 Q16 4 28 14" fill="#9a6a3c" ${S(1.6)}/><rect x="13" y="16" width="6" height="7" fill="url(#gld)" ${S(1.2)}/>`,
+ boss:`<path d="M4 24 L6 8 L12 16 L16 6 L20 16 L26 8 L28 24Z" fill="url(#gld)" ${S(1.6)}/><path d="M4 24 H28 V28 H4Z" fill="${VERM}" ${S(1.6)}/>`,
+ strike:`<path d="M4 28 L20 12" ${S(3)}/><path d="M18 6 L28 4 L26 14Z" fill="${VERM}" ${S(1.6)}/>`,
+ shieldI:`<path d="M16 3 L27 7 Q27 22 16 29 Q5 22 5 7Z" fill="${LAPIS}" ${S(1.6)}/><path d="M16 7 V25 M9 13 H23" stroke="${GOLD}" stroke-width="2"/>`,
+ buff:`<path d="M16 3 L26 15 H20 V28 H12 V15 H6Z" fill="${GOLD}" ${S(1.6)}/>`,
+ debuff:`<path d="M6 20 Q2 12 10 10 Q12 4 19 6 Q26 4 27 12 Q31 18 25 21Z" fill="#6a6a7a" ${S(1.6)}/><path d="M10 24 l-2 5 M16 24 l-2 5 M22 24 l-2 5" stroke="${LAPIS}" stroke-width="2"/>`,
+ curse:`<path d="M8 6 H24 V26 H8Z" fill="#3a3030" ${S(1.6)}/><path d="M12 12 H20 M12 17 H20 M12 22 H17" stroke="${ROSE}" stroke-width="1.6"/>`,
+ hidden:`<circle cx="16" cy="16" r="12" fill="${BONE}" ${S(1.6)}/><text x="16" y="22" text-anchor="middle" font-family="serif" font-weight="bold" font-size="17" fill="${INK}">?</text>`,
+ heart:`<path d="M16 28 Q2 18 4 10 Q6 3 12 4 Q15 5 16 9 Q17 5 20 4 Q26 3 28 10 Q30 18 16 28Z" fill="${VERM}" ${S(1.6)}/>`,
+ coin:`<circle cx="16" cy="16" r="11" fill="url(#gld)" ${S(1.6)}/><circle cx="16" cy="16" r="6" fill="none" stroke="#8a6416" stroke-width="1.4"/>`,
+ deck:`<rect x="6" y="5" width="16" height="22" rx="2" fill="${BONE}" ${S(1.4)}/><rect x="10" y="8" width="16" height="22" rx="2" fill="${PARCH}" ${S(1.4)}/><path d="M14 14 H22 M14 18 H22 M14 22 H19" stroke="${VERM}" stroke-width="1.4"/>`,
+ grace:`<circle cx="16" cy="16" r="13" fill="url(#glow)"/><path d="M16 4 Q22 12 16 28 Q10 12 16 4Z" fill="${GOLD}" ${S(1.4)}/>`,
+};
+const icon=(k,cls)=>svgWrap(IC[k]||'', 'ic '+(cls||''),'0 0 32 32');
+const TYPE_EMBLEM={word:IC.fight,guard:IC.shieldI,grace:`<path d="M16 6 Q24 12 26 22 Q20 18 16 20 Q12 18 6 22 Q8 12 16 6Z" fill="${BONE}" ${S(1.4)}/><circle cx="16" cy="12" r="2" fill="${INK}"/><path d="M15 24 L16 30 L17 24" stroke="${GOLD}" stroke-width="2"/>`,burden:`<path d="M6 26 Q4 14 12 10 Q20 6 26 14 Q30 24 22 28Z" fill="#6f6a60" ${S(1.6)}/>`};
+// parable vignettes reuse simple scenes
+const PARABLE_ART={
+ p_road:`<path d="M0 100 Q60 70 120 100 V120 H0Z" fill="#c9b07a"/><path d="M30 92 Q50 84 70 90" ${S(2)} fill="none"/><circle cx="40" cy="86" r="6" fill="#e6c49a" ${S(1.6)}/><path d="M46 88 Q60 84 72 92 Q60 96 46 94Z" fill="${ASH}" ${S(1.6)}/>`,
+ p_coin:`<rect x="20" y="40" width="80" height="60" fill="#d8c09a" ${S(2)}/><path d="M60 40 L60 20" ${S(2)}/><circle cx="60" cy="18" r="6" fill="url(#glow)"/><circle cx="74" cy="92" r="5" fill="url(#gld)" ${S(1.4)}/><path d="M30 100 L50 70" stroke="#6b4226" stroke-width="3"/>`,
+ p_pearl:`<path d="M30 90 Q60 50 90 90 Q60 100 30 90Z" fill="#e6c49a" ${S(2)}/><circle cx="60" cy="70" r="12" fill="#f6f2ea" ${S(1.6)}/><circle cx="56" cy="66" r="3" fill="#fff"/>`,
+ p_sower:`<path d="M0 96 H120 V120 H0Z" fill="#7a5a32"/><g fill="${GOLD}">${[...Array(14)].map((_,i)=>`<circle cx="${10+i*8}" cy="${92-(i%3)*4}" r="1.8"/>`).join('')}</g><path d="M80 96 Q82 60 90 40" ${S(2)} fill="none"/><path d="M84 70 Q70 60 72 50 M86 60 Q98 52 98 44" fill="none" stroke="${VERD}" stroke-width="3"/>`,
+ p_father:`<path d="M0 100 Q60 80 120 100 V120 H0Z" fill="#c9b07a"/><circle cx="40" cy="60" r="8" fill="#e6c49a" ${S(1.6)}/><path d="M32 100 L36 70 L46 70 L50 100Z" fill="${VERM}" ${S(1.6)}/><circle cx="80" cy="64" r="7" fill="#e6c49a" ${S(1.6)}/><path d="M74 100 L76 74 L84 74 L88 100Z" fill="${ASH}" ${S(1.6)}/><path d="M46 74 Q62 64 76 76" fill="none" ${S(2)}/>`,
+ p_widow:`<rect x="40" y="60" width="40" height="40" fill="#7a4a24" ${S(2)}/><path d="M50 60 H70" stroke="${INK}" stroke-width="4"/><circle cx="56" cy="44" r="4" fill="#b87333" ${S(1.2)}/><circle cx="64" cy="40" r="4" fill="#b87333" ${S(1.2)}/>`,
+ p_talents:`<g fill="url(#gld)" ${S(1.4)}><ellipse cx="40" cy="80" rx="12" ry="5"/><ellipse cx="40" cy="74" rx="12" ry="5"/><ellipse cx="62" cy="80" rx="12" ry="5"/><ellipse cx="84" cy="80" rx="12" ry="5"/><ellipse cx="84" cy="74" rx="12" ry="5"/><ellipse cx="84" cy="68" rx="12" ry="5"/></g>`,
+ p_bush:`<path d="M60 100 Q40 80 46 60 Q50 74 56 66 Q54 50 64 36 Q66 56 74 54 Q82 70 70 100Z" fill="#e8742a" ${S(2)}/><path d="M60 100 Q54 84 58 72 Q62 84 66 78 Q68 90 64 100Z" fill="#f6d44a"/><path d="M30 104 H90" stroke="#3f5a2a" stroke-width="6" stroke-linecap="round"/>`,
+ p_manna:`<path d="M0 90 H120 V120 H0Z" fill="#d8c8a0"/><g fill="${BONE}" ${S(.8)}>${[...Array(16)].map((_,i)=>`<circle cx="${8+i*7}" cy="${86+(i*5)%9}" r="2.6"/>`).join('')}</g>`,
+ p_ladder:`<path d="M48 110 L64 10 M72 110 L84 10" ${S(2)}/>${[...Array(8)].map((_,i)=>`<path d="M${49+i*2} ${100-i*12} L${73+i*1.5} ${100-i*12}" ${S(1.6)}/>`).join('')}<circle cx="74" cy="8" r="14" fill="url(#glow)"/>`,
+ p_cave:`<path d="M10 110 Q10 30 60 30 Q110 30 110 110Z" fill="#5a4a3a" ${S(2)}/><path d="M34 110 Q34 60 60 60 Q86 60 86 110Z" fill="#1a1410"/><path d="M70 20 q8 -6 16 0 M80 14 q8 -6 16 0" fill="none" stroke="${LAPIS}" stroke-width="2"/>`,
+ p_fire:`<rect x="24" y="40" width="72" height="66" rx="8" fill="#5a3020" ${S(2)}/><path d="M34 100 Q40 60 50 80 Q56 50 64 76 Q72 46 80 80 Q86 64 88 100Z" fill="#f08a2a"/>${[0,1,2,3].map(i=>`<path d="M${42+i*12} 98 L${42+i*12} 80" stroke="${i===3?'#fff6c8':INK}" stroke-width="4" stroke-linecap="round"/><circle cx="${42+i*12}" cy="76" r="4" fill="${i===3?'#fff6c8':'#e6c49a'}"/>`).join('')}`,
+ p_tree:`<path d="M56 110 L58 60 L64 60 L66 110Z" fill="#6b4226" ${S(1.6)}/><circle cx="60" cy="44" r="30" fill="${VERD}" ${S(2)}/><circle cx="72" cy="40" r="5" fill="#e6c49a" ${S(1.4)}/>`,
+ p_lions:`<path d="M10 110 Q10 50 60 50 Q110 50 110 110Z" fill="#3a2e24" ${S(2)}/><circle cx="40" cy="92" r="10" fill="${VERM}"/><circle cx="82" cy="92" r="10" fill="${VERM}"/><circle cx="60" cy="78" r="6" fill="#e6c49a" ${S(1.4)}/><path d="M54 110 L56 86 L64 86 L66 110Z" fill="${LAPIS}"/><circle cx="60" cy="40" r="14" fill="url(#glow)"/>`,
+ p_well:`<ellipse cx="60" cy="80" rx="30" ry="10" fill="#9a8a72" ${S(2)}/><path d="M30 80 V100 Q60 112 90 100 V80" fill="#8a7a62" ${S(2)}/><ellipse cx="60" cy="80" rx="22" ry="6" fill="${LAPIS}"/><circle cx="96" cy="20" r="12" fill="#f6d44a"/>`,
+};
+const parableSvg=id=>svgWrap(PARABLE_ART[PARABLES[id].art]||'','vignette');
+
+// ===== Engine: pure game rules, no page drawing =====
+const E={FX:[],onVerse:()=>{},onSeal:()=>{},onFoe:()=>{},onFruit:()=>{}};
+E.fx=(g,ev)=>{E.FX.push(ev);};
+E.rand=g=>{let t=(g.rs=(g.rs+0x6D2B79F5)>>>0);t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};
+E.ri=(g,a,b)=>a+Math.floor(E.rand(g)*(b-a+1));
+E.choice=(g,arr)=>arr[Math.floor(E.rand(g)*arr.length)];
+E.shuffle=(g,a)=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(E.rand(g)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+E.weighted=(g,obj)=>{let s=0;for(const k in obj)s+=obj[k];let r=E.rand(g)*s;for(const k in obj){r-=obj[k];if(r<0)return k;}return Object.keys(obj)[0];};
+E.has=(g,id)=>g.player.relics.includes(id);
+E.uid=g=>'c'+(g.nextUid++);
+E.mkCard=(g,id,up)=>({uid:E.uid(g),id,up:up?1:0});
+
+// ---------- run ----------
+E.newRun=(calling,watch,seed,daily)=>{
+  const cl=CALLINGS[calling];
+  const g={v:1,seed:seed>>>0,rs:seed>>>0,nextUid:1,calling,watch:watch|0,daily:!!daily,book:0,
+    player:{hp:cl.hp,max:cl.hp,talents:99,deck:[],relics:[]},
+    map:null,pos:null,screen:'blessing',bf:0,lastElite:null,removes:0,rainbowUsed:false,
+    stats:{floors:0,fights:0,foes:0,elites:0,bosses:0,truth:0,cards:0,talents:0,started:Date.now()},
+    seenParables:[],fruitsTaken:[],blessings:null,B:null,reward:null,pick:null,cardOffer:null,shop:null,ev:null,note:null};
+  for(let i=0;i<5;i++)g.player.deck.push(E.mkCard(g,'sword'));
+  for(let i=0;i<4;i++)g.player.deck.push(E.mkCard(g,'shield'));
+  g.player.deck.push(E.mkCard(g,cl.start));
+  if(g.watch>=3)g.player.deck.push(E.mkCard(g,'burden'));
+  g.player.relics.push(cl.relic);
+  E.onVerse(cl.ref);
+  g.blessings=E.shuffle(g,BLESSINGS.map(b=>b.id)).slice(0,3);
+  E.genMap(g);
+  return g;
+};
+E.chooseBlessing=(g,id)=>{const b=BLESSINGS.find(x=>x.id===id);g.blessings=null;g.screen='bookintro';b.go(g);};
+
+// ---------- map ----------
+E.ROWS=12;
+E.genMap=g=>{
+  const COLS=6,nodes={},rowsN=E.ROWS;
+  const key=(r,c)=>r+'_'+c;
+  const add=(r,c)=>{const k=key(r,c);if(!nodes[k])nodes[k]={id:k,r,c,t:null,next:[],x:(c+0.5)/COLS+(E.rand(g)-.5)*.07};return nodes[k];};
+  const starts=E.shuffle(g,[0,1,2,3,4,5]).slice(0,4);
+  starts.push(starts[E.ri(g,0,3)]);
+  const edges=new Set();
+  for(const s of starts){let c=s;let prev=add(0,c);
+    for(let r=1;r<rowsN-1;r++){let nc=Math.max(0,Math.min(COLS-1,c+E.ri(g,-1,1)));
+      // avoid crossing an existing diagonal edge
+      if(nc!==c&&edges.has(key(r-1,nc)+'>'+key(r,c)))nc=c;
+      const n=add(r,nc);if(!prev.next.includes(n.id))prev.next.push(n.id);edges.add(prev.id+'>'+n.id);prev=n;c=nc;}
+  }
+  const boss={id:'boss',r:rowsN-1,c:2.5,t:'boss',next:[],x:.5};nodes.boss=boss;
+  for(const k in nodes){const n=nodes[k];if(n.r===rowsN-2)n.next=['boss'];}
+  // types
+  const special=['well','shop','elite'];
+  const parents=id=>Object.values(nodes).filter(n=>n.next.includes(id));
+  const byRow=r=>Object.values(nodes).filter(n=>n.r===r).sort((a,b)=>a.c-b.c);
+  for(let r=0;r<rowsN-1;r++){for(const n of byRow(r)){
+    if(r===0)n.t='fight';else if(r===5)n.t='treasure';else if(r===rowsN-2)n.t='well';
+    else{let t;for(let tries=0;tries<6;tries++){const w={fight:45,event:22};if(r>=2&&r!==rowsN-3)w.well=11;if(r>=2)w.shop=10;if(r>=4)w.elite=13;t=E.weighted(g,w);
+        if(!special.includes(t))break;if(!parents(n.id).some(p=>p.t===t))break;}
+      n.t=t;}
+  }}
+  g.map={nodes};g.pos=null;
+};
+E.available=g=>{const N=g.map.nodes;if(!g.pos)return Object.values(N).filter(n=>n.r===0).map(n=>n.id);return N[g.pos].next.slice();};
+E.enterNode=(g,id)=>{
+  if(!E.available(g).includes(id))return false;
+  const n=g.map.nodes[id];g.pos=id;n.done=1;g.stats.floors++;g.note=null;
+  if(n.t==='fight')E.startFight(g,'normal');
+  else if(n.t==='elite')E.startFight(g,'elite');
+  else if(n.t==='boss')E.startFight(g,'boss');
+  else if(n.t==='event')E.startEvent(g);
+  else if(n.t==='shop')E.openShop(g);
+  else if(n.t==='well'){g.screen='well';g.well={done:0};E.onVerse('Matthew 11:28');}
+  else if(n.t==='treasure'){const r=E.randomRelic(g);g.treasure={relic:r,gold:E.ri(g,18,26),taken:0};g.screen='treasure';}
+  return true;
+};
+
+// ---------- cards & treasures ----------
+E.cardDef=c=>CARDS[c.id];
+E.cardCost=(g,c)=>{const d=CARDS[c.id];if(d.cost<0)return -1;if(c.free)return 0;return(c.up&&d.uc!==undefined)?d.uc:d.cost;};
+E.vals=(g,c)=>{const d=CARDS[c.id];let v=Object.assign({},c.up?d.u:d.v);if(d.dyn)Object.assign(v,d.dyn(g,c,v));return v;};
+E.exhausts=c=>{const d=CARDS[c.id];if(!d.ex)return false;if(c.up&&d.uex===false)return false;return true;};
+E.pool=g=>Object.values(CARDS).filter(d=>(d.pool==='all'||d.pool===g.calling)&&['c','u','r'].includes(d.r));
+E.cardChoices=(g,n,q)=>{
+  const P=E.pool(g);const out=[];
+  const W={normal:{c:60,u:33,r:7},elite:{c:40,u:45,r:15},boss:{r:1},rare:{r:1},good:{u:70,r:30},shop:{c:50,u:38,r:12}}[q]||{c:60,u:33,r:7};
+  let guard=0;while(out.length<n&&guard++<200){const r=E.weighted(g,W);const opts=P.filter(d=>d.r===r&&!out.includes(d.id));if(!opts.length)continue;out.push(E.choice(g,opts).id);}
+  return out;
+};
+E.addDeck=(g,id,up)=>{const c=E.mkCard(g,id,up);g.player.deck.push(c);E.onVerse(CARDS[id].ref);E.checkArmor(g);return c;};
+E.checkArmor=g=>{const ids=new Set(g.player.deck.map(c=>c.id));if(['belt','breastplate','shoes','shield','helmet','sword'].every(i=>ids.has(i)))E.seal(g,'armor');};
+E.giveRelic=(g,id)=>{
+  if(!id){E.talents(g,50);return null;}
+  if(E.has(g,id))return null;
+  g.player.relics.push(id);const p=g.player;E.onVerse(TREASURES[id].ref);
+  if(id==='loaves'){p.max+=8;p.hp+=8;}
+  if(id==='pearl'){p.max+=12;p.hp+=12;}
+  if(id==='love'){p.max+=10;p.hp=p.max;}
+  if(TREASURES[id].kind==='fruit'){g.fruitsTaken.push(id);E.onFruit(id);}
+  E.fx(g,{k:'relic',id});return id;
+};
+E.randomRelic=g=>{const opts=Object.keys(TREASURES).filter(k=>TREASURES[k].kind==='t'&&!E.has(g,k));return opts.length?E.choice(g,opts):null;};
+E.upgradable=g=>g.player.deck.filter(c=>!c.up&&CARDS[c.id].type!=='burden');
+E.upgradeRandom=(g,n)=>{let name=null;for(let i=0;i<n;i++){const o=E.upgradable(g);if(!o.length)break;const c=E.choice(g,o);c.up=1;name=CARDS[c.id].name;E.fx(g,{k:'upgrade',uid:c.uid});}return name;};
+E.talents=(g,n)=>{g.player.talents+=n;if(n>0)g.stats.talents+=n;E.fx(g,{k:'talents',n});};
+E.seal=(g,id)=>E.onSeal(id);
+E.startPick=(g,mode,count,title)=>{g.pick={mode,count,title};};
+E.pickOptions=g=>{const m=g.pick&&g.pick.mode;if(m==='upgrade')return E.upgradable(g);if(m==='remove')return g.player.deck.slice();return[];};
+E.resolvePick=(g,uid)=>{
+  const pk=g.pick;if(!pk)return;const c=g.player.deck.find(x=>x.uid===uid);if(!c)return;
+  if(pk.mode==='upgrade'){if(c.up)return;c.up=1;E.fx(g,{k:'upgrade',uid});g.note='Your '+CARDS[c.id].name+' now shines with gold.';}
+  if(pk.mode==='remove'){g.player.deck=g.player.deck.filter(x=>x.uid!==uid);g.note='You laid down '+CARDS[c.id].name+'.';E.onVerse('Matthew 11:30');}
+  pk.count--;if(pk.count<=0)g.pick=null;
+};
+E.cancelPick=g=>{const pk=g.pick;if(!pk)return;if(pk.refund&&g.shop){g.player.talents+=pk.refund;g.shop.removed=0;g.removes--;}if(pk.well&&g.well)g.well.done=0;g.pick=null;};
+E.takeOfferCard=(g,id)=>{if(!g.cardOffer)return;if(id)E.addDeck(g,id);g.cardOffer=null;};
+
+// ---------- battle ----------
+E.foe=(g,uid)=>g.B?g.B.foes.find(f=>f.uid===uid):null;
+E.live=g=>g.B?g.B.foes.filter(f=>!f.gone):[];
+E.mkFoe=(g,id,kind)=>{
+  const d=FOES[id];let hp=E.ri(g,d.hp[0],d.hp[1]);
+  if(g.watch>=1)hp=Math.round(hp*1.1);if(g.watch>=5&&kind==='boss')hp=Math.round(hp*1.2);
+  const f={uid:'f'+(g.nextUid++),id,name:d.name,hp,max:hp,block:0,st:{},turn:1,ci:0,last:null,rep:0,data:{},gone:false,intent:null};
+  if(d.thorns)f.st.thorns=d.thorns;
+  if(g.watch>=2&&(kind==='elite'||kind==='boss'))f.st.might=1;
+  if(g.watch>=5&&kind==='boss')f.st.might=(f.st.might||0)+2;
+  return f;
+};
+E.startFight=(g,kind)=>{
+  const bk=BOOKS[g.book];let ids;
+  if(kind==='boss')ids=[bk.boss];
+  else if(kind==='elite'){let opts=bk.elites.filter(e=>e.join()!==g.lastElite);ids=E.choice(g,opts.length?opts:bk.elites);g.lastElite=ids.join();}
+  else{ids=E.choice(g,g.bf<3?bk.early:bk.late);g.bf++;}
+  E.startBattle(g,kind,ids);
+};
+E.startBattle=(g,kind,ids)=>{
+  const B={kind,foes:ids.map(id=>E.mkFoe(g,id,kind)),hand:[],draw:[],discard:[],exhaust:[],grace:0,turn:0,played:0,total:0,count:{},
+    next:{draw:0,grace:0,block:0},p:{block:0,st:{},pw:{}},carry:0,guardPlayed:false,miteUsed:false,saltUsed:false,over:false,cur:null,cardDmg:0};
+  g.B=B;g.screen='battle';g.stats.fights++;
+  B.draw=E.shuffle(g,g.player.deck.map(c=>Object.assign({},c)));
+  if(E.has(g,'mustard'))E.apply(g,'p','might',1);
+  if(E.has(g,'peacef'))E.apply(g,'p','peace',2);
+  if(E.has(g,'dove'))B.foes.forEach(f=>E.apply(g,f,'weak',1));
+  if(E.has(g,'gentle'))B.foes.forEach(f=>E.apply(g,f,'weak',2));
+  if(E.has(g,'manna'))E.heal(g,3);
+  B.foes.forEach(f=>{E.onVerse(FOES[f.id].ref);E.decide(g,f);});
+  E.startTurn(g);
+};
+E.decide=(g,f)=>{const d=FOES[f.id];f.intent={key:d.ai(f,g)};};
+E.pick=(g,f,list,maxRep)=>{let k=E.choice(g,list);if(k===f.last&&f.rep>=maxRep){const o=list.filter(x=>x!==f.last);if(o.length)k=E.choice(g,o);}return k;};
+E.cycle=(f,list)=>list[(f.ci++)%list.length];
+E.say=(g,f,text)=>E.fx(g,{k:'say',uid:f&&f.uid,text});
+E.intentInfo=(g,f)=>{
+  if(!f.intent)return null;const d=FOES[f.id];const m=d.moves[f.intent.key];
+  const o={name:m.n,k:m.k,tip:m.tip||''};
+  if(m.d){o.d=E.foeDmg(g,f,m);o.h=m.h||1;}
+  if(m.b)o.b=m.b;
+  if(m.k==='hidden'){o.d=null;o.b=null;}
+  return o;
+};
+E.foeDmg=(g,f,m)=>{let d=m.d+(f.st.might||0)+(m.dyn?m.dyn(g,f):0);if(f.st.weak>0)d*=.75;if(g.B.p.st.vuln>0)d*=1.5;return Math.max(0,Math.floor(d));};
+E.outDmg=(g,base,f)=>{const s=g.B?g.B.p.st:{};let d=base+(s.might||0);if(s.weak>0)d*=.75;if(f&&f.st.vuln>0)d*=1.5;return Math.max(0,Math.floor(d));};
+E.blockAmt=(g,base)=>{const s=g.B.p.st;return Math.max(0,base+(s.peace||0));};
+E.apply=(g,who,key,n)=>{const st=who==='p'?g.B.p.st:who.st;st[key]=(st[key]||0)+n;if(key!=='might'&&st[key]<0)st[key]=0;E.fx(g,{k:'status',who:who==='p'?'p':who.uid,key,n});};
+E.power=(g,key,n)=>{const pw=g.B.p.pw;pw[key]=(pw[key]||0)+n;E.fx(g,{k:'power',key});};
+E.heal=(g,n,outside)=>{const p=g.player;const before=p.hp;p.hp=Math.min(p.max,p.hp+n);if(p.hp>before)E.fx(g,{k:'heal',n:p.hp-before});};
+E.lose=(g,n,outside)=>{const p=g.player;p.hp-=n;E.fx(g,{k:'lose',n});if(outside){if(p.hp<1)p.hp=1;return;}E.checkDeath(g);};
+E.checkDeath=g=>{const p=g.player;if(p.hp>0)return;
+  if(E.has(g,'rainbow')&&!g.rainbowUsed){g.rainbowUsed=true;p.hp=Math.ceil(p.max/3);E.fx(g,{k:'say',text:'The rainbow holds you up!'});E.onVerse('Genesis 9:13');return;}
+  p.hp=0;if(g.B)g.B.over=true;g.screen='gameover';g.result={win:false};E.onVerse('Micah 7:8');};
+E.shield=(g,base)=>{const B=g.B;let n=E.blockAmt(g,base);
+  if(B.cur==='shield'&&E.live(g).some(f=>f.intent&&f.intent.key==='darts'))n+=5;
+  if(B.bonusBlock){n+=B.bonusBlock;B.bonusBlock=0;}
+  B.p.block+=n;E.fx(g,{k:'block',n});return n;};
+E.draw=(g,n)=>{const B=g.B;let safety=0;
+  for(let i=0;i<n&&safety++<40;i++){
+    if(B.hand.length>=10)break;
+    if(!B.draw.length){if(!B.discard.length)break;B.draw=E.shuffle(g,B.discard);B.discard=[];E.fx(g,{k:'shuffle'});}
+    const c=B.draw.pop();
+    if(E.has(g,'selfcontrol')&&CARDS[c.id].type==='burden'){B.exhaust.push(c);E.fx(g,{k:'say',text:'Self-control lays down '+CARDS[c.id].name+'.'});if(E.has(g,'alabaster'))E.heal(g,2);i--;continue;}
+    B.hand.push(c);
+  }
+  E.fx(g,{k:'draw'});
+};
+E.addCard=(g,id,pile,up,tmp)=>{const B=g.B;if(!B)return;const c=E.mkCard(g,id,up);c.tmp=1;
+  if(pile==='draw'){B.draw.splice(Math.floor(E.rand(g)*(B.draw.length+1)),0,c);}else if(pile==='hand'&&B.hand.length<10)B.hand.push(c);else B.discard.push(c);
+  E.fx(g,{k:'curse',id,pile});};
+E.offer=(g,c)=>{const B=g.B;const i=B.hand.indexOf(c);if(i>=0)B.hand.splice(i,1);B.exhaust.push(c);if(E.has(g,'alabaster'))E.heal(g,2);};
+E.foeLose=(g,f,n)=>{if(f.gone)return;f.hp-=n;E.fx(g,{k:'hit',uid:f.uid,n});if(f.hp<=0)E.flee(g,f);else E.halfCheck(g,f);};
+E.halfCheck=(g,f)=>{const d=FOES[f.id];if(d.onHalf&&!f.halfDone&&f.hp*2<=f.max){f.halfDone=1;d.onHalf(g,f);}};
+E.hit=(g,uid,base,hits)=>{hits=hits||1;
+  for(let i=0;i<hits;i++){const f=E.foe(g,uid);if(!f||f.gone||g.B.over)return;
+    const d=E.outDmg(g,base,f);const had=f.block;const ab=Math.min(f.block,d);f.block-=ab;const loss=d-ab;
+    if(FOES[f.id].breakVuln&&had>0&&f.block===0){E.apply(g,f,'vuln',FOES[f.id].breakVuln);E.say(g,f,'Its pride is exposed!');}
+    g.B.cardDmg+=loss;g.stats.truth+=loss;
+    if(loss>0){f.hp-=loss;}
+    E.fx(g,{k:'hit',uid:f.uid,n:loss,blocked:ab});
+    if(f.st.thorns&&!g.B.over)E.strikePlayer(g,f.st.thorns,null,true);
+    if(f.hp<=0)E.flee(g,f);else E.halfCheck(g,f);
+    if(g.player.hp<=0)return;
+  }};
+E.hitAll=(g,base,hits)=>{hits=hits||1;for(let i=0;i<hits;i++)E.live(g).forEach(f=>E.hit(g,f.uid,base,1));};
+E.flee=(g,f)=>{if(f.gone)return;f.gone=true;f.hp=0;f.block=0;const B=g.B;
+  E.fx(g,{k:'flee',uid:f.uid});g.stats.foes++;E.onFoe(f.id);E.onVerse(FOES[f.id].ref);E.seal(g,'resist');
+  if(f.data.stolen){g.player.talents+=f.data.stolen;E.fx(g,{k:'say',text:'Your '+f.data.stolen+' talents are returned.'});}
+  if(E.has(g,'kindness'))E.heal(g,4);
+  E.live(g).forEach(o=>{const d=FOES[o.id];if(d.onAllyGone)d.onAllyGone(g,o);});
+  if(!E.live(g).length)E.winBattle(g);
+};
+E.strikePlayer=(g,d,f,raw)=>{const B=g.B;if(B.over)return;
+  if(!raw&&E.has(g,'salt')&&!B.saltUsed){B.saltUsed=true;d=Math.max(0,d-6);}
+  const ab=Math.min(B.p.block,d);B.p.block-=ab;let loss=d-ab;
+  if(E.has(g,'robe'))loss=Math.min(loss,15);
+  E.fx(g,{k:'struck',n:loss,blocked:ab,from:f&&f.uid});
+  if(loss>0){g.player.hp-=loss;if(B.p.pw.joy)E.apply(g,'p','might',B.p.pw.joy);}
+  if(f&&B.p.st.breast&&!f.gone)E.foeLose(g,f,B.p.st.breast);
+  E.checkDeath(g);
+};
+E.startTurn=g=>{const B=g.B,p=B.p;if(B.over)return;
+  B.turn++;B.played=0;
+  if(!p.pw.rock)p.block=0;
+  p.st.breast=0;
+  B.grace=3+(E.has(g,'joyf')?1:0)+B.next.grace+B.carry+(p.pw.lamb||0);B.next.grace=0;B.carry=0;
+  if(B.next.block){p.block+=B.next.block;B.next.block=0;}
+  if(p.pw.helmet)E.shield(g,p.pw.helmet);
+  if(E.has(g,'faithful'))p.block+=Math.min(B.turn,8);
+  let dn=5+B.next.draw+(p.pw.alert||0)+(E.has(g,'goodnessf')?1:0);B.next.draw=0;
+  if(B.turn===1){
+    if(E.has(g,'quill')){B.grace++;dn++;}
+    if(E.has(g,'net'))dn+=2;
+    if(E.has(g,'mantle')){dn++;p.block+=6;}
+    if(E.has(g,'cornerstone'))p.block+=10;
+  }
+  if(B.turn===3&&E.has(g,'lamp')){B.grace++;dn+=2;}
+  if(p.st.weary>0){dn--;p.st.weary--;}
+  E.draw(g,dn);
+};
+E.canPlay=(g,c)=>{const B=g.B;if(!B||B.over||g.screen!=='battle')return false;const cost=E.cardCost(g,c);return cost>=0&&B.grace>=cost;};
+E.playCard=(g,uid,targetUid)=>{const B=g.B;if(!B||B.over)return false;
+  const i=B.hand.findIndex(c=>c.uid===uid);if(i<0)return false;const c=B.hand[i];const d=CARDS[c.id];
+  if(!E.canPlay(g,c))return false;
+  let t=targetUid;
+  if(d.tg==='foe'){const f=E.foe(g,t);if(!f||f.gone){const L=E.live(g);if(L.length===1)t=L[0].uid;else return false;}}
+  const v=E.vals(g,c);
+  B.grace-=E.cardCost(g,c);B.hand.splice(i,1);B.cur=d.id;B.cardDmg=0;
+  if(d.type==='guard'){B.guardPlayed=true;if(E.has(g,'mite')&&!B.miteUsed){B.miteUsed=true;B.bonusBlock=6;}}
+  E.fx(g,{k:'play',id:d.id,type:d.type});
+  if(d.play)d.play(g,v,t,c);
+  B.bonusBlock=0;
+  B.played++;B.total++;g.stats.cards++;
+  if(d.type==='word'&&B.p.pw.hymn&&!B.over)E.shield(g,B.p.pw.hymn);
+  if(B.p.pw.rejoice&&B.played===3)B.grace+=B.p.pw.rejoice;
+  if(E.has(g,'trumpet')&&B.total%10===0&&!B.over){E.fx(g,{k:'say',text:'The trumpet sounds!'});E.hitAll(g,10);}
+  c.free=0;
+  if(E.exhausts(c)){B.exhaust.push(c);if(E.has(g,'alabaster'))E.heal(g,2);}else B.discard.push(c);
+  if(B.cardDmg>=40)E.seal(g,'bigword');
+  B.cur=null;
+  return true;
+};
+E.endTurn=g=>{const B=g.B;if(!B||B.over||g.screen!=='battle')return;const p=B.p;
+  const worries=B.hand.filter(c=>c.id==='worry').length;
+  if(worries){E.fx(g,{k:'say',text:'Worry weighs on you.'});E.lose(g,2*worries);if(B.over)return;}
+  B.hand.forEach(c=>{c.free=0;B.discard.push(c);});B.hand=[];
+  if(p.pw.shep)E.heal(g,p.pw.shep);
+  if(p.st.song){p.st.might=(p.st.might||0)-p.st.song;p.st.song=0;}
+  if(E.has(g,'patience'))B.carry=Math.min(2,B.grace);
+  if(E.has(g,'anchor')&&p.block===0){p.block+=6;E.fx(g,{k:'block',n:6});}
+  ['weak','vuln'].forEach(k=>{if(p.st[k]>0)p.st[k]--;});
+  // foes act
+  for(const f of B.foes){if(f.gone||B.over)continue;
+    f.block=0;
+    const d=FOES[f.id];const key=f.intent?f.intent.key:d.ai(f,g);const m=d.moves[key];
+    E.fx(g,{k:'act',uid:f.uid,name:m.n});
+    if(m.pre)m.pre(g,f);
+    if(m.b)f.block+=m.b;
+    if(m.d){const h=m.h||1;for(let i=0;i<h;i++){if(B.over||f.gone)break;E.strikePlayer(g,E.foeDmg(g,f,m),f);}}
+    if(B.over)return;
+    if(m.fx&&!f.gone)m.fx(g,f);
+    if(f.last===key)f.rep++;else{f.last=key;f.rep=1;}
+    ['weak','vuln'].forEach(k=>{if(f.st[k]>0)f.st[k]--;});
+    if(d.grow)E.apply(g,f,'might',1);
+    f.turn++;
+  }
+  if(B.over)return;
+  E.live(g).forEach(f=>E.decide(g,f));
+  E.startTurn(g);
+};
+E.winBattle=g=>{const B=g.B;if(B.over)return;B.over=true;B.win=true;const kind=B.kind;
+  if(E.has(g,'staff'))E.heal(g,6);
+  if(E.has(g,'oilwine'))E.heal(g,4);
+  if(kind==='elite'){g.stats.elites++;if(!B.guardPlayed)E.seal(g,'noguard');}
+  const boss=kind==='boss';
+  if(boss){g.stats.bosses++;E.seal(g,['calf','babel','serpent'][g.book]);}
+  let gold=boss?E.ri(g,70,80):kind==='elite'?E.ri(g,28,36):E.ri(g,12,20);if(E.has(g,'purse'))gold=Math.round(gold*1.5);
+  const nCards=3+(E.has(g,'pearl')?1:0);
+  g.reward={talents:gold,cards:E.cardChoices(g,nCards,boss?'boss':kind==='elite'?'elite':'normal'),relic:kind==='elite'?E.randomRelic(g):null,
+    fruits:boss&&g.book<2?E.fruitChoices(g):null,boss,taken:{}};
+  g.screen=boss&&g.book===2?'victory':'reward';
+  if(g.screen==='victory'){g.result={win:true};E.onVerse('Revelation 12:11');E.onVerse('Revelation 21:5');
+    E.seal(g,'serpent');E.seal(g,g.calling);if(g.player.deck.length<=16)E.seal(g,'light');
+    if(g.watch>=1)E.seal(g,'watch1');if(g.watch>=5)E.seal(g,'watch5');if(g.daily)E.seal(g,'daily');}
+};
+E.fruitChoices=g=>{const o=FRUITS.filter(k=>!E.has(g,k));return E.shuffle(g,o.slice()).slice(0,3);};
+E.takeReward=(g,what,id)=>{const R=g.reward;if(!R)return;
+  if(what==='talents'&&!R.taken.talents){R.taken.talents=1;E.talents(g,R.talents);}
+  if(what==='card'&&!R.taken.card){R.taken.card=1;if(id){E.addDeck(g,id);R.cardTaken=id;}else{R.cardTaken='skip';g.player.max+=1;g.player.hp+=1;}}
+  if(what==='relic'&&!R.taken.relic&&R.relic){R.taken.relic=1;E.giveRelic(g,R.relic);}
+  if(what==='fruit'&&!R.taken.fruit&&R.fruits&&R.fruits.includes(id)){R.taken.fruit=1;E.giveRelic(g,id);R.fruitTaken=id;}
+};
+E.leaveReward=g=>{const R=g.reward;
+  if(R&&!R.taken.talents)E.takeReward(g,'talents');
+  if(R&&R.relic&&!R.taken.relic)E.takeReward(g,'relic');
+  const boss=R&&R.boss;g.reward=null;g.B=null;
+  if(g.afterFight==='event'){g.afterFight=null;}
+  if(boss){E.nextBook(g);}else g.screen='map';
+};
+E.nextBook=g=>{g.book++;const p=g.player;
+  if(g.watch>=4)p.hp=Math.min(p.max,p.hp+Math.ceil((p.max-p.hp)/2));else p.hp=p.max;
+  g.bf=0;g.lastElite=null;E.genMap(g);g.screen='bookintro';};
+
+// ---------- parables ----------
+E.startEvent=g=>{let opts=Object.keys(PARABLES).filter(k=>!g.seenParables.includes(k));if(!opts.length){g.seenParables=[];opts=Object.keys(PARABLES);}
+  const id=E.choice(g,opts);g.seenParables.push(id);g.ev={id,result:null};g.screen='event';E.onVerse(PARABLES[id].ref);};
+E.eventChoose=(g,i)=>{const ev=g.ev;if(!ev||ev.result)return;const ch=PARABLES[ev.id].ch[i];if(!ch)return;if(ch.can&&!ch.can(g))return;ev.result=ch.go(g);ev.chose=i;};
+E.queueFight=(g,kind)=>{g.pendingFight=kind;};
+E.leaveEvent=g=>{if(g.pick||g.cardOffer)return;g.ev=null;if(g.pendingFight){const k=g.pendingFight;g.pendingFight=null;E.startFight(g,k);return;}g.screen='map';};
+
+// ---------- scriptorium (shop) ----------
+E.openShop=g=>{const price=(r)=>({c:50,u:78,r:145}[r]);
+  const cards=E.cardChoices(g,5,'shop').map(id=>({id,price:Math.round(price(CARDS[id].r)*(0.9+E.rand(g)*0.2)),sold:0}));
+  const rel=[];for(let i=0;i<2;i++){const o=Object.keys(TREASURES).filter(k=>TREASURES[k].kind==='t'&&!E.has(g,k)&&!rel.some(x=>x.id===k));if(o.length)rel.push({id:E.choice(g,o),price:E.ri(g,140,175),sold:0});}
+  g.shop={cards,rel,removePrice:75+25*g.removes,removed:0,bread:0};g.screen='shop';E.onVerse('Psalm 45:1');};
+E.buy=(g,what,i)=>{const S=g.shop,p=g.player;if(!S)return false;
+  if(what==='card'){const it=S.cards[i];if(!it||it.sold||p.talents<it.price)return false;p.talents-=it.price;it.sold=1;E.addDeck(g,it.id);return true;}
+  if(what==='relic'){const it=S.rel[i];if(!it||it.sold||p.talents<it.price)return false;p.talents-=it.price;it.sold=1;E.giveRelic(g,it.id);return true;}
+  if(what==='remove'){if(S.removed||p.talents<S.removePrice)return false;const pr=S.removePrice;p.talents-=pr;S.removed=1;g.removes++;E.startPick(g,'remove',1,'Lay a card down at the cross');g.pick.refund=pr;return true;}
+  if(what==='bread'){if(S.bread||p.talents<40||p.hp>=p.max)return false;p.talents-=40;S.bread=1;E.heal(g,Math.ceil(p.max/5),1);return true;}
+  return false;};
+E.leaveShop=g=>{if(g.pick)return;g.shop=null;g.screen='map';};
+// ---------- well ----------
+E.wellRest=g=>{if(g.well.done)return;g.well.done=1;const pct=g.watch>=4?0.2:0.3;E.heal(g,Math.ceil(g.player.max*pct),1);g.note='You rest beside still waters. He restores your soul.';E.onVerse('Psalm 23:3');};
+E.wellIlluminate=g=>{if(g.well.done||!E.upgradable(g).length)return;g.well.done=1;E.startPick(g,'upgrade',1,'Illuminate a card');g.pick.well=1;};
+E.leaveWell=g=>{if(g.pick)return;g.well=null;g.screen='map';};
+E.takeTreasure=g=>{const T=g.treasure;if(!T||T.taken)return;T.taken=1;E.talents(g,T.gold);E.giveRelic(g,T.relic);};
+E.leaveTreasure=g=>{if(g.treasure&&!g.treasure.taken)E.takeTreasure(g);g.treasure=null;g.screen='map';};
+E.score=g=>{const s=g.stats;return s.floors*5+s.foes*3+s.elites*15+s.bosses*50+(g.result&&g.result.win?250+g.watch*100:0);};
+
+
+// ===== Page: screens, input, saving, sound =====
+const RUN_KEY='armorOfLight.run.v1',META_KEY='armorOfLight.meta.v1';
+const store={get(k){try{return localStorage.getItem(k);}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){}},del(k){try{localStorage.removeItem(k);}catch(e){}}};
+const blankMeta=()=>({verses:{},foes:{},seals:{},fruits:{},unlocked:{shepherd:1},watchMax:{},runs:0,wins:0,winsBy:{},best:0,daily:{},sound:1,tut:{}});
+let M=(()=>{try{const m=JSON.parse(store.get(META_KEY));if(m&&m.verses)return Object.assign(blankMeta(),m);}catch(e){}return blankMeta();})();
+const saveMeta=()=>store.set(META_KEY,JSON.stringify(M));
+let G=null;
+try{const r=JSON.parse(store.get(RUN_KEY));if(r&&r.v===1&&r.player)G=r;}catch(e){}
+const saveRun=()=>{if(G&&G.screen!=='gameover'&&G.screen!=='victory')store.set(RUN_KEY,JSON.stringify(G));};
+const UI={view:'title',sel:null,target:null,ov:null,busy:false,tab:'verses',calling:'shepherd',watch:0,fled:new Set(),pickSel:null,rewardSel:null,lastPos:undefined,toastQ:[],toastOn:false};
+const app=document.getElementById('app');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const verseHTML=ref=>VERSES[ref]?(E.onVerse(ref),`<div class="verse">${esc(VERSES[ref])}<span class="ref">${esc(ref)}, English Standard Version</span></div>`):'';
+const isTouch=matchMedia('(pointer:coarse)').matches;
+
+// ---------- meta hooks ----------
+E.onVerse=ref=>{if(ref&&VERSES[ref]&&!M.verses[ref]){M.verses[ref]=1;saveMeta();if(Object.keys(M.verses).length>=75)E.onSeal('psalter');}};
+E.onFoe=id=>{M.foes[id]=(M.foes[id]||0)+1;saveMeta();};
+E.onFruit=id=>{M.fruits[id]=1;saveMeta();if(FRUITS.every(f=>M.fruits[f]))E.onSeal('fruits');};
+E.onSeal=id=>{if(M.seals[id]||!SEALS[id])return;M.seals[id]=Date.now();
+  if(id==='calf'&&!M.unlocked.fisher){M.unlocked.fisher=1;toast('A new calling opens: <b>The Fisher</b>. Choose it on your next pilgrimage.',null,1);}
+  if(id==='babel'&&!M.unlocked.scribe){M.unlocked.scribe=1;toast('A new calling opens: <b>The Scribe</b>. Choose it on your next pilgrimage.',null,1);}
+  saveMeta();toast('Seal received: <b>'+esc(SEALS[id].t)+'</b>',null,1);sfx('seal');};
+
+// ---------- sound ----------
+let AC=null;
+function ac(){if(!M.sound)return null;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();}catch(e){AC=null;}return AC;}
+function tone(f,d,type,vol,when){const a=ac();if(!a)return;const t=a.currentTime+(when||0);const o=a.createOscillator(),gn=a.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t);gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(vol||.12,t+.01);gn.gain.exponentialRampToValueAtTime(.0008,t+d);o.connect(gn).connect(a.destination);o.start(t);o.stop(t+d+.05);}
+function noise(d,vol){const a=ac();if(!a)return;const b=a.createBuffer(1,a.sampleRate*d,a.sampleRate);const ch=b.getChannelData(0);for(let i=0;i<ch.length;i++)ch[i]=(Math.random()*2-1)*(1-i/ch.length);const s=a.createBufferSource(),gn=a.createGain(),fl=a.createBiquadFilter();fl.type='lowpass';fl.frequency.value=900;s.buffer=b;gn.gain.value=vol||.2;s.connect(fl).connect(gn).connect(a.destination);s.start();}
+function sfx(k){switch(k){case 'word':tone(196,.25,'triangle',.14);tone(294,.2,'triangle',.07,.03);break;case 'guard':tone(660,.5,'sine',.08);tone(990,.4,'sine',.04);break;case 'grace':[523,659,784].forEach((f,i)=>tone(f,.6,'sine',.06,i*.06));break;
+ case 'hit':noise(.12,.25);break;case 'struck':noise(.2,.35);tone(90,.2,'sine',.2);break;case 'flee':[392,494,587,784].forEach((f,i)=>tone(f,.35,'triangle',.07,i*.08));break;
+ case 'win':[262,330,392,523].forEach((f,i)=>tone(f,1.2,'sine',.07,i*.12));break;case 'seal':[784,988,1175].forEach((f,i)=>tone(f,.5,'sine',.05,i*.1));break;case 'tap':tone(880,.05,'sine',.03);break;case 'coin':tone(1318,.12,'square',.03);tone(1760,.15,'square',.02,.06);break;case 'bad':tone(140,.35,'sawtooth',.05);break;}}
+
+// ---------- toasts & floats ----------
+function toast(html,ref,plain){UI.toastQ.push({html,ref,plain});if(!UI.toastOn)nextToast();}
+function nextToast(){const t=UI.toastQ.shift();if(!t){UI.toastOn=false;return;}UI.toastOn=true;const el=document.createElement('div');el.className='toast'+(t.plain?' plain':'')+(G&&UI.view==='game'&&G.screen!=='battle'&&G.screen!=='map'?' low':'');
+  el.innerHTML=t.html+(t.ref?`<span class="ref">${esc(t.ref)}</span>`:'');el.onclick=()=>{el.remove();clearTimeout(el._t);nextToast();};
+  app.appendChild(el);el._t=setTimeout(()=>{el.remove();nextToast();},t.plain?3200:5600);}
+function verseToast(ref){if(VERSES[ref])toast(esc(VERSES[ref]),ref);}
+function floatAt(el,text,cls){if(!el)return;const r=el.getBoundingClientRect(),a=app.getBoundingClientRect();const f=document.createElement('div');f.className='float '+cls+(/^[+−-]?\d+$/.test(text)?'':' word');f.textContent=text;
+  f.style.left=Math.max(60,Math.min(a.width-60,r.left-a.left+r.width/2))+'px';f.style.top=(r.top-a.top+r.height*.3)+'px';app.appendChild(f);setTimeout(()=>f.remove(),1150);}
+const q=s=>app.querySelector(s);
+
+// ---------- card drawing ----------
+function cardText(c,inBattle){const d=CARDS[c.id];const base=Object.assign({},c.up?d.u:d.v);const v=E.vals(G||{},c);
+  const one=inBattle?(E.live(G).length===1?E.live(G)[0]:null):null;
+  return esc(d.text).replace(/\{(\w+)\}/g,(m,k)=>{let n=v[k],b=base[k];
+    if(inBattle&&k==='d'){n=E.outDmg(G,v.d,one);b=base.d;}
+    if(inBattle&&k==='b'){n=E.blockAmt(G,v.b);if(c.id==='shield'&&E.live(G).some(f=>f.intent&&f.intent.key==='darts'))n+=5;}
+    const cls=n>b?'up':n<b?'down':'';return `<b class="${cls}">${n}</b>`;});}
+function cardHTML(c,opt){opt=opt||{};const d=CARDS[c.id];const cost=G&&opt.battle?E.cardCost(G,c):(d.cost<0?-1:(c.up&&d.uc!==undefined?d.uc:d.cost));
+  const play=opt.battle?E.canPlay(G,c):true;const ini=d.name.replace(/^(The|A|An|In|On|Let|Be|Through|Every|Your)\s+/,'')[0];
+  return `<div class="card t-${d.type}${c.up?' up':''}${opt.sel?' sel':''}${opt.battle&&!play?' unplayable':''}${c.tmp?' tmp':''}${opt.big?' big':''}" ${opt.attr||''}>
+   ${cost>=0?`<div class="cost${opt.battle&&c.free?' low':''}">${cost}</div>`:''}
+   <div class="nm">${esc(d.name)}</div><div class="pic"><span class="ini">${esc(ini)}</span>${svgWrap(TYPE_EMBLEM[d.type],'em','0 0 32 32')}</div>
+   <div class="tx"><span>${cardText(c,opt.battle)}</span></div><div class="tp">${TYPE_NAMES[d.type]}${E.exhausts(c)?' · Offered':''} · ${esc(d.ref)}</div></div>`;}
+
+// ---------- shared pieces ----------
+const STL={p:{might:['Might','good','Each Word you speak deals {n} more truth.'],peace:['Peace','good','Each time you gain shield, gain {n} more.'],weak:['Doubt','bad','Your Words deal a quarter less truth. Lasts {n} more turns.'],vuln:['Fear','bad','Strikes against you hit half again as hard. Lasts {n} more turns.'],weary:['Weary','bad','You draw 1 fewer card at the start of your next {n} turns.'],breast:['Breastplate','good','Any foe that strikes you loses {n} hold, until your next turn.']},
+ f:{might:['Might','bad','Its strikes deal {n} more.'],weak:['Humbled','good','Its strikes deal a quarter less. Lasts {n} more turns.'],vuln:['Exposed','good','It takes half again as much truth. Lasts {n} more turns.'],thorns:['Thorns','bad','You lose {n} resolve every time you strike it.']}};
+const PWL={helmet:['Helmet','Gain {n} shield at the start of each turn.'],hymn:['Hymns','Gain {n} shield whenever you play a Word card.'],joy:['Joy','Gain {n} Might whenever a strike takes your resolve.'],alert:['Alert','Draw {n} more card each turn.'],shep:['Shepherd','Regain {n} resolve at the end of each turn.'],rock:['Rock','Your shield does not fade at the start of your turn.'],rejoice:['Rejoice','The third card you play each turn gives back {n} grace.'],lamb:['The Lamb','Gain {n} more grace every turn. The victory is the Lamb’s.']};
+function stChips(st,side){let s='';const L=STL[side];for(const k in L){const n=st[k];if(n&&(n>0||k==='might'))s+=`<span class="st ${L[k][1]==='good'?(n<0?'bad':'good'):'bad'}" data-act="tip" data-tip="${esc(L[k][0]+': '+L[k][2].replace('{n}',n))}">${L[k][0]} ${n}</span>`;}return s;}
+function pwChips(pw){let s='';for(const k in pw){if(!pw[k]||!PWL[k])continue;s+=`<span class="st pw" data-act="tip" data-tip="${esc(PWL[k][0]+': '+PWL[k][1].replace('{n}',pw[k]))}">${PWL[k][0]}${pw[k]>1&&k!=='rock'?' '+pw[k]:''}</span>`;}return s;}
+function relicsHTML(){return G.player.relics.map(id=>{const t=TREASURES[id];return `<button class="relic k-${t.kind}" data-act="relic" data-id="${id}" title="${esc(t.name)}">${esc(t.name.replace(/^(The|A)\s+/,'')[0])}</button>`;}).join('');}
+function topbar(extra){const p=G.player;return `<div class="topbar"><span class="stat" data-act="tip" data-tip="Resolve: how much you can endure. At 0 your pilgrimage ends.">${icon('heart')}${p.hp}/${p.max}</span>
+ <span class="stat" data-act="tip" data-tip="Talents: spend them at the Scriptorium.">${icon('coin')}${p.talents}</span>
+ <span class="stat" data-act="tip" data-tip="${esc(BOOKS[G.book].name)}">Book ${['I','II','III'][G.book]}${G.watch?' · Watch '+G.watch:''}</span>
+ <div class="relics">${relicsHTML()}</div>${extra||''}
+ <button class="iconbtn" data-act="deck" title="Your deck (D)">${icon('deck')}</button><button class="iconbtn" data-act="help" title="How to play (H)">?</button><button class="iconbtn" data-act="menu" title="Menu (Escape)">≡</button></div>`;}
+
+// ---------- screens ----------
+function render(){
+  let html='';
+  if(!G||UI.view!=='game'){html=renderMeta();}
+  else switch(G.screen){
+    case 'blessing':html=scBlessing();break;case 'bookintro':html=scBookIntro();break;case 'map':html=scMap();break;case 'battle':html=scBattle();break;
+    case 'reward':html=scReward();break;case 'event':html=scEvent();break;case 'shop':html=scShop();break;case 'well':html=scWell();break;case 'treasure':html=scTreasure();break;
+    case 'gameover':html=scEnd(false);break;case 'victory':html=scEnd(true);break;default:html=scMap();}
+  html+=renderOverlay();
+  const keep=[...app.querySelectorAll('.toast,.float')];
+  app.innerHTML=html;keep.forEach(k=>app.appendChild(k));
+  postRender();
+}
+function renderMeta(){switch(UI.view){case 'new':return scNew();case 'psalter':return scPsalter();case 'about':return scAbout();case 'howto':return `<div class="screen"><div class="border"></div><div class="content"><div class="content-in">${howtoHTML()}<p class="center"><button class="btn" data-act="view" data-v="title">Back</button></p></div></div></div>`;default:return scTitle();}}
+function scTitle(){const sealIds=Object.keys(SEALS);const has=!!G&&G.screen!=='gameover'&&G.screen!=='victory';
+ return `<div class="screen"><div class="border"></div><div class="title-wrap scroll">
+  <div class="title-big"><span class="drop" style="float:none;display:inline-block;font-size:1em;padding:0 .12em">A</span>rmor <b>of</b> Light</div>
+  <div class="title-sub">A pilgrimage in three books. Take up the whole armor of God, speak the Word, and stand firm against every temptation on the narrow way.</div>
+  <div style="max-width:520px">${verseHTML('Romans 13:12')}</div>
+  <div class="menu">${has?`<button class="btn red" data-act="continue">Continue your pilgrimage</button>`:''}
+   <button class="btn ${has?'':'red'}" data-act="view" data-v="new">Begin a new pilgrimage</button>
+   <button class="btn blue" data-act="daily">Daily pilgrimage</button>
+   <button class="btn" data-act="view" data-v="howto">How to play</button>
+   <button class="btn" data-act="view" data-v="psalter">Your Psalter</button>
+   <button class="btn" data-act="view" data-v="about">About and credits</button>
+   <button class="btn small" data-act="sound">Sound: ${M.sound?'on':'off'}</button><a class="homelink center" href="../../churches/#youth">Back to all games</a></div>
+  <div class="seals" data-act="view" data-v="psalter" data-tab="seals" title="Seals">${sealIds.map(id=>`<span class="seal${M.seals[id]?' on':''}">✦</span>`).join('')}</div>
+  <div class="muted" style="font-size:.85rem">${Object.keys(M.seals).length} of ${sealIds.length} seals · ${Object.keys(M.verses).length} of ${Object.keys(VERSES).length} verses gathered</div>
+ </div></div>`;}
+function scNew(){const anyWin=M.wins>0;const wm=(M.watchMax[UI.calling]===undefined?-1:M.watchMax[UI.calling]);const maxW=Math.min(5,wm+1);if(UI.watch>maxW)UI.watch=Math.max(0,maxW);
+ return `<div class="screen"><div class="border"></div><div class="content"><div class="content-in"><h1 class="center">Choose Your Calling</h1>
+ ${Object.values(CALLINGS).map(c=>{const lock=!M.unlocked[c.id];return `<button class="choice calling${lock?' locked':''}${UI.calling===c.id?' on':''}" data-act="calling" data-id="${c.id}" ${lock?'disabled':''}>
+   ${svgWrap(ART.pilgrim(c.id),'','0 0 100 100')}<div><b>${esc(c.name)}${lock?' (not yet open)':''}</b><span>${lock?esc(c.unlock):esc(c.blurb)+' Begins with '+c.hp+' resolve, '+esc(CARDS[c.start].name)+' and '+esc(TREASURES[c.relic].name)+'.'}</span></div></button>`;}).join('')}
+ ${anyWin?`<h3 class="center">Watch of the Night</h3><div class="watchsel">${WATCHES.map((w,i)=>`<button class="btn small${UI.watch===i?' gold':''}" data-act="watch" data-i="${i}" ${i>maxW?'disabled':''}>${i}</button>`).join('')}</div>
+   <p class="center muted">${esc(WATCHES[UI.watch].n)}: ${esc(WATCHES[UI.watch].d)}${UI.watch>1?' Each Watch includes the ones before it.':''} Finish a pilgrimage in a Watch to open the next one for that calling.</p>`:`<p class="center muted">Finish a pilgrimage to open the Watches of the Night, harder pilgrimages for each calling.</p>`}
+ <p class="center"><button class="btn red" data-act="begin">Set out</button> <button class="btn" data-act="view" data-v="title">Back</button></p></div></div></div>`;}
+function scBlessing(){return `<div class="screen"><div class="border"></div><div class="content"><div class="content-in"><h1 class="center">Before You Set Out</h1>${verseHTML('Ephesians 6:13')}
+ <p class="center">A gift is offered at the gate. Choose one.</p>${G.blessings.map(id=>{const b=BLESSINGS.find(x=>x.id===id);return `<button class="choice" data-act="bless" data-id="${id}"><b>${esc(b.t)}</b><span>${esc(b.d)}</span></button>`;}).join('')}</div></div></div>`;}
+function scBookIntro(){const b=BOOKS[G.book];return `<div class="screen"><div class="border"></div><div class="content"><div class="content-in center" style="padding-top:4vh">
+ <div class="muted" style="font-variant:small-caps;letter-spacing:.1em">${esc(b.sub)}</div><div class="banner">${esc(b.name)}</div>${verseHTML(b.ref)}
+ <p style="text-align:left"><span class="drop">${esc(b.intro[0])}</span>${esc(b.intro.slice(1))}</p>
+ <p>At the end of this book waits <b>${esc(FOES[b.boss].name)}</b>.</p><button class="btn red" data-act="setout">Set out</button></div></div></div>`;}
+const NODE_NAMES={fight:'Temptation',elite:'Trial',well:'Well',shop:'Scriptorium',event:'Parable',treasure:'Reliquary',boss:'The end of the book'};
+const NODE_IC={fight:'fight',elite:'elite',well:'well',shop:'shop',event:'event',treasure:'treasure',boss:'boss'};
+function scMap(){const N=G.map.nodes,av=E.available(G);const rowH=74,H=E.ROWS*rowH+70;const y=r=>(E.ROWS-1-r)*rowH+50;
+ let lines='';for(const k in N){const n=N[k];for(const nx of n.next){const m=N[nx];const act=(G.pos===n.id&&av.includes(nx))||(!G.pos&&false);const done=n.done&&m.done;
+   lines+=`<line x1="${n.x*100}" y1="${y(n.r)}" x2="${m.x*100}" y2="${y(m.r)}" stroke="${act?'#b3301e':done?'#2a1b10':'#8c8170'}" stroke-width="${act?3.4:done?2.6:1.6}" ${act||done?'':'stroke-dasharray="3 5"'} vector-effect="non-scaling-stroke"/>`;}}
+ const avSorted=av.slice().sort((a,b)=>N[a].x-N[b].x);
+ const nodes=Object.values(N).map(n=>{const a=av.includes(n.id);const num=a?avSorted.indexOf(n.id)+1:0;return `<button class="node${n.t==='boss'?' boss':''}${n.done?' done':''}${G.pos===n.id?' here':''}${a?' avail':''}" style="left:${n.x*100}%;top:${y(n.r)}px" data-act="node" data-id="${n.id}" title="${NODE_NAMES[n.t]}${a&&!isTouch?' (key '+num+')':''}" aria-label="${NODE_NAMES[n.t]}">${n.t==='boss'?svgWrap(ART[FOES[BOOKS[G.book].boss].art]({data:{}}),'ic'):icon(NODE_IC[n.t])}</button>`;}).join('');
+ return `<div class="screen">${topbar()}<div class="map-head"><b style="font-family:var(--fd);font-size:1.5rem;color:var(--verm)">${esc(BOOKS[G.book].name)}</b><div class="muted" style="font-size:.9rem">Choose your next step on the way. ${isTouch?'Tap a glowing circle.':'Click a glowing circle or press its number key.'}</div></div>
+ <div class="legend">${Object.keys(NODE_IC).filter(k=>k!=='boss').map(k=>`<span>${icon(NODE_IC[k])}${NODE_NAMES[k]}</span>`).join('')}</div>
+ <div class="map-wrap" id="mapwrap"><div class="map-page" style="height:${H}px"><svg class="lines" viewBox="0 0 100 ${H}" preserveAspectRatio="none">${lines}</svg>${nodes}</div></div></div>`;}
+function intentHTML(f){const i=E.intentInfo(G,f);if(!i)return '';const ik={strike:'strike',shield:'shieldI',buff:'buff',debuff:'debuff',curse:'curse',hidden:'hidden'}[i.k];
+ const n=i.d!=null&&i.d!==undefined?(i.h>1?i.d+'×'+i.h:''+i.d):'';return `<div class="intent k-${i.k}">${icon(ik)}${n}${i.b&&i.k!=='shield'&&i.k!=='hidden'?'':i.b&&i.k==='shield'?i.b:''}</div>`;}
+function scBattle(){const B=G.B,p=G.player;const sel=UI.sel&&B.hand.find(c=>c.uid===UI.sel);const selD=sel&&CARDS[sel.id];const L=E.live(G);
+ if(UI.target&&!L.some(f=>f.uid===UI.target))UI.target=null;
+ const targeting=selD&&selD.tg==='foe';
+ const foes=B.foes.map(f=>{let cls='';if(f.gone)cls=UI.fled.has(f.uid)?' gone':' fleeing';const tg=targeting&&!f.gone;
+   return `<div class="foe${cls}${tg?' targetable':''}${tg&&UI.target===f.uid?' target':''}" data-act="foe" data-uid="${f.uid}">${f.gone?'':intentHTML(f)}${foeSvg(f)}
+   <div class="fname">${esc(f.name)}</div><div class="bar"><i style="width:${Math.max(0,f.hp/f.max*100)}%"></i><b>${Math.max(0,f.hp)}/${f.max}</b></div>${f.block?`<div class="blk">${f.block}</div>`:''}<div class="sts">${stChips(f.st,'f')}</div></div>`;}).join('');
+ const n=B.hand.length;const cw=innerWidth<=560?88:(innerHeight<=620?84:118);const avail=Math.min(innerWidth,1180)-24;let ov=0;if(n>1&&n*cw>avail)ov=Math.ceil((n*cw-avail)/(2*(n-1)));
+ const hand=B.hand.map((c,i)=>cardHTML(c,{battle:1,sel:UI.sel===c.uid,attr:`data-act="card" data-uid="${c.uid}" style="z-index:${i+1}"`})).join('');
+ return `<div class="screen">${topbar()}<div class="arena">${foes}</div>
+ <div class="player-row"><div class="pilgrim">${svgWrap(ART.pilgrim(G.calling),'','0 0 100 100')}${B.p.block?`<div class="blk">${B.p.block}</div>`:''}</div>
+  <div class="pinfo"><div class="bar hp"><i style="width:${p.hp/p.max*100}%"></i><b>${p.hp}/${p.max} resolve</b></div><div class="sts" style="justify-content:flex-start">${stChips(B.p.st,'p')}${pwChips(B.p.pw)}</div></div>
+  <div class="piles"><button class="pile" data-act="pile" data-p="draw" title="Draw pile">Draw ${B.draw.length}</button><button class="pile" data-act="pile" data-p="discard" title="Discard pile">Used ${B.discard.length}</button>${B.exhaust.length?`<button class="pile" data-act="pile" data-p="exhaust" title="Offered">Offered ${B.exhaust.length}</button>`:''}</div>
+  <div class="grace" data-act="tip" data-tip="Grace: pays for cards. You receive it fresh each turn.">${B.grace}<small>grace</small></div>
+  <button class="btn red endturn" data-act="end">End turn</button></div>
+ <div class="hand-wrap"><div class="hint">${esc(battleHint(selD,L))}</div><div class="hand" style="--ov:${ov}px">${hand}</div></div></div>`;}
+function battleHint(selD,L){
+ if(selD){if(selD.tg==='foe'&&L.length>1&&!UI.target)return isTouch?'Now tap a foe to receive it.':'Click a foe (or use the arrow keys, then Enter).';return isTouch?'Tap the card again to play it.':'Click it again, or press Enter, to play it.';}
+ if(!M.tut.play)return isTouch?'Tap a card to choose it. Hold a card to read it in full.':'Click a card (or press its number key) to choose it. Right-click to read it.';
+ if(!M.tut.end&&G.B.grace===0)return 'Out of grace. Press End turn and the foes will act.';
+ if(!M.tut.intent)return 'The sign above each foe shows what it will do next. '+(isTouch?'Tap':'Click')+' a foe to learn more.';
+ return '';}
+function scReward(){const R=G.reward;const opts=R.cards;const verse=R.boss?FOES[BOOKS[G.book].boss].ref2:null;
+ return `<div class="screen">${topbar()}<div class="content"><div class="content-in"><div class="banner">${R.boss?'Thrown Down!':'It Has Fled'}</div>${verse?verseHTML(verse):verseHTML('James 4:7')}
+ <button class="btn reward-item${R.taken.talents?' taken':''}" data-act="rw" data-w="talents" ${R.taken.talents?'disabled':''}>${icon('coin')} ${R.talents} talents${R.taken.talents?' (taken)':''}</button>
+ ${R.relic?`<button class="btn reward-item${R.taken.relic?' taken':''}" data-act="rw" data-w="relic" ${R.taken.relic?'disabled':''}><span class="relic k-${TREASURES[R.relic].kind}">${esc(TREASURES[R.relic].name[0])}</span><span><b>${esc(TREASURES[R.relic].name)}</b><br><span style="font-weight:400">${esc(TREASURES[R.relic].text)}</span></span></button>`:''}
+ ${R.fruits&&R.fruits.length?`<h3>A Fruit of the Spirit: choose one</h3>${verseHTML('Galatians 5:22')}${R.fruits.map(id=>`<button class="choice" data-act="rw" data-w="fruit" data-id="${id}" ${R.taken.fruit?'disabled':''} style="${R.fruitTaken===id?'outline:4px solid var(--gold)':''}"><b>${esc(TREASURES[id].name)}</b><span>${esc(TREASURES[id].text)}</span></button>`).join('')}`:''}
+ ${R.taken.card?`<p class="center"><b>${R.cardTaken==='skip'?'You passed by the cards. Your greatest resolve rose by 1.':esc(CARDS[R.cardTaken].name)+' was added to your deck.'}</b></p>`:`<h3 class="center">Choose a card for your deck</h3>
+   <div class="cards-row">${opts.map(id=>cardHTML({id,up:0},{sel:UI.rewardSel===id,attr:`data-act="rwsel" data-id="${id}"`})).join('')}</div>
+   <p class="center"><button class="btn gold" data-act="rw" data-w="card" data-id="${UI.rewardSel||''}" ${UI.rewardSel?'':'disabled'}>Add to deck</button> <button class="btn small" data-act="rw" data-w="card" data-id="">Pass by (greatest resolve +1)</button></p>`}
+ <p class="center"><button class="btn red" data-act="leave-reward">${R.boss?'Close the book':'Continue'}</button></p></div></div></div>`;}
+function scEvent(){const ev=G.ev,P=PARABLES[ev.id];return `<div class="screen">${topbar()}<div class="content"><div class="content-in"><h1 class="center">${esc(P.t)}</h1>${parableSvg(ev.id)}${verseHTML(P.ref)}
+ <p><span class="drop">${esc(P.text[0])}</span>${esc(P.text.slice(1))}</p>
+ ${ev.result?`<div class="panel"><p style="margin:0">${esc(ev.result)}</p></div>${G.note?`<p class="center"><b>${esc(G.note)}</b></p>`:''}<p class="center"><button class="btn red" data-act="leave-event">${G.pendingFight?'Stand firm':'Continue'}</button></p>`
+  :P.ch.map((c,i)=>{const ok=!c.can||c.can(G);return `<button class="choice" data-act="evc" data-i="${i}" ${ok?'':'disabled'}><b>${esc(c.t)}</b><span>${esc(c.d)}${ok?'':' (You cannot do this now.)'}</span></button>`;}).join('')}</div></div></div>`;}
+function scShop(){const S=G.shop,p=G.player;return `<div class="screen">${topbar()}<div class="content"><div class="content-in"><h1 class="center">The Scriptorium</h1>${verseHTML('Psalm 45:1')}
+ <p class="center">Scribes copy the Word here by candlelight. Trade your talents for cards and treasures.</p>
+ <div class="cards-row">${S.cards.map((it,i)=>`<div class="center">${cardHTML({id:it.id,up:0},{attr:`data-act="cardinfo" data-id="${it.id}"`})}<button class="btn small gold" style="margin-top:6px" data-act="buy" data-w="card" data-i="${i}" ${it.sold||p.talents<it.price?'disabled':''}>${it.sold?'Taken':icon('coin')+it.price}</button></div>`).join('')}</div>
+ ${S.rel.map((it,i)=>{const t=TREASURES[it.id];return `<button class="choice" data-act="buy" data-w="relic" data-i="${i}" ${it.sold||p.talents<it.price?'disabled':''}><b>${esc(t.name)} · ${it.sold?'taken':it.price+' talents'}</b><span>${esc(t.text)}</span></button>`;}).join('')}
+ <button class="choice" data-act="buy" data-w="remove" ${S.removed||p.talents<S.removePrice?'disabled':''}><b>Lay a card down at the cross · ${S.removed?'done':S.removePrice+' talents'}</b><span>Remove a card from your deck for good. Fewer, better cards come around more often.</span></button>
+ <button class="choice" data-act="buy" data-w="bread" ${S.bread||p.talents<40||p.hp>=p.max?'disabled':''}><b>Bread and water · ${S.bread?'done':'40 talents'}</b><span>Regain a fifth of your resolve.</span></button>
+ <p class="center"><button class="btn red" data-act="leave-shop">Leave the Scriptorium</button></p></div></div></div>`;}
+function scWell(){const W=G.well,p=G.player;const pct=G.watch>=4?.2:.3;return `<div class="screen">${topbar()}<div class="content"><div class="content-in"><h1 class="center">A Well by Still Waters</h1>${verseHTML('Psalm 23:2')}
+ ${W.done&&!G.pick?`<div class="panel center"><b>${esc(G.note||'You go on refreshed.')}</b></div><p class="center"><button class="btn red" data-act="leave-well">Continue</button></p>`:`
+ <button class="choice" data-act="rest"><b>Rest and pray</b><span>Regain ${Math.ceil(p.max*pct)} resolve.</span></button>
+ <button class="choice" data-act="illum" ${E.upgradable(G).length?'':'disabled'}><b>Illuminate a card</b><span>Choose a card to make stronger for the rest of this pilgrimage. It is gilded with gold.</span></button>`}</div></div></div>`;}
+function scTreasure(){const T=G.treasure;const t=T.relic&&TREASURES[T.relic];return `<div class="screen">${topbar()}<div class="content"><div class="content-in center"><h1>A Reliquary</h1>
+ <svg viewBox="0 0 32 32" style="width:120px;height:120px">${GRAD}${IC.treasure}</svg>
+ ${T.taken?`<div class="panel"><p>${icon('coin')} <b>${T.gold} talents</b></p>${t?`<p><b>${esc(t.name)}</b>: ${esc(t.text)}</p>${verseHTML(t.ref)}`:''}</div><p><button class="btn red" data-act="leave-treasure">Continue</button></p>`:`<p>An old chest stands by the roadside, left for pilgrims.</p><button class="btn gold" data-act="open-treasure">Open it</button>`}</div></div></div>`;}
+function scEnd(win){recordEnd(win);const s=G.stats;const mins=Math.max(1,Math.round((Date.now()-s.started)/60000));
+ return `<div class="screen"><div class="border"></div><div class="content"><div class="content-in center"><div class="banner">${win?'The Night Is Far Gone':'You Fell, But You Will Rise'}</div>
+ ${win?verseHTML('Revelation 21:5')+verseHTML('1 Corinthians 15:57')+'<p>The ancient serpent is thrown down, not by your strength, but by the blood of the Lamb and the word of testimony. You fought the good fight. You finished the race. You kept the faith.</p>'+verseHTML('2 Timothy 4:7')
+  :verseHTML('Micah 7:8')+verseHTML('Psalm 37:24')+'<p>Every pilgrim stumbles. Grace is new every morning. Gather what you learned and set out again.</p>'}
+ <div class="panel" style="text-align:left;max-width:420px;margin:10px auto"><b>${esc(CALLINGS[G.calling].name)}${G.watch?' · '+esc(WATCHES[G.watch].n):''}${G.daily?' · Daily pilgrimage':''}</b><br>
+ Reached: ${esc(BOOKS[Math.min(2,G.book)].name)}<br>Steps taken: ${s.floors}<br>Foes that fled: ${s.foes} (Trials ${s.elites}, books closed ${s.bosses})<br>Truth spoken: ${s.truth}<br>Cards played: ${s.cards}<br>Deck at the end: ${G.player.deck.length} cards<br>Time: about ${mins} minutes<br><b>Score: ${E.score(G)}</b>${M.best===E.score(G)?' (your best!)':''}</div>
+ <p><button class="btn red" data-act="view" data-v="new">Begin a new pilgrimage</button> <button class="btn" data-act="totitle">Return to the title</button></p></div></div></div>`;}
+function recordEnd(win){if(G.recorded)return;G.recorded=1;const sc=E.score(G);M.runs++;if(sc>M.best)M.best=sc;
+ if(win){M.wins++;M.winsBy[G.calling]=(M.winsBy[G.calling]||0)+1;const wm=M.watchMax[G.calling];if(wm===undefined||G.watch>wm){M.watchMax[G.calling]=G.watch;if(G.watch<5)setTimeout(()=>toast('The '+esc(WATCHES[G.watch+1].n)+' is now open for '+esc(CALLINGS[G.calling].name)+'.',null,1),600);}}
+ if(G.daily){const k=G.dailyKey;M.daily[k]=Math.max(M.daily[k]||0,sc);}
+ saveMeta();store.del(RUN_KEY);if(win)sfx('win');}
+function scPsalter(){const t=UI.tab;const tabs=[['verses','Verses'],['beasts','Bestiary'],['seals','Seals'],['records','Records']];let body='';
+ if(t==='verses'){const all=Object.keys(VERSES);body=`<p class="center">${Object.keys(M.verses).length} of ${all.length} verses gathered. Verses are gathered as you meet them on the way.</p><div class="vlist">${all.map(r=>M.verses[r]?`<div class="v"><b>${esc(r)}</b>: <i>${esc(VERSES[r])}</i></div>`:`<div class="v miss"><b>${esc(r)}</b>: not yet gathered</div>`).join('')}</div>`;}
+ if(t==='beasts')body=`<p class="center">Every temptation you have resisted. Foes you have not yet met are shadowed.</p><div class="center">${Object.values(FOES).map(f=>{const n=M.foes[f.id]||0;return `<div class="beast${n?'':' miss'}">${svgWrap(ART[f.art]({data:{revealed:1}}))}<b>${n?esc(f.name):'Unknown'}</b>${n?`<span class="muted">${esc(f.desc)}<br>Fled ${n} time${n>1?'s':''} · ${esc(f.ref)}</span>`:''}</div>`;}).join('')}</div>`;
+ if(t==='seals')body=Object.keys(SEALS).map(id=>`<div class="choice" style="${M.seals[id]?'':'opacity:.55'}"><b>${M.seals[id]?'✦ ':''}${esc(SEALS[id].t)}</b><span>${esc(SEALS[id].d)}${M.seals[id]?' · received':''}</span></div>`).join('');
+ if(t==='records')body=`<div class="panel">Pilgrimages begun and ended: ${M.runs}<br>Pilgrimages finished: ${M.wins}<br>${Object.values(CALLINGS).map(c=>`${esc(c.name)}: ${M.unlocked[c.id]?(M.winsBy[c.id]||0)+' finished'+(M.watchMax[c.id]!==undefined?', highest Watch finished: '+M.watchMax[c.id]:''):'not yet open'}`).join('<br>')}<br>Best score: ${M.best}<br>Fruits of the Spirit received: ${Object.keys(M.fruits).length} of 9<br>${Object.keys(M.daily).length?'Daily pilgrimages: '+Object.entries(M.daily).slice(-7).map(([d,s])=>d+' ('+s+')').join(', '):'No daily pilgrimages yet.'}</div>`;
+ return `<div class="screen"><div class="border"></div><div class="content"><div class="content-in"><h1 class="center">Your Psalter</h1><div class="tabs">${tabs.map(([k,n])=>`<button class="btn small${t===k?' on':''}" data-act="tab" data-t="${k}">${n}</button>`).join('')}</div>${body}<p class="center"><button class="btn" data-act="view" data-v="title">Back</button></p></div></div></div>`;}
+function scAbout(){return `<div class="screen"><div class="border"></div><div class="content"><div class="content-in"><h1 class="center">About Armor of Light</h1>
+ <p><span class="drop">A</span>rmor of Light is a card game of pilgrimage. You build a deck as you travel through three books: the Wilderness, the City on a Hill, and the Sea and the Night. The temptations you meet are drawn like the little beasts in the margins of old Bible manuscripts. You never destroy them. You resist them with the Word, with faith, and with grace, and they flee.</p>
+ <p>Every verse in the game is quoted from the English Standard Version, and each was checked word for word. Your Psalter keeps every verse you meet.</p>
+ <h3>Scripture</h3><p style="font-size:.92rem">${esc(ESV_NOTICE)}</p><p style="font-size:.92rem">${esc(ESV_TRADEMARK)}</p>
+ <h3>Credits</h3><p>Made by Brandon Bridges. Art, music and code are original and drawn in the browser. Fonts: EB Garamond and UnifrakturMaguntia from Google Fonts.</p>
+ <p class="center"><button class="btn" data-act="view" data-v="title">Back</button></p></div></div></div>`;}
+function howtoHTML(){return `<h1 class="center">How to Play</h1>
+ <p><span class="drop">Y</span>ou are a pilgrim on the narrow way. Each <b>book</b> is a map of paths. Choose a step at a time, and at the end of each book you face a great foe. Close all three books to finish the pilgrimage.</p>
+ <h3>In battle</h3><p><b>Resolve</b> (the red heart) is how much you can endure. <b>Grace</b> (the gold orb) pays for cards; the red seal on each card shows its cost, and you receive fresh grace each turn. Each turn you draw 5 cards.</p>
+ <p><b>Word</b> cards (red) deal <b>truth</b>, which loosens a foe's <b>hold</b>. When its hold reaches 0, it flees. <b>Guard</b> cards (blue) give <b>shield</b>, which soaks up strikes until your next turn. <b>Grace</b> cards (gold) bless you for the whole battle.</p>
+ <p>The sign above each foe shows what it will do next: a red dart is a strike (12×2 means two strikes of 12), a shield means it will guard, a gold arrow means it grows stronger, a cloud means it will trouble you, and a dark scroll means it will slip Burdens into your cards. Plan around it. When you are done, press <b>End turn</b> and the foes act.</p>
+ <p><b>Offered</b> cards are set aside for the rest of the battle once played. <b>Burdens</b>, Worries and Distractions clog your hand; lay them down when you can.</p>
+ <h3>On the way</h3><p>${icon('fight')} Temptations are battles. ${icon('elite')} Trials are harder battles that give a treasure. ${icon('event')} Parables are stories with choices. ${icon('well')} Wells let you rest or <b>illuminate</b> a card (make it stronger, gilded with gold). ${icon('shop')} The Scriptorium sells cards and treasures and lets you lay cards down. ${icon('treasure')} Reliquaries hold a treasure. Treasures (the round seals at the top) help you all pilgrimage long; tap one to read it.</p>
+ <h3>Controls</h3><table class="ctl"><tr><td><b>Choose a card</b></td><td>Tap or click it, or press its number key <span class="kbd">1</span>…<span class="kbd">0</span></td></tr>
+ <tr><td><b>Play it</b></td><td>Tap or click it again, or press <span class="kbd">Enter</span> or <span class="kbd">Space</span></td></tr>
+ <tr><td><b>Pick a foe</b></td><td>Tap or click the foe, or use <span class="kbd">←</span> <span class="kbd">→</span></td></tr>
+ <tr><td><b>Read a card</b></td><td>Hold your finger on it, or right-click it</td></tr>
+ <tr><td><b>Learn about a foe</b></td><td>Tap or click it when no card is chosen</td></tr>
+ <tr><td><b>End your turn</b></td><td>The End turn button, or <span class="kbd">E</span></td></tr>
+ <tr><td><b>Choose a path</b></td><td>Tap a glowing circle, or press <span class="kbd">1</span>…<span class="kbd">4</span> (left to right)</td></tr>
+ <tr><td><b>Your deck</b></td><td>The deck button, or <span class="kbd">D</span></td></tr>
+ <tr><td><b>Menu</b></td><td>The ≡ button, or <span class="kbd">Esc</span>. Help: ? or <span class="kbd">H</span></td></tr></table>
+ <p class="muted">Your pilgrimage saves itself after every move. Close the page any time and continue later on the same device and browser.</p>`;}
+
+// ---------- overlays ----------
+function renderOverlay(){
+ if(G&&UI.view==='game'){
+  if(G.pick)return ovPick();
+  if(G.cardOffer)return `<div class="overlay"><div class="panel"><h2 class="center">Choose a card</h2><div class="grid-cards">${G.cardOffer.cards.map(id=>cardHTML({id,up:0},{attr:`data-act="offer" data-id="${id}"`})).join('')}</div><p class="center"><button class="btn small" data-act="offer" data-id="">Take none</button></p></div></div>`;}
+ const o=UI.ov;if(!o)return '';
+ const wrap=(inner)=>`<div class="overlay" data-act="ovbg"><div class="panel" data-act="none"><button class="iconbtn close" data-act="close">✕</button>${inner}</div></div>`;
+ if(o==='menu')return wrap(`<h2 class="center">Pause</h2><div class="menu" style="margin:0 auto"><button class="btn red" data-act="close">Resume</button><button class="btn" data-act="help">How to play</button><button class="btn" data-act="deck">Your deck</button><button class="btn" data-act="sound">Sound: ${M.sound?'on':'off'}</button><button class="btn" data-act="totitle">Save and return to the title</button><button class="btn small" data-act="abandon">Abandon this pilgrimage</button></div>`);
+ if(o==='abandon')return wrap(`<h2 class="center">Abandon this pilgrimage?</h2><p class="center">Your progress on this pilgrimage will be lost. Your Psalter, seals and callings stay.</p><p class="center"><button class="btn red" data-act="abandon-yes">Abandon it</button> <button class="btn" data-act="close">Keep going</button></p>`);
+ if(o==='help')return wrap(howtoHTML());
+ if(o==='deck'||o.startsWith('pile:')){let cards,title;if(o==='deck'){cards=G.player.deck.slice();title='Your deck ('+cards.length+' cards)';}else{const k=o.slice(5);cards=G.B?G.B[k].slice():[];title={draw:'Draw pile (shown in no particular order)',discard:'Used cards',exhaust:'Offered cards'}[k]+' ('+cards.length+')';}
+   const ord={word:0,guard:1,grace:2,burden:3};cards.sort((a,b)=>ord[CARDS[a.id].type]-ord[CARDS[b.id].type]||CARDS[a.id].name.localeCompare(CARDS[b.id].name));
+   return wrap(`<h2 class="center">${esc(title)}</h2><div class="grid-cards">${cards.map(c=>cardHTML(c,{attr:`data-act="cardinfo" data-id="${c.id}" data-up="${c.up}"`})).join('')||'<p>Empty.</p>'}</div>`);}
+ if(o.startsWith('relic:')){const t=TREASURES[o.slice(6)];return wrap(`<h2 class="center">${esc(t.name)}</h2><p class="center">${esc(t.text)}</p>${verseHTML(t.ref)}<p class="center muted">${t.kind==='fruit'?'A fruit of the Spirit':t.kind==='start'?'Your calling’s treasure':'A treasure'}</p>`);}
+ if(o.startsWith('card:')){const [id,up]=o.slice(5).split('|');const c={id,up:+up};const d=CARDS[id];return wrap(`<div class="cards-row">${cardHTML(c,{big:1})}${d.type!=='burden'&&!c.up?`<div class="center"><div class="muted">Illuminated</div>${cardHTML({id,up:1},{})}</div>`:''}</div>${verseHTML(d.ref)}`);}
+ if(o.startsWith('foe:')){const f=E.foe(G,o.slice(4));if(!f)return '';const d=FOES[f.id];const i=E.intentInfo(G,f);
+   let it='';if(i){it=i.k==='hidden'?'Its true intent is hidden.':(i.d!=null?`It will strike ${i.h>1?i.h+' times for '+i.d+' each':'for '+i.d}. `:'')+(i.b&&i.k!=='hidden'&&!i.tip?`It will gain ${i.b} shield. `:'')+(i.tip?esc(i.tip)+'.':'');}
+   const sts=[];for(const k in STL.f)if(f.st[k])sts.push(`<b>${STL.f[k][0]} ${f.st[k]}</b>: ${STL.f[k][2].replace('{n}',f.st[k])}`);
+   return wrap(`<div class="row" style="flex-wrap:nowrap"><div style="width:110px;flex:none">${foeSvg(f)}</div><div><h2>${esc(f.name)}</h2><i>${esc(d.desc)}</i><br>Hold ${f.hp} of ${f.max}${f.block?', shield '+f.block:''}</div></div>
+    <p><b>Next: ${i?esc(i.name):'nothing'}.</b> ${it}</p>${sts.length?'<p>'+sts.join('<br>')+'</p>':''}<p class="muted">When it flees you will hear:</p>${verseHTML(d.ref)}`);}
+ if(o.startsWith('tip:'))return wrap(`<p class="center" style="margin-top:28px">${esc(o.slice(4))}</p>`);
+ return '';}
+function ovPick(){const pk=G.pick;const opts=E.pickOptions(G);const sel=UI.pickSel&&opts.find(c=>c.uid===UI.pickSel);
+ return `<div class="overlay"><div class="panel"><h2 class="center">${esc(pk.title)}</h2>
+ ${sel?`<div class="cards-row">${cardHTML(sel,{})}${pk.mode==='upgrade'?`<div class="center" style="align-self:center;font-size:2rem">→</div>${cardHTML(Object.assign({},sel,{up:1}),{})}`:''}</div>
+  <p class="center">${pk.mode==='upgrade'?'Illuminate this card?':'Lay down this card for good?'}</p><p class="center"><button class="btn red" data-act="pick-yes">${pk.mode==='upgrade'?'Illuminate it':'Lay it down'}</button> <button class="btn" data-act="pick-back">Choose another</button></p>`
+ :`<div class="grid-cards">${opts.map(c=>cardHTML(c,{attr:`data-act="picksel" data-uid="${c.uid}"`})).join('')}</div><p class="center"><button class="btn small" data-act="pick-cancel">${pk.refund?'Never mind (refund)':pk.well?'Back':'Skip'}</button></p>`}</div></div>`;}
+
+// ---------- after render ----------
+function postRender(){
+ if(G&&UI.view==='game'&&G.screen==='map'){const w=q('#mapwrap');if(w){const key=G.pos+'|'+G.book;if(UI.lastPos!==key){UI.lastPos=key;const r=G.pos?G.map.nodes[G.pos].r:0;const y=(E.ROWS-1-r)*74+50;w.scrollTop=Math.max(0,y-w.clientHeight*.62);UI.mapScroll=w.scrollTop;}else w.scrollTop=UI.mapScroll||0;w.addEventListener('scroll',()=>{UI.mapScroll=w.scrollTop;},{passive:true});}}
+ if(G&&G.B)G.B.foes.forEach(f=>{if(f.gone)setTimeout(()=>UI.fled.add(f.uid),900);});
+}
+function playFX(){const list=E.FX.splice(0);let t=0;const fe=uid=>q(`.foe[data-uid="${uid}"]`);
+ for(const ev of list){if(ev.k==='act')t+=360;const d=t;
+  setTimeout(()=>{switch(ev.k){
+   case 'hit':{const el=fe(ev.uid);if(el){el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');if(ev.n>0)floatAt(el,'−'+ev.n,'dmg');else if(ev.blocked)floatAt(el,'shielded','blk');}sfx('hit');break;}
+   case 'struck':{const el=q('.pilgrim');if(el){el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');if(ev.n>0){floatAt(el,'−'+ev.n,'dmg');const fl=document.createElement('div');fl.className='flash';app.appendChild(fl);setTimeout(()=>fl.remove(),520);}else floatAt(el,'blocked','blk');}sfx('struck');break;}
+   case 'block':floatAt(q('.pilgrim'),'+'+ev.n,'blk');break;
+   case 'heal':floatAt(q('.pilgrim')||q('.stat'),'+'+ev.n,'heal');break;
+   case 'talents':if(ev.n>0){floatAt(q('.stat:nth-child(2)'),'+'+ev.n,'gold');sfx('coin');}break;
+   case 'flee':sfx('flee');break;
+   case 'say':{const el=ev.uid&&fe(ev.uid);if(el){const b=document.createElement('div');b.className='say';b.textContent=ev.text;el.appendChild(b);setTimeout(()=>b.remove(),2500);}else toast(esc(ev.text),null,1);break;}
+   case 'curse':floatAt(q('.piles')||q('.hand'),'+ '+CARDS[ev.id].name,'dmg');break;
+   case 'verse':verseToast(ev.ref);break;
+   case 'relic':{const el=q(`.relic[data-id="${ev.id}"]`);if(el)el.classList.add('pulse');toast('Treasure received: <b>'+esc(TREASURES[ev.id].name)+'</b>. '+esc(TREASURES[ev.id].text),null,1);sfx('seal');break;}
+   case 'play':E.onVerse(CARDS[ev.id].ref);sfx(ev.type==='word'?'word':ev.type==='guard'?'guard':'grace');break;
+   case 'act':{const el=fe(ev.uid);if(el){const b=document.createElement('div');b.className='say';b.textContent=ev.name;el.appendChild(b);setTimeout(()=>b.remove(),1500);}break;}
+  }},d);}
+ const fled=list.filter(e=>e.k==='flee');if(fled.length){const f=E.foe(G,fled[fled.length-1].uid);if(f)setTimeout(()=>verseToast(FOES[f.id].ref),t+300);}
+ return t;}
+function act(fn){E.FX.length=0;fn();saveRun();render();return playFX();}
+
+// ---------- input ----------
+function playSel(){const B=G.B;const c=B.hand.find(x=>x.uid===UI.sel);if(!c)return;const d=CARDS[c.id];let t=null;
+ if(d.tg==='foe'){const L=E.live(G);t=UI.target&&L.some(f=>f.uid===UI.target)?UI.target:(L.length===1?L[0].uid:null);if(!t){render();return;}}
+ act(()=>{if(E.playCard(G,c.uid,t)){M.tut.play=1;saveMeta();}UI.sel=null;});}
+function onCard(uid){const B=G.B;const c=B.hand.find(x=>x.uid===uid);if(!c)return;
+ if(!E.canPlay(G,c)){const cost=E.cardCost(G,c);toast(cost<0?esc(CARDS[c.id].name)+' cannot be played.':'Not enough grace for that card.',null,1);sfx('bad');UI.sel=null;render();return;}
+ if(UI.sel===uid){playSel();return;}
+ UI.sel=uid;sfx('tap');const d=CARDS[c.id];if(d.tg==='foe'&&E.live(G).length===1)UI.target=E.live(G)[0].uid;render();}
+function onFoe(uid){const f=E.foe(G,uid);if(!f||f.gone)return;const c=UI.sel&&G.B.hand.find(x=>x.uid===UI.sel);
+ if(c&&CARDS[c.id].tg==='foe'){UI.target=uid;playSel();return;}
+ UI.ov='foe:'+uid;M.tut.intent=1;saveMeta();render();}
+function endTurn(){if(UI.busy)return;UI.busy=true;UI.sel=null;M.tut.end=1;saveMeta();const t=act(()=>E.endTurn(G));setTimeout(()=>{UI.busy=false;},Math.min(t,1600));}
+function startRun(calling,watch,seed,daily){G=E.newRun(calling,watch,seed,daily);UI.view='game';UI.fled=new Set();UI.lastPos=undefined;if(daily)G.dailyKey=daily;saveRun();render();}
+const handlers={
+ view:(el)=>{UI.view=el.dataset.v;if(el.dataset.tab)UI.tab=el.dataset.tab;UI.ov=null;render();},
+ tab:(el)=>{UI.tab=el.dataset.t;render();},
+ continue:()=>{UI.view='game';UI.fled=new Set();UI.lastPos=undefined;if(G.B)G.B.foes.forEach(f=>{if(f.gone)UI.fled.add(f.uid);});render();},
+ calling:(el)=>{UI.calling=el.dataset.id;render();},watch:(el)=>{UI.watch=+el.dataset.i;render();},
+ begin:()=>{if(!M.unlocked[UI.calling])return;startRun(UI.calling,UI.watch,(Math.random()*4294967296)>>>0,null);},
+ daily:()=>{const d=new Date();const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');let h=2166136261;for(const ch of 'aol'+key){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)>>>0;}
+   const cl=['shepherd','fisher','scribe'][h%3];startRun(cl,0,h,key);toast('Today’s pilgrimage: '+esc(CALLINGS[cl].name)+'. Everyone gets the same map and gifts today.',null,1);},
+ sound:()=>{M.sound=M.sound?0:1;saveMeta();render();if(M.sound)sfx('seal');},
+ bless:(el)=>act(()=>E.chooseBlessing(G,el.dataset.id)),
+ setout:()=>{G.screen='map';saveRun();render();},
+ node:(el)=>{if(UI.busy)return;const id=el.dataset.id;if(!E.available(G).includes(id)){const n=G.map.nodes[id];toast(n.done?'You have already walked this way.':'That step is not open from where you stand. Choose a glowing circle.',null,1);return;}UI.sel=null;UI.target=null;act(()=>E.enterNode(G,id));},
+ card:(el)=>{if(UI.busy||UI.longPress)return;onCard(el.dataset.uid);},
+ foe:(el)=>{if(UI.busy)return;onFoe(el.dataset.uid);},
+ end:()=>endTurn(),
+ pile:(el)=>{UI.ov='pile:'+el.dataset.p;render();},
+ deck:()=>{UI.ov='deck';render();},help:()=>{UI.ov='help';render();},menu:()=>{UI.ov='menu';render();},
+ close:()=>{UI.ov=null;render();},ovbg:(el,e)=>{if(e.target===el){UI.ov=null;render();}},none:()=>{},
+ relic:(el)=>{UI.ov='relic:'+el.dataset.id;render();},
+ tip:(el)=>{UI.ov='tip:'+el.dataset.tip;render();},
+ cardinfo:(el)=>{UI.ov='card:'+el.dataset.id+'|'+(el.dataset.up||0);render();},
+ rwsel:(el)=>{UI.rewardSel=el.dataset.id;sfx('tap');render();},
+ rw:(el)=>{const w=el.dataset.w;act(()=>{E.takeReward(G,w,el.dataset.id||null);if(w==='card')UI.rewardSel=null;});},
+ 'leave-reward':()=>{UI.rewardSel=null;UI.fled=new Set();act(()=>E.leaveReward(G));},
+ evc:(el)=>act(()=>E.eventChoose(G,+el.dataset.i)),
+ 'leave-event':()=>{UI.fled=new Set();act(()=>E.leaveEvent(G));},
+ buy:(el)=>act(()=>{if(!E.buy(G,el.dataset.w,+el.dataset.i))sfx('bad');else sfx('coin');}),
+ 'leave-shop':()=>act(()=>E.leaveShop(G)),
+ rest:()=>act(()=>E.wellRest(G)),illum:()=>act(()=>E.wellIlluminate(G)),'leave-well':()=>act(()=>E.leaveWell(G)),
+ 'open-treasure':()=>act(()=>E.takeTreasure(G)),'leave-treasure':()=>act(()=>E.leaveTreasure(G)),
+ picksel:(el)=>{UI.pickSel=el.dataset.uid;render();},'pick-back':()=>{UI.pickSel=null;render();},
+ 'pick-yes':()=>{const u=UI.pickSel;UI.pickSel=null;act(()=>E.resolvePick(G,u));},
+ 'pick-cancel':()=>{UI.pickSel=null;act(()=>E.cancelPick(G));},
+ offer:(el)=>act(()=>E.takeOfferCard(G,el.dataset.id||null)),
+ totitle:()=>{UI.ov=null;UI.view='title';if(G&&(G.screen==='gameover'||G.screen==='victory'))G=null;render();},
+ abandon:()=>{UI.ov='abandon';render();},
+ 'abandon-yes':()=>{store.del(RUN_KEY);G=null;UI.ov=null;UI.view='title';render();},
+};
+app.addEventListener('click',e=>{ac();const el=e.target.closest('[data-act]');if(!el||!app.contains(el))return;if(el.disabled)return;const h=handlers[el.dataset.act];if(h){if(el.dataset.act!=='ovbg'&&el.dataset.act!=='none')e.stopPropagation();h(el,e);}});
+let lpT=null;
+app.addEventListener('pointerdown',e=>{const el=e.target.closest('[data-act="card"]');UI.longPress=false;if(!el)return;clearTimeout(lpT);
+ lpT=setTimeout(()=>{UI.longPress=true;const c=G&&G.B&&G.B.hand.find(x=>x.uid===el.dataset.uid);if(c){UI.ov='card:'+c.id+'|'+c.up;render();}},480);});
+['pointerup','pointercancel','pointerleave'].forEach(t=>app.addEventListener(t,()=>{clearTimeout(lpT);setTimeout(()=>{UI.longPress=false;},30);}));
+app.addEventListener('contextmenu',e=>{const el=e.target.closest('[data-act="card"]');if(!el)return;e.preventDefault();const c=G&&G.B&&G.B.hand.find(x=>x.uid===el.dataset.uid);if(c){UI.ov='card:'+c.id+'|'+c.up;render();}});
+document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const k=e.key;
+ if(k==='Escape'){if(UI.ov){UI.ov=null;render();return;}if(G&&UI.view==='game'&&G.B&&UI.sel){UI.sel=null;render();return;}if(G&&UI.view==='game'&&!G.pick&&!G.cardOffer){UI.ov='menu';render();}return;}
+ if(UI.ov){return;}
+ if(!G||UI.view!=='game'||G.pick||G.cardOffer)return;
+ if(k==='h'||k==='H'||k==='?'){UI.ov='help';render();return;}
+ if(k==='d'||k==='D'){UI.ov='deck';render();return;}
+ if(G.screen==='battle'&&!UI.busy){const B=G.B;
+  if(/^[0-9]$/.test(k)){const i=k==='0'?9:(+k-1);const c=B.hand[i];if(c){e.preventDefault();onCard(c.uid);}return;}
+  if(k==='ArrowLeft'||k==='ArrowRight'){const L=E.live(G);if(!L.length)return;e.preventDefault();let i=L.findIndex(f=>f.uid===UI.target);i=i<0?0:(i+(k==='ArrowRight'?1:-1)+L.length)%L.length;UI.target=L[i].uid;render();return;}
+  if((k==='Enter'||k===' ')&&UI.sel){e.preventDefault();playSel();return;}
+  if(k==='e'||k==='E'){endTurn();return;}}
+ if(G.screen==='map'&&/^[1-9]$/.test(k)){const N=G.map.nodes;const av=E.available(G).sort((a,b)=>N[a].x-N[b].x);const id=av[+k-1];if(id){UI.sel=null;act(()=>E.enterNode(G,id));}}
+});
+window.addEventListener('resize',()=>{if(G&&UI.view==='game'&&G.screen==='battle')render();});
+window.__aol={get G(){return G;},E,M:()=>M,render,startRun,act,handlers};
+render();
+
+})();
+</script>
+</body>
+</html>

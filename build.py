@@ -4,6 +4,7 @@
 Outputs
   docs/index.html, docs/<slug>/index.html   one page per lesson, each with its own URL
   docs/v2/...                               redirects from the old comparison URLs
+  docs/games/<slug>/index.html              Brandon's Bible games, copied from games/ (see games/README.md)
   docs/sitemap.xml, robots.txt, llms.txt, llms-full.txt   search + AI-search files
 
 Every page gets a title, description, canonical URL, Open Graph tags and JSON-LD structured data.
@@ -112,13 +113,13 @@ PAGES = [
     {
         "slug": "churches", "sections": ["churches"],
         "title": "Churches and 24/7 Prayer We Recommend",
-        "description": "Find a church that preaches the Word, and pray with someone 24/7 through the Billy Graham prayer line and BPN Radio.",
+        "description": "Find a church that preaches the Word, pray 24/7 with the Billy Graham prayer line and BPN Radio, and play free Bible games for youth.",
         "type": "churches", "nav": "Churches",
     },
     {
         "slug": "prayers", "sections": ["prayers"],
         "title": "Scripture Prayers for Everyday Needs",
-        "description": "Prayers built from God's Word for everyday needs: a prayer before a test, and a prayer for when you are tested or tempted (Hebrews 4:15).",
+        "description": "Prayers from God's Word for everyday needs: before a test, when you are tested or tempted, and when you are afraid or anxious (2 Timothy 1:7).",
         "type": "prayers", "nav": "Prayers",
     },
     {
@@ -142,6 +143,22 @@ PAGES = [
 ]
 if not SHOW_CARDS:
     PAGES = [p for p in PAGES if p["slug"] != "cards"]
+
+# Brandon's Bible games, copied verbatim from the linkbridges-games repo into games/ so they play on this site too
+# (see games/README.md). The build serves each at /games/<slug>/ and makes only the edits listed in "swap".
+GAMES = [
+    {"slug": "lamp-unto-my-feet", "name": "Lamp Unto My Feet", "genre": "Adventure",
+     "title": "Lamp Unto My Feet: A Free Bible Adventure Game",
+     "swap": [('<a id="home" href="/">&larr; Home</a>', '<a id="home" href="../../">&larr; Home</a>')]},
+    {"slug": "armor-of-light", "name": "Armor of Light", "genre": "Card game",
+     "title": "Armor of Light: A Free Christian Card Game",
+     "swap": [('<a class="homelink center" href="/">Back to all games</a>', '<a class="homelink center" href="../../churches/#youth">Back to all games</a>'),
+              ("Made for linkbridges.org.", "Made by Brandon Bridges.")]},
+    {"slug": "watchmen-on-the-walls", "name": "Watchmen on the Walls", "genre": "Tower defense",
+     "title": "Watchmen on the Walls: A Free Nehemiah Bible Game",
+     "swap": [('A game by <a href="/">linkbridges.org</a>', 'A game by Brandon Bridges &middot; <a href="../../churches/#youth">More games</a>'),
+              ('Made for <a href="/">linkbridges.org</a>,', "Made by Brandon Bridges,")]},
+]
 LESSON_ORDER = ["repentance", "faith", "baptisms", "laying-on-of-hands", "resurrection", "eternal-judgment", "fruitful"]
 
 # In-page anchors in the source, and where they live on the built site (relative to the home page).
@@ -153,6 +170,7 @@ ANCHORS = {
     "laying-on-of-hands": "laying-on-of-hands/", "resurrection": "resurrection/", "eternal-judgment": "eternal-judgment/", "fruitful": "fruitful/", "faq": "questions/", "ask": "ask/",
     "printables": "cards/", "churches": "churches/", "prayers": "prayers/", "about": "about/",
     "privacy": "privacy/", "mission": "mission/", "prayer-for-a-test": "prayers/#prayer-for-a-test", "prayer-when-tested": "prayers/#prayer-when-tested",
+    "prayer-when-afraid": "prayers/#prayer-when-afraid", "youth": "churches/#youth",
 }
 
 
@@ -223,6 +241,7 @@ def rewrite_links(fragment, root, home):
     fragment = fragment.replace('src="img/', f'src="{root}img/')
     fragment = fragment.replace('src="printables/', f'src="{root}printables/')
     fragment = fragment.replace('href="printables/', f'href="{root}printables/')
+    fragment = fragment.replace('href="games/', f'href="{root}games/')
     return fragment
 
 
@@ -372,6 +391,57 @@ def page_ld(page, sections):
     return out
 
 
+def build_games(og_image):
+    """Copy each game to docs/games/<slug>/ with this site's head tags, local fonts and links back to TPOTDOC."""
+    shutil.copytree(ROOT / "games" / "fonts", OUT / "games" / "fonts")
+    robots = "index, follow, max-image-preview:large" if INDEXABLE else "noindex, nofollow"
+    analytics = (f'<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon=\'{{"token": "{CF_ANALYTICS_TOKEN}"}}\'></script>'
+                 if CF_ANALYTICS_TOKEN else "")
+    for g in GAMES:
+        s = (ROOT / "games" / f"{g['slug']}.html").read_text()
+        for old, new in g["swap"]:
+            if old not in s:
+                raise SystemExit(f"games/{g['slug']}.html: expected text not found (re-check the swap list in GAMES): {old}")
+            s = s.replace(old, new)
+        # Google Fonts would break the privacy page's promise, so the games use the self-hosted copies in games/fonts/.
+        s, n = re.subn(r'<link\b[^>]*fonts\.(?:googleapis|gstatic)\.com[^>]*>\s*', "", s)
+        if n:
+            s = s.replace("</head>", '<link rel="stylesheet" href="../fonts/fonts.css">\n</head>', 1)
+        leftover = re.findall(r'href="/"|fonts\.googleapis|fonts\.gstatic', s)
+        if leftover:
+            raise SystemExit(f"games/{g['slug']}.html: still has {leftover}; add it to the swap list in GAMES")
+        desc = html.unescape(re.search(r'<meta name="description" content="([^"]*)"', s).group(1))
+        url = f"{SITE_URL}/games/{g['slug']}/"
+        t, d = html.escape(g["title"]), html.escape(desc)
+        s = re.sub(r"<title>.*?</title>", f"<title>{t}</title>", s, count=1, flags=re.S)
+        ld = {"@context": "https://schema.org", "@type": "VideoGame", "name": g["name"], "description": desc, "url": url,
+              "author": {"@type": "Person", "name": "Brandon Bridges"}, "genre": g["genre"], "gamePlatform": "Web browser",
+              "applicationCategory": "Game", "operatingSystem": "Any", "isAccessibleForFree": True, "inLanguage": "en",
+              "image": og_image, "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": page_url("")}}
+        tags = f"""<meta name="robots" content="{robots}">
+<meta name="author" content="Brandon Bridges">
+<link rel="canonical" href="{url}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{SITE_NAME}">
+<meta property="og:title" content="{t}">
+<meta property="og:description" content="{d}">
+<meta property="og:url" content="{url}">
+<meta property="og:image" content="{og_image}">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="{SITE_URL}/img/favicon.png">
+<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
+{analytics}
+"""
+        s = s.replace("</head>", tags + "</head>", 1)
+        if not re.search(r"<h1[\s>]", re.sub(r"<script\b.*?</script>", "", s, flags=re.S)):  # canvas games: a heading for screen readers and search
+            s = s.replace("<body>", '<body>\n<h1 style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;'
+                          f'clip:rect(0,0,0,0);white-space:nowrap;border:0">{html.escape(g["name"])}</h1>', 1)
+        dest = OUT / "games" / g["slug"] / "index.html"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(s)
+        g["description"] = desc
+
+
 def pager(page, home):
     if page["slug"] not in LESSON_ORDER:
         return ""
@@ -416,6 +486,7 @@ def build():
     (OUT / "site.js").write_text(re.sub(r"^<script>\s*|\s*</script>$", "", parts["script"]).strip() + "\n")
     site_script = '<script src="/site.js"></script>'
     shutil.copytree(ROOT / "prototype" / "fonts", OUT / "fonts")
+    build_games(og)
 
     for page in PAGES:
         root = "../" if page["slug"] else ""
@@ -478,8 +549,8 @@ def build():
 """)
 
     # sitemap.xml
-    urls = [page_url(p["slug"]) for p in PAGES]
-    sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    urls = [page_url(p["slug"]) for p in PAGES] + [f"{SITE_URL}/games/{g['slug']}/" for g in GAMES]
+    sm =['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     sm += [f"  <url><loc>{u}</loc><lastmod>{TODAY}</lastmod></url>" for u in urls]
     sm.append("</urlset>")
     (OUT / "sitemap.xml").write_text("\n".join(sm) + "\n")
@@ -498,7 +569,9 @@ def build():
     lines += [f"- [{by_slug[s]['title'].split(' | ')[0]}]({page_url(s)}): {by_slug[s]['description']}" for s in LESSON_ORDER]
     lines += ["", "## Help for new believers"]
     lines += [f"- [{by_slug[s]['title'].split(' | ')[0]}]({page_url(s)}): {by_slug[s]['description']}" for s in ["prayers", "questions", "ask", "churches", "cards", "about"] if s in by_slug]
-    lines += ["", "## Optional", f"- [Full text of every lesson]({SITE_URL}/llms-full.txt): all lessons as plain text"]
+    lines += ["", "## Bible games for youth (by Brandon Bridges; Scripture in the games is ESV)"]
+    lines += [f"- [{g['name']}]({SITE_URL}/games/{g['slug']}/): {g['description']}" for g in GAMES]
+    lines += ["", "## Optional",f"- [Full text of every lesson]({SITE_URL}/llms-full.txt): all lessons as plain text"]
     (OUT / "llms.txt").write_text("\n".join(lines) + "\n")
 
     full = [f"# {SITE_NAME}", f"Source: {SITE_URL}/", f"Updated: {TODAY}", ""]

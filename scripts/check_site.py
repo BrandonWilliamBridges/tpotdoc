@@ -29,7 +29,7 @@ for page in sorted(DOCS.rglob("*.html")):
             if not (local / "index.html" if target.endswith("/") else local).exists():
                 errors.append(f"{rel}: redirects to missing page {target}")
         continue
-    h1 = len(re.findall(r"<h1[\s>]", s))
+    h1 = len(re.findall(r"<h1[\s>]", re.sub(r"<script\b.*?</script>", "", s, flags=re.S)))  # the games build screens in script
     if h1 != 1:
         errors.append(f"{rel}: {h1} <h1> elements (want exactly 1)")
     title = re.search(r"<title>(.*?)</title>", s, re.S)
