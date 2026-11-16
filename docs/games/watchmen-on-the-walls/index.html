@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="description" content="Watchmen on the Walls: a tower defense game where you rebuild the walls of Jerusalem gate by gate with Nehemiah." />
+<title>Watchmen on the Walls: A Free Nehemiah Bible Game</title>
+<style>
+:root{
+  --sand:#F3E2BF; --sand2:#E8CB97; --sand3:#D6AE6E; --terra:#C0613F; --terra2:#9E4A2F;
+  --dusk:#2E2140; --dusk2:#4A3360; --plum:#6B4A7A; --gold:#F2B33D; --gold2:#FFD46E;
+  --ink:#2A1D2E; --ink2:#5B4757; --cream:#FFF7E8; --olive:#6F7F3A; --teal:#2F9C95;
+  --red:#C8443A; --panel:rgba(46,33,64,.92); --line:rgba(255,231,190,.22);
+  --fh:'Baloo 2',system-ui,sans-serif; --fb:'Nunito',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{background:linear-gradient(180deg,#2E2140 0%,#5A3E63 55%,#B8644A 100%);color:var(--cream);font-family:var(--fb);
+  -webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+button{font-family:var(--fb);cursor:pointer;border:0}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+/* ---------- heads up display ---------- */
+body.nogame #hud,body.nogame #bottom{visibility:hidden}
+#hud{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:6px 10px;background:var(--panel);border-bottom:1px solid var(--line);z-index:5}
+#hud .grp{display:flex;align-items:center;gap:6px}
+#hud .lvl{font-family:var(--fh);font-weight:700;font-size:17px;line-height:1;color:var(--gold2);white-space:nowrap;max-width:42vw;overflow:hidden;text-overflow:ellipsis}
+.stat{display:flex;align-items:center;gap:5px;font-weight:800;font-size:15px;white-space:nowrap}
+.stat small{font-weight:600;opacity:.75;font-size:12px}
+.bar{width:70px;height:9px;border-radius:9px;background:rgba(255,255,255,.15);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#F2B33D,#FFE28A);width:100%;transition:width .25s}
+.ico{width:20px;height:20px;display:inline-block}
+.hbtn{background:rgba(255,255,255,.1);color:var(--cream);border:1px solid var(--line);border-radius:10px;padding:7px 11px;font-weight:800;font-size:14px;white-space:nowrap}
+.hbtn:hover{background:rgba(255,255,255,.18)}
+.hbtn.go{background:linear-gradient(180deg,#F7C14E,#E39A24);color:#3A2410;border-color:#FFD98A;box-shadow:0 2px 0 #9C5F12}
+.hbtn.go.pulse{animation:pulse 1.4s infinite}
+.hbtn:disabled{opacity:.45;cursor:default}
+.hbtn.on{background:rgba(242,179,61,.28);border-color:var(--gold)}
+@keyframes pulse{0%,100%{box-shadow:0 2px 0 #9C5F12,0 0 0 0 rgba(255,212,110,.7)}50%{box-shadow:0 2px 0 #9C5F12,0 0 0 8px rgba(255,212,110,0)}}
+.spacer{flex:1}
+/* ---------- stage ---------- */
+#stage{position:relative;flex:1;min-height:0;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#popup{position:absolute;display:none;z-index:6;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px;gap:6px;flex-wrap:wrap;max-width:300px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+#popup.show{display:flex}
+.pop-t{width:100%;font-family:var(--fh);font-weight:700;font-size:14px;color:var(--gold2);padding:0 4px}
+.tbtn{display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--cream);border-radius:12px;padding:6px 6px 5px;min-width:64px;font-size:12px;font-weight:700}
+.tbtn canvas{width:38px;height:38px}
+.tbtn .c{font-weight:800;color:var(--gold2);font-size:12px}
+.tbtn.sel{border-color:var(--gold);background:rgba(242,179,61,.22)}
+.tbtn:disabled{opacity:.42}
+.tbtn.locked{opacity:.3}
+#toast{position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:7;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;width:min(92%,560px)}
+.tmsg{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-weight:700;font-size:14px;text-align:center;animation:tin .25s ease-out}
+.tmsg.verse{font-weight:600;font-style:italic;color:#FFF0CF}
+.tmsg.verse b{display:block;font-style:normal;font-size:12px;color:var(--gold2);margin-top:3px}
+@keyframes tin{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+#coach{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:6;background:rgba(46,33,64,.88);border:1px solid var(--gold);border-radius:12px;padding:8px 14px;font-weight:700;font-size:14px;max-width:min(92%,520px);text-align:center;display:none;pointer-events:none}
+#coach.show{display:block;animation:tin .3s}
+/* ---------- palette ---------- */
+#bottom{background:var(--panel);border-top:1px solid var(--line);z-index:5}
+#palette{display:flex;gap:6px;padding:6px 8px;overflow-x:auto;scrollbar-width:none;align-items:stretch}
+#palette::-webkit-scrollbar{display:none}
+#palette .tbtn{flex:0 0 auto}
+#palette .key{font-size:10px;opacity:.6;font-weight:700}
+#sel{display:none;align-items:center;gap:8px;padding:6px 10px;border-top:1px solid var(--line);flex-wrap:wrap}
+#sel.show{display:flex}
+#sel .nm{font-family:var(--fh);font-weight:700;font-size:16px;color:var(--gold2)}
+#sel .st{font-size:12px;opacity:.85;flex:1;min-width:140px}
+/* ---------- screens ---------- */
+.screen{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(30,20,40,.72);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.screen.show{display:flex}
+.card{background:linear-gradient(180deg,#FFF7E8,#F3E2BF);color:var(--ink);border-radius:20px;padding:22px 22px 18px;max-width:640px;width:100%;max-height:100%;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.45);border:2px solid #E2C48C;user-select:text;-webkit-user-select:text}
+.card h1,.card h2,.card h3{font-family:var(--fh);line-height:1.1;color:var(--terra2)}
+.card h1{font-size:30px;margin-bottom:6px}
+.card h2{font-size:24px;margin-bottom:8px}
+.card h3{font-size:18px;margin:14px 0 6px}
+.card p{line-height:1.55;margin-bottom:10px;font-size:15.5px}
+.card .sub{font-family:var(--fh);font-weight:600;color:var(--ink2);font-size:15px;margin-bottom:10px}
+.verse{background:rgba(192,97,63,.08);border-left:4px solid var(--terra);border-radius:8px;padding:10px 12px;margin:10px 0;font-style:italic;line-height:1.55;font-size:15px}
+.verse b{display:block;font-style:normal;font-size:13px;color:var(--terra2);margin-top:4px;font-weight:800}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--dusk);color:var(--cream);border-radius:12px;padding:11px 18px;font-weight:800;font-size:15px;border:2px solid transparent}
+.btn:hover{background:var(--dusk2)}
+.btn.pri{background:linear-gradient(180deg,#F7C14E,#E39A24);color:#3A2410;border-color:#FFD98A}
+.btn.ghost{background:transparent;color:var(--ink);border-color:#D9BD88}
+.btn:disabled{opacity:.45}
+.btn.full{flex:1 1 200px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px;margin:8px 0}
+.kv b{color:var(--terra2)}
+.stars{color:#E39A24;letter-spacing:2px;font-size:20px}
+.stars .off{color:#D8C5A0}
+/* title */
+#title{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;padding:0}
+#titleCv{position:absolute;inset:0;width:100%;height:100%}
+#titleBox{position:relative;text-align:center;padding:18px;max-width:520px;width:100%}
+#titleBox h1{font-family:var(--fh);font-weight:800;font-size:clamp(38px,9vw,64px);line-height:.95;color:#FFE7A8;text-shadow:0 3px 0 #9E4A2F,0 8px 30px rgba(0,0,0,.45);letter-spacing:-.01em}
+#titleBox .tag{font-weight:700;color:#FFE9C7;margin:12px 0 18px;font-size:16px;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+#titleBox .menu{display:flex;flex-direction:column;gap:8px;align-items:stretch;max-width:320px;margin:0 auto}
+#titleBox .btn{font-size:16px;padding:12px 18px;background:rgba(46,33,64,.85);border-color:rgba(255,231,190,.35)}
+#titleBox .btn.pri{background:linear-gradient(180deg,#F7C14E,#E39A24);color:#3A2410}
+#titleBox .foot{margin-top:14px;font-size:12px;opacity:.85}
+#titleBox .foot a{color:#FFE7A8}
+/* map screen */
+#mapScr .card{max-width:980px;padding:14px}
+#mapWrap{position:relative;width:100%}
+#mapCv{width:100%;display:block;border-radius:14px;background:#E8CB97;touch-action:manipulation}
+.mapbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.mapbar h2{margin:0;flex:1;min-width:180px}
+.pill{background:var(--dusk);color:#FFE7A8;border-radius:999px;padding:5px 12px;font-weight:800;font-size:13px}
+/* lists */
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.55);border:1px solid #E2C48C;border-radius:14px;padding:10px 12px}
+.item .t{flex:1}
+.item .t b{font-family:var(--fh);font-size:16px;color:var(--terra2);display:block}
+.item .t span{font-size:13.5px;color:var(--ink2);line-height:1.4;display:block}
+.item canvas{width:44px;height:44px;flex:0 0 auto}
+.pips{font-size:13px;color:#E39A24;font-weight:800;white-space:nowrap}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs button{background:rgba(255,255,255,.5);border:1px solid #D9BD88;border-radius:999px;padding:6px 12px;font-weight:800;color:var(--ink2)}
+.tabs button.on{background:var(--dusk);color:#FFE7A8;border-color:var(--dusk)}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:14px;margin:6px 0 10px}
+.keys kbd{background:var(--dusk);color:#FFE7A8;border-radius:6px;padding:2px 7px;font-family:var(--fb);font-weight:800;font-size:12px;white-space:nowrap;justify-self:start}
+.small{font-size:12.5px;color:var(--ink2);line-height:1.5}
+.locked-v{opacity:.55}
+@media (max-width:620px){
+  #hud{padding:5px 8px;gap:5px 8px}
+  #hud .lvl{font-size:15px;max-width:38vw}
+  .bar{width:46px}
+  .hbtn{padding:6px 9px;font-size:13px}
+  .card{padding:16px 15px 14px;border-radius:16px}
+  .card h1{font-size:25px}
+  .card p{font-size:14.5px}
+  .tbtn{min-width:58px;font-size:11px}
+  .tbtn canvas{width:32px;height:32px}
+}
+@media (prefers-reduced-motion:reduce){.hbtn.go.pulse{animation:none}}
+</style>
+<link rel="stylesheet" href="../fonts/fonts.css">
+<meta name="robots" content="noindex, nofollow">
+<meta name="author" content="Brandon Bridges">
+<link rel="canonical" href="https://tpotdoc.com/games/watchmen-on-the-walls/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Principles of the Doctrine of Christ">
+<meta property="og:title" content="Watchmen on the Walls: A Free Nehemiah Bible Game">
+<meta property="og:description" content="Watchmen on the Walls: a tower defense game where you rebuild the walls of Jerusalem gate by gate with Nehemiah.">
+<meta property="og:url" content="https://tpotdoc.com/games/watchmen-on-the-walls/">
+<meta property="og:image" content="https://tpotdoc.com/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="https://tpotdoc.com/img/favicon.png">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "Watchmen on the Walls", "description": "Watchmen on the Walls: a tower defense game where you rebuild the walls of Jerusalem gate by gate with Nehemiah.", "url": "https://tpotdoc.com/games/watchmen-on-the-walls/", "author": {"@type": "Person", "name": "Brandon Bridges"}, "genre": "Tower defense", "gamePlatform": "Web browser", "applicationCategory": "Game", "operatingSystem": "Any", "isAccessibleForFree": true, "inLanguage": "en", "image": "https://tpotdoc.com/img/og.png", "isPartOf": {"@type": "WebSite", "name": "The Principles of the Doctrine of Christ", "url": "https://tpotdoc.com/"}}</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "68a88602d3054c4ab0100cb75be105e6"}'></script>
+</head>
+<body>
+<div id="app">
+  <header id="hud">
+    <div class="grp"><button class="hbtn" id="bMenu" title="Pause and menu (Escape)">&#9776;</button><span class="lvl" id="hLvl">Sheep Gate</span></div>
+    <div class="stat" title="Resolve: if it runs out, the work pauses"><canvas class="ico" id="icoRes" width="40" height="40"></canvas><span id="hRes">20</span><div class="bar"><i id="hResBar"></i></div></div>
+    <div class="stat" title="Stones: spend them to build, upgrade and repair"><canvas class="ico" id="icoSt" width="40" height="40"></canvas><span id="hSt">120</span></div>
+    <div class="stat" title="Wave"><small>Wave</small><span id="hWave">0/8</span></div>
+    <div class="spacer"></div>
+    <div class="grp">
+      <button class="hbtn" id="bRepair" title="Repair a section of the wall (R)">Repair wall</button>
+      <button class="hbtn" id="bSpeed" title="Game speed (F)">1&times;</button>
+      <button class="hbtn" id="bHelp" title="Controls and help (H)">?</button>
+      <button class="hbtn go pulse" id="bWave" title="Start the next wave (Space)">Start wave</button>
+    </div>
+  </header>
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div id="popup"></div>
+    <div id="toast"></div>
+    <div id="coach"></div>
+  </div>
+  <div id="bottom">
+    <div id="sel"></div>
+    <nav id="palette"></nav>
+  </div>
+</div>
+
+<div class="screen show" id="title">
+  <canvas id="titleCv"></canvas>
+  <div id="titleBox">
+    <h1>Watchmen<br/>on the Walls</h1>
+    <div class="tag">Rebuild Jerusalem gate by gate. Keep watch day and night.</div>
+    <div class="menu" id="titleMenu"></div>
+    <div class="foot">A game by Brandon Bridges &middot; <a href="../../churches/#youth">More games</a> &middot; Scripture from the English Standard Version</div>
+  </div>
+</div>
+<div class="screen" id="mapScr"><div class="card">
+  <div class="mapbar"><h2>The Walls of Jerusalem</h2><span class="pill" id="mapHope">Hope 0</span><button class="btn ghost" id="mapBack">Back</button></div>
+  <div id="mapWrap"><canvas id="mapCv"></canvas></div>
+  <div class="row" id="mapBtns"></div>
+</div></div>
+<div class="screen" id="briefScr"><div class="card" id="briefCard"></div></div>
+<div class="screen" id="storyScr"><div class="card" id="storyCard"></div></div>
+<div class="screen" id="resultScr"><div class="card" id="resultCard"></div></div>
+<div class="screen" id="pauseScr"><div class="card" id="pauseCard"></div></div>
+<div class="screen" id="helpScr"><div class="card" id="helpCard"></div></div>
+<div class="screen" id="shopScr"><div class="card" id="shopCard"></div></div>
+<div class="screen" id="bookScr"><div class="card" id="bookCard"></div></div>
+<div class="screen" id="aboutScr"><div class="card" id="aboutCard"></div></div>
+<script>
+'use strict';
+/*LOGIC-START*/
+// ============================================================
+//  Watchmen on the Walls  ·  data
+// ============================================================
+const ESV_NOTICE='Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway, a publishing ministry of Good News Publishers. ESV Text Edition: 2025. The ESV text may not be quoted in any publication made available to the public by a Creative Commons license. The ESV text may not be translated in whole or in part into any other language. Used by permission. All rights reserved.';
+const ESV_TRADEMARK='The “ESV” and “English Standard Version” are registered trademarks of Crossway.';
+
+// Every verse below was checked word for word against the English Standard Version on Bible Gateway.
+const VERSES={
+ n1_3:['Nehemiah 1:3','And they said to me, “The remnant there in the province who had survived the exile is in great trouble and shame. The wall of Jerusalem is broken down, and its gates are destroyed by fire.”'],
+ n2_17:['Nehemiah 2:17','Then I said to them, “You see the trouble we are in, how Jerusalem lies in ruins with its gates burned. Come, let us build the wall of Jerusalem, that we may no longer suffer derision.”'],
+ n2_18:['Nehemiah 2:18','And I told them of the hand of my God that had been upon me for good, and also of the words that the king had spoken to me. And they said, “Let us rise up and build.” So they strengthened their hands for the good work.'],
+ n2_20:['Nehemiah 2:20','Then I replied to them, “The God of heaven will make us prosper, and we his servants will arise and build, but you have no portion or right or claim in Jerusalem.”'],
+ n3_1:['Nehemiah 3:1','Then Eliashib the high priest rose up with his brothers the priests, and they built the Sheep Gate. They consecrated it and set its doors. They consecrated it as far as the Tower of the Hundred, as far as the Tower of Hananel.'],
+ n3_3:['Nehemiah 3:3','The sons of Hassenaah built the Fish Gate. They laid its beams and set its doors, its bolts, and its bars.'],
+ n3_6:['Nehemiah 3:6','Joiada the son of Paseah and Meshullam the son of Besodeiah repaired the Gate of Yeshanah. They laid its beams and set its doors, its bolts, and its bars.'],
+ n3_13:['Nehemiah 3:13','Hanun and the inhabitants of Zanoah repaired the Valley Gate. They rebuilt it and set its doors, its bolts, and its bars, and repaired a thousand cubits of the wall, as far as the Dung Gate.'],
+ n3_14:['Nehemiah 3:14','Malchijah the son of Rechab, ruler of the district of Beth-haccherem, repaired the Dung Gate. He rebuilt it and set its doors, its bolts, and its bars.'],
+ n3_15:['Nehemiah 3:15','And Shallum the son of Col-hozeh, ruler of the district of Mizpah, repaired the Fountain Gate. He rebuilt it and covered it and set its doors, its bolts, and its bars. And he built the wall of the Pool of Shelah of the king\'s garden, as far as the stairs that go down from the city of David.'],
+ n3_26:['Nehemiah 3:26','and the temple servants living on Ophel repaired to a point opposite the Water Gate on the east and the projecting tower.'],
+ n3_28:['Nehemiah 3:28','Above the Horse Gate the priests repaired, each one opposite his own house.'],
+ n3_29:['Nehemiah 3:29','After them Zadok the son of Immer repaired opposite his own house. After him Shemaiah the son of Shecaniah, the keeper of the East Gate, repaired.'],
+ n3_31:['Nehemiah 3:31','After him Malchijah, one of the goldsmiths, repaired as far as the house of the temple servants and of the merchants, opposite the Muster Gate, and to the upper chamber of the corner.'],
+ n4_6:['Nehemiah 4:6','So we built the wall. And all the wall was joined together to half its height, for the people had a mind to work.'],
+ n4_9:['Nehemiah 4:9','And we prayed to our God and set a guard as a protection against them day and night.'],
+ n4_10:['Nehemiah 4:10','In Judah it was said, “The strength of those who bear the burdens is failing. There is too much rubble. By ourselves we will not be able to rebuild the wall.”'],
+ n4_14:['Nehemiah 4:14','And I looked and arose and said to the nobles and to the officials and to the rest of the people, “Do not be afraid of them. Remember the Lord, who is great and awesome, and fight for your brothers, your sons, your daughters, your wives, and your homes.”'],
+ n4_20:['Nehemiah 4:20','In the place where you hear the sound of the trumpet, rally to us there. Our God will fight for us.'],
+ n6_3:['Nehemiah 6:3','And I sent messengers to them, saying, “I am doing a great work and I cannot come down. Why should the work stop while I leave it and come down to you?”'],
+ n6_9:['Nehemiah 6:9','For they all wanted to frighten us, thinking, “Their hands will drop from the work, and it will not be done.” But now, O God, strengthen my hands.'],
+ n6_15:['Nehemiah 6:15','So the wall was finished on the twenty-fifth day of the month Elul, in fifty-two days.'],
+ n6_16:['Nehemiah 6:16','And when all our enemies heard of it, all the nations around us were afraid and fell greatly in their own esteem, for they perceived that this work had been accomplished with the help of our God.'],
+ n8_8:['Nehemiah 8:8','They read from the book, from the Law of God, clearly, and they gave the sense, so that the people understood the reading.'],
+ n8_10:['Nehemiah 8:10','Then he said to them, “Go your way. Eat the fat and drink sweet wine and send portions to anyone who has nothing ready, for this day is holy to our Lord. And do not be grieved, for the joy of the LORD is your strength.”'],
+ n9_17:['Nehemiah 9:17','But you are a God ready to forgive, gracious and merciful, slow to anger and abounding in steadfast love, and did not forsake them.'],
+ n12_27:['Nehemiah 12:27','And at the dedication of the wall of Jerusalem they sought the Levites in all their places, to bring them to Jerusalem to celebrate the dedication with gladness, with thanksgivings and with singing, with cymbals, harps, and lyres.'],
+ n12_43:['Nehemiah 12:43','And they offered great sacrifices that day and rejoiced, for God had made them rejoice with great joy; the women and children also rejoiced. And the joy of Jerusalem was heard far away.'],
+ n13_31:['Nehemiah 13:31','Remember me, O my God, for good.'],
+ i58_12:['Isaiah 58:12','And your ancient ruins shall be rebuilt; you shall raise up the foundations of many generations; you shall be called the repairer of the breach, the restorer of streets to dwell in.'],
+ i61_4:['Isaiah 61:4','They shall build up the ancient ruins; they shall raise up the former devastations; they shall repair the ruined cities, the devastations of many generations.'],
+ i62_6:['Isaiah 62:6','On your walls, O Jerusalem, I have set watchmen; all the day and all the night they shall never be silent.'],
+ p127_1:['Psalm 127:1','Unless the LORD builds the house, those who build it labor in vain. Unless the LORD watches over the city, the watchman stays awake in vain.'],
+ p130_5:['Psalm 130:5-6','I wait for the LORD, my soul waits, and in his word I hope; my soul waits for the Lord more than watchmen for the morning, more than watchmen for the morning.'],
+ l3_22:['Lamentations 3:22-23','The steadfast love of the LORD never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness.'],
+ i40_31:['Isaiah 40:31','but they who wait for the LORD shall renew their strength; they shall mount up with wings like eagles; they shall run and not be weary; they shall walk and not faint.'],
+ g6_9:['Galatians 6:9','And let us not grow weary of doing good, for in due season we will reap, if we do not give up.'],
+ c5_17:['2 Corinthians 5:17','Therefore, if anyone is in Christ, he is a new creation. The old has passed away; behold, the new has come.'],
+ p46_1:['Psalm 46:1','God is our refuge and strength, a very present help in trouble.'],
+ j1_9:['Joshua 1:9','Have I not commanded you? Be strong and courageous. Do not be frightened, and do not be dismayed, for the LORD your God is with you wherever you go.'],
+ i43_19:['Isaiah 43:19','Behold, I am doing a new thing; now it springs forth, do you not perceive it? I will make a way in the wilderness and rivers in the desert.'],
+ c3_11:['1 Corinthians 3:11','For no one can lay a foundation other than that which is laid, which is Jesus Christ.'],
+ e2_19:['Ephesians 2:19-20','So then you are no longer strangers and aliens, but you are fellow citizens with the saints and members of the household of God, built on the foundation of the apostles and prophets, Christ Jesus himself being the cornerstone,'],
+ m11_28:['Matthew 11:28','Come to me, all who labor and are heavy laden, and I will give you rest.'],
+ ph1_6:['Philippians 1:6','And I am sure of this, that he who began a good work in you will bring it to completion at the day of Jesus Christ.'],
+ r21_5:['Revelation 21:5','And he who was seated on the throne said, “Behold, I am making all things new.”'],
+ p147_2:['Psalm 147:2-3','The LORD builds up Jerusalem; he gathers the outcasts of Israel. He heals the brokenhearted and binds up their wounds.'],
+ jn8_36:['John 8:36','So if the Son sets you free, you will be free indeed.'],
+ r15_13:['Romans 15:13','May the God of hope fill you with all joy and peace in believing, so that by the power of the Holy Spirit you may abound in hope.']
+};
+const VERSE_ORDER=Object.keys(VERSES);
+
+// ---------- towers ----------
+// kind: bolt (single shot), pulse (area around), econ (stones each wave), aura (helps neighbors), beam (long shot), field (slows all in range)
+const TOWERS={
+ watch:{name:'Watchman',key:'1',cost:50,color:'#F2B33D',unlock:0,kind:'bolt',
+   blurb:'Keeps a lamp burning and sends out bright light at one shadow at a time. Cheap and steady.',
+   verse:'n4_9',
+   tiers:[{range:2.6,rate:1.1,dmg:12},{up:55,range:2.8,rate:1.3,dmg:19},{up:95,range:3.1,rate:1.5,dmg:30}],
+   master:{up:150,range:3.3,rate:1.7,dmg:42,multi:2,title:'Watch by Night',desc:'Two beams at once.'}},
+ trumpet:{name:'Trumpeter',key:'2',cost:85,color:'#D9733A',unlock:1,kind:'pulse',
+   blurb:'Sounds the ram\'s horn. Every shadow nearby is struck and slowed, armor or not, and hidden Rumors are shown for a moment.',
+   verse:'n4_20',
+   tiers:[{range:2.0,rate:.45,dmg:9,slow:.35,slowDur:1.6},{up:70,range:2.2,rate:.5,dmg:15,slow:.45,slowDur:1.7},{up:110,range:2.5,rate:.55,dmg:24,slow:.5,slowDur:1.8}],
+   master:{up:170,range:2.7,rate:.6,dmg:34,slow:.55,slowDur:1.9,stun:.5,title:'Rally Call',desc:'Every blast also stops shadows still for a moment.'}},
+ mason:{name:'Stonemason',key:'3',cost:70,color:'#B5563C',unlock:2,kind:'econ',
+   blurb:'Does not fight. Quarries and dresses stone, bringing you more stones at the end of every wave.',
+   verse:'n4_6',
+   tiers:[{income:14},{up:70,income:24},{up:110,income:36}],
+   master:{up:160,income:46,heal:1,title:'Master Builder',desc:'Also mends 1 Resolve after every wave.'}},
+ choir:{name:'Levite Singers',key:'4',cost:95,color:'#2F9C95',unlock:3,kind:'aura',
+   blurb:'Sing with lyres and cymbals. Every helper close by works faster while the song goes on.',
+   verse:'n12_27',
+   tiers:[{range:1.6,boost:.2},{up:75,range:1.7,boost:.3},{up:120,range:2.0,boost:.4}],
+   master:{up:170,range:2.2,boost:.45,dmgBoost:.2,title:'Song of Joy',desc:'Nearby helpers also strike harder.'}},
+ scribe:{name:'Scribe',key:'5',cost:110,color:'#5B5EA6',unlock:5,kind:'beam',
+   blurb:'Reads the Law clearly. A long beam of truth that ignores armor, and every Rumor in reach is seen for what it is.',
+   verse:'n8_8',
+   tiers:[{range:3.6,rate:.55,dmg:40},{up:90,range:3.8,rate:.6,dmg:62},{up:140,range:4.2,rate:.65,dmg:90}],
+   master:{up:200,range:4.4,rate:.7,dmg:120,pierce:1,title:'Reading Aloud',desc:'The beam passes through every shadow in its line.'}},
+ keeper:{name:'Gatekeeper',key:'6',cost:80,color:'#7C8C3A',unlock:6,kind:'field',
+   blurb:'Stands guard over the road. Every shadow inside the circle slows down and fades a little each moment.',
+   verse:'p127_1',
+   tiers:[{range:1.7,slow:.3,dps:5},{up:65,range:1.8,slow:.38,dps:8},{up:105,range:2.1,slow:.45,dps:12}],
+   master:{up:160,range:2.3,slow:.5,dps:16,mark:.25,title:'Keeper of the Gate',desc:'Shadows inside the circle take a quarter more from everyone.'}}
+};
+const TOWER_ORDER=['watch','trumpet','mason','choir','scribe','keeper'];
+
+// ---------- the shadows (discouragements) ----------
+const ENEMIES={
+ taunt:{name:'Mockery',hp:32,speed:1.0,reward:5,harm:1,cost:1,col:'#8C7AA0',shape:'spike',
+   blurb:'“What are these feeble people doing?” A jeering whirl of dust that wants the work to look foolish.',answer:'n2_20'},
+ fear:{name:'Fear',hp:20,speed:1.85,reward:4,harm:1,cost:.8,col:'#3E4F8C',shape:'dart',
+   blurb:'Small and quick. It does not hit hard; it hopes you will drop your tools and run.',answer:'n4_14'},
+ weary:{name:'Weariness',hp:120,speed:.55,reward:12,harm:2,cost:3,col:'#8E7B66',shape:'blob',
+   blurb:'Slow, heavy and stubborn. It whispers that the burden is too much to carry.',answer:'m11_28'},
+ rubble:{name:'Rubble',hp:75,armor:5,speed:.75,reward:10,harm:2,cost:2.5,col:'#8A8580',shape:'rock',
+   blurb:'“There is too much rubble.” Armored: a Watchman\'s light glances off it. Trumpeters, Scribes and Gatekeepers get through.',answer:'n4_10'},
+ distract:{name:'Distraction',hp:48,speed:1.1,reward:6,harm:1,cost:2,col:'#B9A24E',shape:'twin',split:'mote',
+   blurb:'Always something else to do. Break it up and it scatters into two Stray Thoughts.',answer:'n6_3'},
+ mote:{name:'Stray Thought',hp:16,speed:1.5,reward:2,harm:1,cost:.5,col:'#C9B866',shape:'mote',
+   blurb:'A small leftover of a Distraction. Easy to let go of.',answer:'n6_3'},
+ rumor:{name:'Rumor',hp:44,speed:1.15,reward:8,harm:1,cost:2,col:'#A7A3B8',shape:'ring',hidden:1,
+   blurb:'Hard to see. A Scribe shows it plainly, a Trumpeter\'s blast shows it for a moment, and a Watchman only sees it up close.',answer:'n8_8'},
+ swift:{name:'Panic',hp:38,speed:2.4,reward:6,harm:1,cost:1.2,col:'#5A3E8C',shape:'streak',
+   blurb:'Fear that gallops. Gatekeepers and Trumpeters slow it down.',answer:'j1_9'},
+ mockB:{name:'The Great Mockery',hp:1000,speed:.42,reward:90,harm:8,boss:1,col:'#7A6590',shape:'spike',spawn:{types:['taunt'],every:3.5},
+   blurb:'A towering storm of jeers that keeps throwing smaller taunts at the wall.',answer:'n4_6'},
+ burdenB:{name:'The Weight of Weariness',hp:1900,armor:5,speed:.32,reward:140,harm:10,boss:1,col:'#7D6A55',shape:'blob',spawn:{types:['weary'],every:7},
+   blurb:'All the tiredness of every day at once, slow and armored.',answer:'i40_31'},
+ voicesB:{name:'The Night of Many Voices',hp:2600,speed:.45,reward:180,harm:12,boss:1,col:'#3A3466',shape:'ring',flicker:1,spawn:{types:['fear'],every:2.5},
+   blurb:'It fades in and out of sight and scatters Fears as it comes.',answer:'p130_5'},
+ whirlB:{name:'The Whirlwind of Lies',hp:5200,armor:5,speed:.36,reward:300,harm:20,boss:1,col:'#4E3B5E',shape:'whirl',spawn:{types:['rumor','distract','swift'],every:2.2},
+   blurb:'Every lie at once. It throws Rumors, Distractions and Panic in every direction.',answer:'n6_16'}
+};
+
+// ---------- levels ----------
+const COLS=17, ROWS=10, BUILD_COLS=15;
+const CHAPTERS=['Rise and Build','Too Much Rubble','Do Not Be Afraid','The Wall Is Finished'];
+const LEVELS=[
+ {name:'The Sheep Gate',ch:0,gate:4,waves:8,night:.05,theme:'sheep',
+  paths:[[[-1,2],[4,2],[4,7],[9,7],[9,4],[15,4]]],
+  pool:[['taunt',0]],
+  v:['n3_1','n2_20','p127_1'],
+  intro:'Eliashib the high priest and his brothers start the work at the Sheep Gate, up by the pastures. You are posted on the wall as a watchman. Mockery is already drifting in from the desert, hoping to make the builders quit.',
+  outro:'The Sheep Gate stands again, its doors hung and dedicated. One gate is not a whole wall, but it is a start, and a start is what the mockers said would never happen.'},
+ {name:'The Fish Gate',ch:0,gate:6,waves:10,night:.1,theme:'fish',
+  paths:[[[-1,1],[3,1],[3,8],[7,8],[7,2],[11,2],[11,6],[15,6]]],
+  pool:[['taunt',0],['fear',1]],
+  v:['n3_3','n4_9','i62_6'],
+  intro:'The family of Hassenaah sets beams and bolts at the Fish Gate, where the fishermen bring their catch. Fear comes quick and low along the road. A Trumpeter has joined you on the wall.',
+  outro:'Beams, doors, bolts and bars. The Fish Gate is shut tight, and the market can open again.'},
+ {name:'The Old Gate',ch:0,gate:5,waves:12,night:.15,theme:'old',boss:'mockB',
+  paths:[[[-1,8],[2,8],[2,2],[6,2],[6,6],[10,6],[10,1],[13,1],[13,5],[15,5]]],
+  pool:[['taunt',0],['fear',0],['weary',3]],
+  v:['n3_6','n4_6','i61_4'],
+  intro:'Joiada and Meshullam repair the Old Gate, the Gate of Yeshanah. The wall is rising, and the louder it rises the louder the mocking gets. A Stonemason comes to help: more stones every wave.',
+  outro:'The Great Mockery has blown itself out. The wall is joined together to half its height, because the people had a mind to work.'},
+ {name:'The Valley Gate',ch:1,gate:3,waves:12,night:.15,theme:'valley',
+  paths:[[[-1,5],[3,5],[3,1],[6,1],[6,8],[12,8],[12,3],[15,3]]],
+  pool:[['taunt',0],['fear',0],['rubble',1],['weary',4]],
+  v:['n3_13','n4_10','p46_1'],
+  intro:'Hanun and the people of Zanoah rebuild the Valley Gate and a thousand cubits of wall beside it. Here the shadows come armored with rubble. Your Watchman\'s light will glance off; Levite Singers arrive to lift everyone\'s work.',
+  outro:'There was too much rubble, and still it was cleared. Not by strength alone, but stone by stone, together.'},
+ {name:'The Dung Gate',ch:1,gate:7,waves:12,night:.2,theme:'dung',
+  paths:[[[-1,1],[5,1],[5,5],[1,5],[1,8],[9,8],[9,3],[12,3],[12,7],[15,7]]],
+  pool:[['taunt',0],['fear',0],['distract',1],['rubble',3],['weary',5]],
+  v:['n3_14','n6_3','c5_17'],
+  intro:'Malchijah son of Rechab repairs the Dung Gate, where the city\'s refuse is carried out. Nobody wants this job, and Distraction says there are better things to do. It is a great work; do not come down.',
+  outro:'Even the gate for carrying out the refuse was rebuilt with care. Nothing in this city is beyond repair.'},
+ {name:'The Fountain Gate',ch:1,gate:4,waves:14,night:.25,theme:'fountain',boss:'burdenB',
+  paths:[[[-1,4],[2,4],[2,1],[8,1],[8,4],[5,4],[5,8],[11,8],[11,4],[15,4]]],
+  pool:[['taunt',0],['rumor',1],['distract',2],['weary',3],['rubble',4]],
+  v:['n3_15','m11_28','i40_31'],
+  intro:'Shallum rebuilds the Fountain Gate and the wall by the Pool of Shelah in the king\'s garden. Rumors slip past unseen here; a Scribe joins you to read clearly and show them for what they are.',
+  outro:'The Weight of Weariness has lifted. The water runs in the king\'s garden again, and tired hands find new strength.'},
+ {name:'The Water Gate',ch:2,gate:5,waves:14,night:.45,theme:'water',
+  paths:[[[-1,2],[5,2],[5,5],[15,5]],[[3,10],[3,8],[10,8],[10,5],[15,5]]],
+  pool:[['taunt',0],['fear',0],['rumor',1],['rubble',2],['distract',3],['weary',5]],
+  v:['n3_26','n8_8','i43_19'],
+  intro:'Night is falling. The temple servants on Ophel work toward the Water Gate on the east. Shadows now come by two roads at once. A Gatekeeper stands with you to hold the way.',
+  outro:'Later, at this very gate, Ezra will read the Law to all the people from morning until midday. Tonight it simply stands.'},
+ {name:'The Horse Gate',ch:2,gate:2,waves:14,night:.5,theme:'horse',
+  paths:[[[-1,7],[6,7],[6,4],[3,4],[3,1],[9,1],[9,8],[13,8],[13,2],[15,2]]],
+  pool:[['fear',0],['swift',1],['taunt',1],['rumor',3],['rubble',4],['distract',6]],
+  v:['n3_28','n4_14','j1_9'],
+  intro:'Above the Horse Gate the priests repair the wall, each one opposite his own house. Panic gallops in fast. Slow it down, and do not be afraid.',
+  outro:'Every priest repaired the part of the wall in front of his own door. Small faithful work, right where you are, adds up to a city.'},
+ {name:'The East Gate',ch:2,gate:4,waves:15,night:.55,theme:'east',boss:'voicesB',
+  paths:[[[-1,1],[4,1],[4,3],[8,3],[8,1],[12,1],[12,4],[15,4]],[[-1,8],[4,8],[4,6],[8,6],[8,8],[12,8],[12,4],[15,4]]],
+  pool:[['taunt',0],['fear',0],['swift',1],['rumor',2],['distract',3],['rubble',4],['weary',6]],
+  v:['n3_29','p130_5','l3_22'],
+  intro:'Shemaiah, keeper of the East Gate, repairs his stretch. This is the longest night. Watch for the morning; it is coming.',
+  outro:'The sun comes up over the Mount of Olives and lands on a whole East Gate. His mercies are new every morning.'},
+ {name:'The Muster Gate',ch:3,gate:5,waves:15,night:.3,theme:'muster',
+  paths:[[[-1,5],[2,5],[2,1],[5,1],[5,8],[8,8],[8,1],[11,1],[11,8],[13,8],[13,5],[15,5]]],
+  pool:[['taunt',0],['fear',0],['rubble',1],['distract',2],['rumor',3],['weary',4],['swift',5]],
+  v:['n3_31','n6_9','g6_9'],
+  intro:'Malchijah the goldsmith repairs up to the Muster Gate and the corner chamber. The last stretch is the hardest, and every shadow you have met comes again.',
+  outro:'The circle is almost closed. The goldsmiths and the merchants have done their part, side by side with priests and servants and farmers.'},
+ {name:'Fifty-Two Days',ch:3,gate:5,waves:18,night:.35,theme:'final',boss:'whirlB',
+  paths:[[[7,-1],[7,2],[3,2],[3,5],[15,5]],[[7,10],[7,8],[12,8],[12,5],[15,5]],[[-1,5],[3,5],[15,5]]],
+  pool:[['taunt',0],['fear',0],['rumor',1],['distract',1],['rubble',2],['swift',3],['weary',4]],
+  v:['n4_20','n9_17','n6_15'],
+  intro:'The last breach. Shadows come from three directions at once for the final push. Wherever you hear the trumpet, rally there. Our God will fight for us.',
+  outro:'The wall is finished, in fifty-two days.'}
+];
+const ENDLESS={name:'Night Watch',ch:4,gate:5,waves:9999,night:.5,theme:'endless',
+  paths:[[[-1,3],[5,3],[5,1],[10,1],[10,5],[15,5]],[[-1,7],[5,7],[5,9],[10,9],[10,5],[15,5]]],
+  pool:[['taunt',0],['fear',0],['rubble',2],['distract',3],['rumor',4],['weary',5],['swift',6]],
+  v:['i62_6','n13_31','p130_5'],intro:'',outro:''};
+
+const VIGILS=[
+ {id:'few',name:'Few Hands',desc:'You may build no more than 6 helpers.'},
+ {id:'lean',name:'Lean Days',desc:'Half the starting stones, and half the bonus after each wave.'},
+ {id:'swift',name:'Long Night',desc:'Every shadow moves a fifth faster.'},
+ {id:'norest',name:'No Rest',desc:'Waves start by themselves, 8 seconds apart.'},
+ {id:'watch',name:'Only the Watch',desc:'Only Watchmen and Trumpeters may be built.'}
+];
+const LEVEL_VIGIL=['few','lean','swift','watch','norest','few','lean','swift','norest','watch','few'];
+
+const UPGRADES=[
+ {id:'stones',name:'A Mind to Work',desc:'Start every level with 30 more stones.',costs:[2,3,4],verse:'n4_6'},
+ {id:'power',name:'Strengthened Hands',desc:'Every helper strikes 10% harder.',costs:[2,3,4],verse:'n6_9'},
+ {id:'resolve',name:'Set a Guard',desc:'Start every level with 5 more Resolve.',costs:[2,3],verse:'n4_9'},
+ {id:'range',name:'Day and Night',desc:'Every helper reaches 8% farther.',costs:[3,4],verse:'i62_6'},
+ {id:'cheap',name:'Many Hands',desc:'Helpers cost 8% fewer stones to build.',costs:[3,4],verse:'n2_18'},
+ {id:'m_watch',name:'Master Watchman',desc:'Watchmen can be raised to a fourth rank: Watch by Night.',costs:[2],tower:'watch'},
+ {id:'m_trumpet',name:'Master Trumpeter',desc:'Trumpeters can be raised to a fourth rank: Rally Call.',costs:[2],tower:'trumpet'},
+ {id:'m_mason',name:'Master Builder',desc:'Stonemasons can be raised to a fourth rank and mend Resolve.',costs:[2],tower:'mason'},
+ {id:'m_choir',name:'Song of Joy',desc:'Levite Singers can be raised to a fourth rank.',costs:[2],tower:'choir'},
+ {id:'m_scribe',name:'Reading Aloud',desc:'Scribes can be raised to a fourth rank: a piercing beam.',costs:[2],tower:'scribe'},
+ {id:'m_keeper',name:'Keeper of the Gate',desc:'Gatekeepers can be raised to a fourth rank.',costs:[2],tower:'keeper'}
+];
+
+const REPAIR_COSTS=[60,90,130,180];
+const PROLOGUE=['n1_3','n2_17','n2_18'];
+const ENDING=['n6_16','n8_10','n12_27','n12_43','i58_12','e2_19','c3_11','r21_5','ph1_6'];
+const GRACE=['n9_17','l3_22','g6_9','p46_1','jn8_36','r15_13','p147_2'];
+
+// ============================================================
+//  engine (no drawing, no page elements: can run headless)
+// ============================================================
+function RNG(seed){let a=seed>>>0;return function(){a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const dist2=(ax,ay,bx,by)=>{const dx=ax-bx,dy=ay-by;return dx*dx+dy*dy;};
+
+function levelCfg(idx){return idx<0?ENDLESS:LEVELS[idx];}
+
+function buildGeom(cfg,seed){
+  const blocked=[];for(let c=0;c<COLS;c++){blocked.push(new Array(ROWS).fill(0));}
+  for(let r=0;r<ROWS;r++){blocked[15][r]=2;blocked[16][r]=2;}
+  const paths=cfg.paths.map(wp=>{
+    const pts=wp.map(p=>({x:p[0]+.5,y:p[1]+.5}));
+    // mark tiles along segments
+    for(let i=0;i<wp.length-1;i++){
+      const [x0,y0]=wp[i],[x1,y1]=wp[i+1];
+      const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0));
+      for(let k=0;k<=n;k++){const x=Math.round(x0+(x1-x0)*k/n),y=Math.round(y0+(y1-y0)*k/n);
+        if(x>=0&&x<BUILD_COLS&&y>=0&&y<ROWS)blocked[x][y]=1;}
+    }
+    // end at the gate inside the wall
+    const last=pts[pts.length-1];pts[pts.length-1]={x:15.5,y:last.y};
+    const cum=[0];for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y));
+    return {pts,cum,len:cum[cum.length-1]};
+  });
+  // decorations on free tiles
+  const rng=RNG(seed);const decor=[];
+  const want=9+Math.floor(rng()*4);let tries=0;
+  while(decor.length<want&&tries<400){tries++;
+    const c=Math.floor(rng()*BUILD_COLS),r=Math.floor(rng()*ROWS);
+    if(blocked[c][r])continue;
+    // keep tiles next to the path free for building
+    let near=false;for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){const cc=c+dx,rr=r+dy;if(cc>=0&&cc<BUILD_COLS&&rr>=0&&rr<ROWS&&blocked[cc][rr]===1)near=true;}
+    if(near&&rng()<.85)continue;
+    blocked[c][r]=3;decor.push({c,r,k:Math.floor(rng()*1000)});
+  }
+  // free sand specks for texture (not blocking)
+  const specks=[];for(let i=0;i<220;i++)specks.push({x:rng()*15,y:rng()*10,s:.02+rng()*.05,a:rng()});
+  return {blocked,paths,decor,specks};
+}
+function posAt(path,d){
+  const {pts,cum}=path;if(d<=0)return{x:pts[0].x,y:pts[0].y,a:Math.atan2(pts[1].y-pts[0].y,pts[1].x-pts[0].x)};
+  let i=1;while(i<cum.length-1&&cum[i]<d)i++;
+  const seg=cum[i]-cum[i-1]||1,f=clamp((d-cum[i-1])/seg,0,1);
+  return{x:pts[i-1].x+(pts[i].x-pts[i-1].x)*f,y:pts[i-1].y+(pts[i].y-pts[i-1].y)*f,a:Math.atan2(pts[i].y-pts[i-1].y,pts[i].x-pts[i-1].x)};
+}
+
+function makeWave(idx,w,cfg){
+  const endless=idx<0;
+  const rng=RNG((idx+3)*7919+w*104729+13);
+  const pool=cfg.pool.filter(p=>p[1]<=w).map(p=>p[0]);
+  const lv=endless?5+w*.24:idx;
+  let budget=(5+w*3.0)*(1+lv*.1)*(w<2?.75:1)*(cfg.paths.length>1?.9:1);
+  let hpMul=(1+w*.07)*(1+lv*.075);
+  if(endless)hpMul*=1+Math.max(0,w-15)*.035;
+  let boss=null;
+  if(!endless&&cfg.boss&&w===cfg.waves-1)boss=cfg.boss;
+  if(endless&&w%10===9)boss=['mockB','burdenB','voicesB','whirlB'][Math.floor(w/10)%4];
+  if(boss)budget*=.55;
+  const groups=[];const newest=pool[pool.length-1];
+  // a shadow met for the first time this wave comes as one small group among familiar ones
+  const fresh=endless?[]:cfg.pool.filter(p=>p[1]===w&&w>0).map(p=>p[0]);
+  const known=pool.filter(t=>!fresh.includes(t));
+  fresh.forEach(t=>{const n=3;groups.push({type:t,n});budget-=n*ENEMIES[t].cost;});
+  while(budget>.4&&groups.length<14){
+    const src=known.length?known:pool;
+    const type=(!fresh.length&&rng()<.3)?newest:src[Math.floor(rng()*src.length)];
+    const def=ENEMIES[type];let n=3+Math.floor(rng()*4);
+    n=Math.max(1,Math.min(n,Math.ceil(budget/def.cost)));
+    groups.push({type,n});budget-=n*def.cost;
+  }
+  if(boss)groups.splice(Math.min(2,groups.length),0,{type:boss,n:1});
+  const sched=[];let t=.5;const np=cfg.paths.length;
+  groups.forEach((g,i)=>{const def=ENEMIES[g.type];const sp=clamp(.9/def.speed,.45,1.5);
+    const path=def.boss?(np>1?Math.floor(rng()*np):0):i%np;
+    for(let k=0;k<g.n;k++){sched.push({t,type:g.type,path});t+=sp;}
+    t+=def.boss?2:1.1;});
+  return {sched,hpMul,boss,dur:t};
+}
+
+function towerStats(G,t){
+  const def=TOWERS[t.type];const s={};
+  for(let i=0;i<=t.tier;i++)Object.assign(s,def.tiers[i]);
+  if(t.master)Object.assign(s,def.master);
+  delete s.up;delete s.title;delete s.desc;
+  const m=G.mods;
+  if(s.range)s.range*=1+.08*m.range;
+  const pm=(1+.1*m.power)*(1+(t.dmgBoost||0));
+  if(s.dmg)s.dmg*=pm;if(s.dps)s.dps*=pm;
+  if(s.rate)s.rate*=1+(t.boost||0);
+  if(s.dps)s.dps*=1+(t.boost||0);
+  return s;
+}
+function towerCost(G,type){return Math.round(TOWERS[type].cost*(1-.08*G.mods.cheap));}
+function upgradeCost(G,t){
+  const def=TOWERS[t.type];
+  if(t.master)return null;
+  if(t.tier<2)return def.tiers[t.tier+1].up;
+  if(G.mods.masters[t.type])return def.master.up;
+  return null;
+}
+function towerAllowed(G,type){
+  const def=TOWERS[type];
+  if(G.idx>=0&&def.unlock>G.idx&&G.mode!=='vigil')return false;
+  if(G.mode==='vigil'&&def.unlock>G.idx)return false;
+  if(G.vigil==='watch'&&type!=='watch'&&type!=='trumpet')return false;
+  return true;
+}
+
+function newGame(idx,mode,mods,save){
+  const cfg=levelCfg(idx);
+  const G={idx,mode:mode||'story',cfg,mods,vigil:mode==='vigil'?LEVEL_VIGIL[idx]:null,
+    geom:buildGeom(cfg,(idx+5)*1337),t:0,
+    stones:0,resolve:0,maxResolve:0,wave:0,waves:cfg.waves,waveActive:false,sched:null,waveT:0,schedI:0,
+    enemies:[],towers:[],shots:[],fx:[],events:[],sections:0,retries:0,leaks:0,over:false,won:false,
+    nextId:1,autoT:-1,kills:0,seen:{},paused:false,midShown:false,endlessHope:0};
+  G.stones=130+(idx>=0?idx*35:200)+40*(cfg.paths.length-1)+30*mods.stones;
+  G.maxResolve=20+5*mods.resolve;G.resolve=G.maxResolve;
+  if(G.vigil==='lean')G.stones=Math.round(G.stones*.5);
+  if(G.vigil==='norest')G.autoT=12;
+  return G;
+}
+function emit(G,type,data){G.events.push(Object.assign({type},data||{}));}
+
+function canBuild(G,c,r){return c>=0&&c<BUILD_COLS&&r>=0&&r<ROWS&&!G.geom.blocked[c][r]&&!G.towers.some(t=>t.c===c&&t.r===r);}
+function build(G,type,c,r){
+  if(!towerAllowed(G,type))return 'That helper is not available here.';
+  if(!canBuild(G,c,r))return 'You cannot build there.';
+  if(G.vigil==='few'&&G.towers.length>=6)return 'Few Hands: no more than 6 helpers.';
+  const cost=towerCost(G,type);if(G.stones<cost)return 'Not enough stones.';
+  G.stones-=cost;
+  const t={id:G.nextId++,type,c,r,x:c+.5,y:r+.5,tier:0,master:false,cd:.2,mode:'first',ang:-Math.PI/2,flash:0,spent:cost,fresh:true,kills:0,boost:0,dmgBoost:0,born:G.t};
+  G.towers.push(t);emit(G,'build',{t});return t;
+}
+function upgrade(G,t){
+  const cost=upgradeCost(G,t);if(cost==null)return 'Already at the highest rank.';
+  if(G.stones<cost)return 'Not enough stones.';
+  G.stones-=cost;t.spent+=cost;if(t.tier<2)t.tier++;else t.master=true;
+  emit(G,'upgrade',{t});return t;
+}
+function sellValue(t){return t.fresh?t.spent:Math.floor(t.spent*.7);}
+function sell(G,t){const v=sellValue(t);G.stones+=v;G.towers=G.towers.filter(x=>x!==t);emit(G,'sell',{t,v});return v;}
+function repairCost(G){return G.sections>=4?null:REPAIR_COSTS[G.sections];}
+function repair(G){
+  const c=repairCost(G);if(c==null)return 'The wall here is whole.';
+  if(G.stones<c)return 'Not enough stones.';
+  G.stones-=c;G.sections++;G.maxResolve+=4;G.resolve+=4;emit(G,'repair',{n:G.sections});
+  if(G.sections===4)emit(G,'doors',{});
+  return true;
+}
+function snapshot(G){
+  return {stones:G.stones,resolve:G.resolve,maxResolve:G.maxResolve,wave:G.wave,sections:G.sections,retries:G.retries,leaks:G.leaks,
+    towers:G.towers.map(t=>({type:t.type,c:t.c,r:t.r,tier:t.tier,master:t.master,mode:t.mode,spent:t.spent,kills:t.kills}))};
+}
+function restore(G,s){
+  G.stones=s.stones;G.resolve=s.resolve;G.maxResolve=s.maxResolve;G.wave=s.wave;G.sections=s.sections;G.retries=s.retries||0;G.leaks=s.leaks||0;
+  G.towers=s.towers.map(o=>({id:G.nextId++,type:o.type,c:o.c,r:o.r,x:o.c+.5,y:o.r+.5,tier:o.tier,master:o.master,cd:.2,mode:o.mode||'first',ang:-Math.PI/2,flash:0,spent:o.spent,fresh:false,kills:o.kills||0,boost:0,dmgBoost:0,born:-9}));
+  G.enemies=[];G.shots=[];G.waveActive=false;G.sched=null;G.over=false;G.won=false;
+  if(G.vigil==='norest')G.autoT=10;
+}
+function startWave(G){
+  if(G.waveActive||G.over||G.wave>=G.waves)return false;
+  G.snap=snapshot(G);
+  const W=makeWave(G.idx,G.wave,G.cfg);
+  G.sched=W.sched;G.hpMul=W.hpMul;G.schedI=0;G.waveT=0;G.waveActive=true;G.autoT=-1;
+  G.towers.forEach(t=>t.fresh=false);
+  emit(G,'waveStart',{n:G.wave+1,boss:W.boss});
+  return true;
+}
+function spawn(G,type,path,d,hpMul){
+  const def=ENEMIES[type];
+  const bm=def.boss?(G.idx<0?G.hpMul*.6:1+(G.idx)*.04):hpMul;
+  const e={id:G.nextId++,type,def,path,d:d||0,hp:def.hp*bm,maxHp:def.hp*bm,armor:def.armor||0,
+    speed:def.speed*(G.vigil==='swift'?1.2:1),slowT:0,slowAmt:0,stunT:0,revealT:0,fieldSlow:0,mark:0,
+    spawnT:0,wob:Math.random()*6.28,x:0,y:0,a:0,hitT:0,alive:true};
+  const p=posAt(G.geom.paths[path],e.d);e.x=p.x;e.y=p.y;e.a=p.a;
+  G.enemies.push(e);
+  if(!G.seen[type]){G.seen[type]=1;emit(G,'newEnemy',{etype:type});}
+  return e;
+}
+function isHidden(e,G){
+  if(e.revealT>0)return false;
+  if(e.def.hidden)return true;
+  if(e.def.flicker)return Math.floor(G.t/3)%2===1;
+  return false;
+}
+function damage(G,e,amt,pierce,src){
+  if(!e.alive)return;
+  if(!pierce)amt=Math.max(1,amt-e.armor);
+  if(e.mark)amt*=1+e.mark;
+  e.hp-=amt;e.hitT=.12;
+  if(e.hp<=0){
+    e.alive=false;G.kills++;
+    const rw=e.def.reward;G.stones+=rw;
+    if(src)src.kills++;
+    emit(G,'kill',{e,rw});
+    if(e.def.split){for(let k=0;k<2;k++){const m=spawn(G,e.def.split,e.path,Math.max(0,e.d-.25-k*.3),G.hpMul);}}
+  }
+}
+function findTarget(G,t,range,exclude){
+  let best=null,bv=-1e9;const r2=range*range;
+  for(const e of G.enemies){if(!e.alive||isHidden(e,G)||(exclude&&exclude.includes(e)))continue;
+    const d2=dist2(t.x,t.y,e.x,e.y);if(d2>r2)continue;
+    let v;if(t.mode==='strong')v=e.hp;else if(t.mode==='close')v=-d2;else v=e.d+(e.path*0);
+    if(t.mode==='first'){v=e.d/(G.geom.paths[e.path].len);}
+    if(v>bv){bv=v;best=e;}}
+  return best;
+}
+function update(G,dt){
+  if(G.over)return;
+  G.t+=dt;
+  // auto start (No Rest vigil)
+  if(!G.waveActive&&G.autoT>0){G.autoT-=dt;if(G.autoT<=0)startWave(G);}
+  // spawning
+  if(G.waveActive&&G.sched){
+    G.waveT+=dt;
+    while(G.schedI<G.sched.length&&G.sched[G.schedI].t<=G.waveT){const s=G.sched[G.schedI++];spawn(G,s.type,s.path,0,G.hpMul);}
+  }
+  // helpers that help other helpers
+  for(const t of G.towers){t.boost=0;t.dmgBoost=0;}
+  for(const c of G.towers){if(c.type!=='choir')continue;const s=towerStats(G,c);const r2=s.range*s.range;
+    for(const t of G.towers){if(t===c||t.type==='choir'||t.type==='mason')continue;
+      if(dist2(c.x,c.y,t.x,t.y)<=r2){t.boost=Math.max(t.boost,s.boost);t.dmgBoost=Math.max(t.dmgBoost,s.dmgBoost||0);}}}
+  // gatekeeper fields
+  for(const e of G.enemies){e.fieldSlow=0;e.mark=0;}
+  for(const k of G.towers){if(k.type!=='keeper')continue;const s=towerStats(G,k);const r2=s.range*s.range;let any=false;
+    for(const e of G.enemies){if(!e.alive)continue;if(dist2(k.x,k.y,e.x,e.y)<=r2){any=true;e.fieldSlow=Math.max(e.fieldSlow,s.slow);if(s.mark)e.mark=Math.max(e.mark,s.mark);damage(G,e,s.dps*dt,true,k);}}
+    k.active=any;}
+  // watchmen see what comes close; gatekeepers see everything inside their circle
+  for(const t of G.towers){if(t.type!=='watch'&&t.type!=='keeper')continue;const rr=t.type==='watch'?1.3:towerStats(G,t).range;const r2=rr*rr;
+    for(const e of G.enemies)if(e.alive&&(e.def.hidden||e.def.flicker)&&dist2(t.x,t.y,e.x,e.y)<=r2)e.revealT=Math.max(e.revealT,.15);}
+  // move shadows
+  for(const e of G.enemies){
+    if(!e.alive)continue;
+    e.slowT-=dt;e.stunT-=dt;e.revealT-=dt;e.hitT-=dt;e.wob+=dt*4;
+    let sp=e.speed;const sl=Math.max(e.slowT>0?e.slowAmt:0,e.fieldSlow);sp*=1-sl;if(e.stunT>0)sp=0;
+    e.d+=sp*dt;
+    const path=G.geom.paths[e.path];
+    const p=posAt(path,e.d);e.x=p.x;e.y=p.y;e.a=p.a;
+    if(e.def.spawn){e.spawnT+=dt;if(e.spawnT>=e.def.spawn.every){e.spawnT=0;const ty=e.def.spawn.types[Math.floor(Math.random()*e.def.spawn.types.length)];spawn(G,ty,e.path,Math.max(0,e.d-.4),G.hpMul*.8);}}
+    if(e.d>=path.len){e.alive=false;G.resolve-=e.def.harm;G.leaks++;emit(G,'leak',{e});
+      if(G.resolve<=0){G.resolve=0;G.over=true;emit(G,'defeat',{});return;}}
+  }
+  // helpers act
+  for(const t of G.towers){
+    t.flash-=dt;const def=TOWERS[t.type];if(def.kind==='econ'||def.kind==='aura'||def.kind==='field')continue;
+    const s=towerStats(G,t);t.cd-=dt;
+    if(def.kind==='bolt'){
+      const tg=findTarget(G,t,s.range);if(tg)t.ang=Math.atan2(tg.y-t.y,tg.x-t.x);
+      if(t.cd<=0&&tg){t.cd=1/s.rate;t.flash=.12;
+        const n=s.multi||1;const ex=[];
+        for(let i=0;i<n;i++){const g=i===0?tg:findTarget(G,t,s.range,ex);if(!g)break;ex.push(g);
+          G.shots.push({x:t.x,y:t.y-.15,tg:g,tx:g.x,ty:g.y,dmg:s.dmg,src:t,sp:9,col:'#FFE08A'});}
+        emit(G,'shoot',{t});}
+    }else if(def.kind==='pulse'){
+      if(t.cd<=0){const r2=s.range*s.range;const hit=G.enemies.filter(e=>e.alive&&dist2(t.x,t.y,e.x,e.y)<=r2);
+        if(hit.length){t.cd=1/s.rate;t.flash=.25;
+          for(const e of hit){e.revealT=2.5;e.slowT=s.slowDur;e.slowAmt=Math.max(e.slowT>0?e.slowAmt:0,s.slow);if(s.stun)e.stunT=s.stun;damage(G,e,s.dmg,true,t);}
+          G.fx.push({k:'ring',x:t.x,y:t.y,r:s.range,t:0,life:.5,col:'#FFB36B'});emit(G,'pulse',{t});}}
+    }else if(def.kind==='beam'){
+      // reveal rumors in range
+      const r2=s.range*s.range;for(const e of G.enemies)if(e.alive&&dist2(t.x,t.y,e.x,e.y)<=r2&&(e.def.hidden||e.def.flicker))e.revealT=Math.max(e.revealT,.2);
+      const tg=findTarget(G,t,s.range);if(tg)t.ang=Math.atan2(tg.y-t.y,tg.x-t.x);
+      if(t.cd<=0&&tg){t.cd=1/s.rate;t.flash=.2;
+        let ex=tg.x,ey=tg.y;
+        if(s.pierce){const L=Math.hypot(tg.x-t.x,tg.y-t.y)||1;ex=t.x+(tg.x-t.x)/L*s.range;ey=t.y+(tg.y-t.y)/L*s.range;
+          for(const e of G.enemies){if(!e.alive)continue;if(segDist(t.x,t.y,ex,ey,e.x,e.y)<.4)damage(G,e,s.dmg,true,t);}}
+        else damage(G,tg,s.dmg,true,t);
+        G.fx.push({k:'beam',x:t.x,y:t.y,x2:ex,y2:ey,t:0,life:.25});emit(G,'beam',{t});}
+    }
+  }
+  // light bolts
+  for(const sh of G.shots){
+    if(sh.tg.alive){sh.tx=sh.tg.x;sh.ty=sh.tg.y;}
+    const dx=sh.tx-sh.x,dy=sh.ty-sh.y,L=Math.hypot(dx,dy);const step=sh.sp*dt;
+    if(L<=step+.12){sh.done=true;if(sh.tg.alive)damage(G,sh.tg,sh.dmg,false,sh.src);G.fx.push({k:'spark',x:sh.tx,y:sh.ty,t:0,life:.3});}
+    else{sh.x+=dx/L*step;sh.y+=dy/L*step;}
+  }
+  G.shots=G.shots.filter(s=>!s.done);
+  G.enemies=G.enemies.filter(e=>e.alive);
+  for(const f of G.fx)f.t+=dt;G.fx=G.fx.filter(f=>f.t<f.life);
+  // halfway word of encouragement
+  if(!G.midShown&&G.idx>=0&&G.wave>=Math.floor(G.waves/2)){G.midShown=true;emit(G,'midVerse',{});}
+  // wave cleared
+  if(G.waveActive&&G.schedI>=G.sched.length&&G.enemies.length===0){
+    G.waveActive=false;G.wave++;
+    let bonus=20+G.wave*3;bonus=Math.round(bonus*(1+.1*G.sections));if(G.vigil==='lean')bonus=Math.round(bonus*.5);
+    let income=0,heal=0;for(const t of G.towers){if(t.type==='mason'){const s=towerStats(G,t);income+=s.income;if(s.heal)heal+=s.heal;}}
+    G.stones+=bonus+income;if(heal)G.resolve=Math.min(G.maxResolve,G.resolve+heal);
+    emit(G,'waveEnd',{n:G.wave,bonus,income,heal});
+    if(G.idx<0&&G.wave%10===0&&G.wave<=100){G.endlessHope++;emit(G,'milestone',{n:G.wave});}
+    if(G.wave>=G.waves){G.over=true;G.won=true;emit(G,'victory',{});}
+    else if(G.vigil==='norest')G.autoT=8;
+  }
+}
+function segDist(x1,y1,x2,y2,px,py){const dx=x2-x1,dy=y2-y1;const L2=dx*dx+dy*dy||1;let t=((px-x1)*dx+(py-y1)*dy)/L2;t=clamp(t,0,1);return Math.hypot(x1+dx*t-px,y1+dy*t-py);}
+function starsFor(G){if(!G.won)return 0;let s=1;if(G.resolve>=G.maxResolve*.6)s++;if(G.sections>=4&&G.retries===0)s++;return s;}
+/*LOGIC-END*/
+
+// ============================================================
+//  drawing
+// ============================================================
+const TAU=Math.PI*2;
+const V={cw:0,ch:0,dpr:1,rot:false,s:40,ox:0,oy:0};
+function layoutView(cw,ch){
+  V.cw=cw;V.ch=ch;V.dpr=Math.min(2,window.devicePixelRatio||1);
+  V.rot=ch>cw*1.1;
+  if(V.rot){V.s=Math.min(cw/ROWS,ch/COLS);V.ox=(cw-ROWS*V.s)/2;V.oy=(ch-COLS*V.s)/2;}
+  else{V.s=Math.min(cw/COLS,ch/ROWS);V.ox=(cw-COLS*V.s)/2;V.oy=(ch-ROWS*V.s)/2;}
+}
+function setWorld(ctx){const s=V.s*V.dpr;
+  if(V.rot)ctx.setTransform(0,s,-s,0,(V.ox+ROWS*V.s)*V.dpr,V.oy*V.dpr);else ctx.setTransform(s,0,0,s,V.ox*V.dpr,V.oy*V.dpr);}
+function toScreen(x,y){return V.rot?{x:V.ox+(ROWS-y)*V.s,y:V.oy+x*V.s}:{x:V.ox+x*V.s,y:V.oy+y*V.s};}
+function toWorld(px,py){return V.rot?{x:(py-V.oy)/V.s,y:ROWS-(px-V.ox)/V.s}:{x:(px-V.ox)/V.s,y:(py-V.oy)/V.s};}
+function upright(ctx,x,y,sc){const p=toScreen(x,y);const s=V.s*V.dpr*(sc||1);ctx.setTransform(s,0,0,s,p.x*V.dpr,p.y*V.dpr);}
+function screenAng(a){return V.rot?a+Math.PI/2:a;}
+function hexA(h,a){const n=parseInt(h.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`;}
+
+// ---------- helpers (towers) ----------
+function drawTowerIcon(ctx,type,r,tier,master,time,opts){
+  opts=opts||{};const col=TOWERS[type].color;
+  if(!opts.flat){ctx.fillStyle='rgba(40,25,30,.28)';ctx.beginPath();ctx.ellipse(r*.08,r*.18,r*.98,r*.8,0,0,TAU);ctx.fill();}
+  // stone base
+  const g=ctx.createRadialGradient(-r*.3,-r*.35,r*.1,0,0,r);g.addColorStop(0,'#F7E6C2');g.addColorStop(1,'#D9B57E');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r*.92,0,TAU);ctx.fill();
+  ctx.lineWidth=r*.1;ctx.strokeStyle='#A47A45';ctx.stroke();
+  ctx.lineWidth=r*.13;ctx.strokeStyle=col;ctx.beginPath();ctx.arc(0,0,r*.74,0,TAU);ctx.stroke();
+  ctx.save();ctx.scale(r,r);
+  ctx.lineCap='round';ctx.lineJoin='round';
+  if(type==='watch'){
+    const fl=1+Math.sin(time*9)*.06;
+    const gl=ctx.createRadialGradient(0,-.15,0,0,-.15,.7);gl.addColorStop(0,'rgba(255,226,140,.75)');gl.addColorStop(1,'rgba(255,226,140,0)');
+    ctx.fillStyle=gl;ctx.beginPath();ctx.arc(0,-.15,.7,0,TAU);ctx.fill();
+    ctx.fillStyle='#8B5A2B';ctx.beginPath();ctx.ellipse(0,.22,.38,.17,0,0,TAU);ctx.fill();
+    ctx.fillStyle='#A86F38';ctx.beginPath();ctx.ellipse(0,.16,.3,.1,0,0,TAU);ctx.fill();
+    ctx.beginPath();ctx.moveTo(.3,.16);ctx.lineTo(.48,.06);ctx.lineWidth=.08;ctx.strokeStyle='#8B5A2B';ctx.stroke();
+    ctx.fillStyle='#FFB53B';ctx.beginPath();ctx.moveTo(.47,.06);ctx.quadraticCurveTo(.62,-.1*fl,.48,-.42*fl);ctx.quadraticCurveTo(.34,-.1*fl,.47,.06);ctx.fill();
+    ctx.fillStyle='#FFF4C2';ctx.beginPath();ctx.moveTo(.47,.04);ctx.quadraticCurveTo(.54,-.08,.48,-.24*fl);ctx.quadraticCurveTo(.41,-.08,.47,.04);ctx.fill();
+  }else if(type==='trumpet'){
+    ctx.strokeStyle='#7A4A22';ctx.lineWidth=.3;ctx.beginPath();ctx.moveTo(-.45,.25);ctx.quadraticCurveTo(-.05,.38,.25,.02);ctx.quadraticCurveTo(.38,-.16,.32,-.42);ctx.stroke();
+    ctx.strokeStyle='#F0DDB4';ctx.lineWidth=.2;ctx.beginPath();ctx.moveTo(-.45,.25);ctx.quadraticCurveTo(-.05,.38,.25,.02);ctx.quadraticCurveTo(.38,-.16,.32,-.42);ctx.stroke();
+    ctx.fillStyle='#F0DDB4';ctx.strokeStyle='#7A4A22';ctx.lineWidth=.06;ctx.beginPath();ctx.ellipse(.32,-.44,.16,.09,-.2,0,TAU);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#3B2414';ctx.beginPath();ctx.ellipse(.32,-.44,.09,.045,-.2,0,TAU);ctx.fill();
+  }else if(type==='mason'){
+    ctx.fillStyle='#CFC3B2';ctx.strokeStyle='#7E7468';ctx.lineWidth=.06;ctx.beginPath();ctx.rect(-.42,.02,.5,.34);ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.moveTo(-.42,.19);ctx.lineTo(.08,.19);ctx.moveTo(-.17,.02);ctx.lineTo(-.17,.19);ctx.stroke();
+    const sw=Math.sin(time*6)*.15;ctx.save();ctx.translate(.12,.1);ctx.rotate(-.6+sw);
+    ctx.strokeStyle='#7A4A22';ctx.lineWidth=.1;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-.52);ctx.stroke();
+    ctx.fillStyle='#6E6E78';ctx.beginPath();ctx.rect(-.17,-.62,.34,.16);ctx.fill();ctx.restore();
+  }else if(type==='choir'){
+    ctx.strokeStyle='#C99A3A';ctx.lineWidth=.1;ctx.beginPath();ctx.moveTo(-.3,-.4);ctx.quadraticCurveTo(-.42,.15,0,.36);ctx.quadraticCurveTo(.42,.15,.3,-.4);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(-.34,-.36);ctx.lineTo(.34,-.36);ctx.stroke();
+    ctx.strokeStyle='#5A4030';ctx.lineWidth=.035;for(let i=-2;i<=2;i++){ctx.beginPath();ctx.moveTo(i*.08,-.36);ctx.lineTo(i*.06,.22);ctx.stroke();}
+    ctx.fillStyle='#2F9C95';const ny=-.1+Math.sin(time*3)*.06;ctx.beginPath();ctx.ellipse(.42,ny+.1,.08,.06,-.4,0,TAU);ctx.fill();ctx.fillRect(.47,ny-.22,.035,.32);
+  }else if(type==='scribe'){
+    ctx.fillStyle='#FBF1D9';ctx.strokeStyle='#8C6C3E';ctx.lineWidth=.05;ctx.beginPath();ctx.rect(-.32,-.32,.64,.6);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#C9A66B';ctx.beginPath();ctx.ellipse(0,-.34,.38,.08,0,0,TAU);ctx.fill();ctx.stroke();ctx.beginPath();ctx.ellipse(0,.3,.38,.08,0,0,TAU);ctx.fill();ctx.stroke();
+    ctx.strokeStyle='#5B5EA6';ctx.lineWidth=.045;for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(-.22,-.18+i*.12);ctx.lineTo(.22-(i%2)*.1,-.18+i*.12);ctx.stroke();}
+  }else if(type==='keeper'){
+    ctx.strokeStyle='#8A6A2A';ctx.lineWidth=.12;ctx.beginPath();ctx.arc(-.18,-.18,.17,0,TAU);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(-.06,-.06);ctx.lineTo(.36,.36);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(.22,.22);ctx.lineTo(.12,.32);ctx.moveTo(.32,.32);ctx.lineTo(.22,.42);ctx.stroke();
+  }
+  ctx.restore();
+  // rank pips
+  const n=tier+1;for(let i=0;i<n;i++){const a=Math.PI/2+(i-(n-1)/2)*.42;ctx.fillStyle='#FFD46E';ctx.strokeStyle='#8A5A14';ctx.lineWidth=r*.05;ctx.beginPath();ctx.arc(Math.cos(a)*r*.9,Math.sin(a)*r*.9,r*.12,0,TAU);ctx.fill();ctx.stroke();}
+  if(master){ctx.fillStyle='#FFD46E';ctx.strokeStyle='#8A5A14';ctx.lineWidth=r*.05;ctx.beginPath();
+    const cy=-r*1.02;ctx.moveTo(-r*.3,cy+r*.12);ctx.lineTo(-r*.3,cy-r*.12);ctx.lineTo(-r*.15,cy);ctx.lineTo(0,cy-r*.2);ctx.lineTo(r*.15,cy);ctx.lineTo(r*.3,cy-r*.12);ctx.lineTo(r*.3,cy+r*.12);ctx.closePath();ctx.fill();ctx.stroke();}
+}
+
+// ---------- shadows ----------
+function drawEnemy(ctx,e,time,hidden){
+  const d=e.def;const boss=!!d.boss;const R={spike:.26,dart:.2,blob:.34,rock:.3,twin:.26,mote:.14,ring:.26,streak:.22,whirl:.3}[d.shape]*(boss?1.9:1);
+  ctx.globalAlpha=hidden?.16:1;
+  const w=e.wob;const col=e.hitT>0?'#FFF3D6':d.col;
+  if(boss){ctx.fillStyle=hexA(d.col,.18);ctx.beginPath();ctx.arc(0,0,R*1.45+Math.sin(w)*.05,0,TAU);ctx.fill();}
+  ctx.fillStyle='rgba(30,20,30,.18)';ctx.beginPath();ctx.ellipse(.04,R*.7,R*.8,R*.3,0,0,TAU);ctx.fill();
+  ctx.fillStyle=col;ctx.strokeStyle='rgba(40,25,50,.55)';ctx.lineWidth=.03;
+  const sa=screenAng(e.a);
+  switch(d.shape){
+    case 'spike':{ctx.beginPath();const k=9;for(let i=0;i<=k*2;i++){const a=i/(k*2)*TAU+w*.3;const rr=(i%2?R*.62:R)*(1+Math.sin(w+i)*.06);ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);}ctx.closePath();ctx.fill();ctx.stroke();break;}
+    case 'dart':{ctx.save();ctx.rotate(sa);ctx.beginPath();ctx.moveTo(R*1.3,0);ctx.quadraticCurveTo(0,R*.9,-R*1.1,R*.2*Math.sin(w*2));ctx.quadraticCurveTo(0,-R*.9,R*1.3,0);ctx.fill();ctx.stroke();
+      ctx.strokeStyle=hexA(d.col,.4);ctx.lineWidth=.04;ctx.beginPath();ctx.moveTo(-R*1.2,0);ctx.lineTo(-R*2.2,Math.sin(w*3)*R*.3);ctx.stroke();ctx.restore();break;}
+    case 'blob':{ctx.beginPath();for(let i=0;i<=24;i++){const a=i/24*TAU;const sag=Math.sin(a)>0?1+Math.sin(a)*.25:1;const rr=R*(1+Math.sin(a*3+w*.6)*.05)*sag;ctx.lineTo(Math.cos(a)*rr*1.1,Math.sin(a)*rr*.85+R*.05);}ctx.closePath();ctx.fill();ctx.stroke();break;}
+    case 'rock':{const bs=[[-.4,-.1,.5,.42],[.0,-.35,.46,.4],[.05,.1,.5,.38]];for(const b of bs){ctx.beginPath();ctx.rect(b[0]*R*1.4,b[1]*R*1.4,b[2]*R*1.4,b[3]*R*1.4);ctx.fill();ctx.stroke();}
+      ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(-.36*R*1.4,-.08*R*1.4,.46*R*1.4,.08*R);break;}
+    case 'twin':{for(let i=0;i<2;i++){const a=w*1.5+i*Math.PI;ctx.beginPath();ctx.arc(Math.cos(a)*R*.55,Math.sin(a)*R*.55,R*.55,0,TAU);ctx.fill();ctx.stroke();}break;}
+    case 'mote':{ctx.beginPath();ctx.arc(0,0,R,0,TAU);ctx.fill();ctx.stroke();break;}
+    case 'ring':{ctx.lineWidth=R*.38;ctx.strokeStyle=e.hitT>0?'#FFF3D6':hexA(d.col,.85);ctx.beginPath();ctx.arc(0,0,R*.8,w*.5,w*.5+TAU*.85);ctx.stroke();
+      ctx.lineWidth=R*.15;ctx.strokeStyle=hexA(d.col,.5);ctx.beginPath();ctx.arc(0,0,R*.35,-w,-w+TAU*.7);ctx.stroke();break;}
+    case 'streak':{ctx.save();ctx.rotate(sa);ctx.beginPath();ctx.ellipse(0,0,R*1.5,R*.55,0,0,TAU);ctx.fill();ctx.stroke();
+      ctx.strokeStyle=hexA(d.col,.45);ctx.lineWidth=.035;for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(-R*1.6,i*R*.35);ctx.lineTo(-R*2.6-Math.random()*R*.4,i*R*.35);ctx.stroke();}ctx.restore();break;}
+    case 'whirl':{for(let k=0;k<4;k++){ctx.strokeStyle=hexA(d.col,.9-k*.15);ctx.lineWidth=R*.22;ctx.beginPath();for(let i=0;i<=30;i++){const t=i/30;const a=w*1.2+k*TAU/4+t*4;ctx.lineTo(Math.cos(a)*R*t*1.2,Math.sin(a)*R*t*1.2);}ctx.stroke();}
+      ctx.beginPath();ctx.arc(0,0,R*.4,0,TAU);ctx.fill();break;}
+  }
+  // small pale eyes give the dust some character
+  if(d.shape!=='ring'&&d.shape!=='whirl'&&d.shape!=='rock'){const ex=d.shape==='dart'||d.shape==='streak'?0:0;ctx.fillStyle='rgba(255,246,225,.85)';
+    const er=Math.max(.025,R*.11);ctx.beginPath();ctx.ellipse(ex-R*.25,-R*.12,er,er*.6,0,0,TAU);ctx.ellipse(ex+R*.25,-R*.12,er,er*.6,0,0,TAU);ctx.fill();}
+  ctx.globalAlpha=1;
+  if(!hidden&&e.hp<e.maxHp){const bw=boss?1:.5;ctx.fillStyle='rgba(30,20,30,.55)';ctx.fillRect(-bw/2,-R-.16,bw,.07);ctx.fillStyle=boss?'#FF8A5B':'#FFD46E';ctx.fillRect(-bw/2,-R-.16,bw*Math.max(0,e.hp/e.maxHp),.07);}
+  if(e.stunT>0&&!hidden){ctx.strokeStyle='#FFE08A';ctx.lineWidth=.03;ctx.beginPath();ctx.arc(0,-R-.05,.1,0,TAU);ctx.stroke();}
+}
+
+// ---------- ground ----------
+const THEME_DECOR={sheep:['olive','rock','sheep','sheep','bush'],fish:['basket','palm','rock','olive','basket'],old:['olive','rock','pillar','bush'],
+  valley:['rock','rock','bush','olive','rock'],dung:['pot','rock','bush','cart'],fountain:['palm','pool','olive','flower'],water:['palm','jar','rock','olive'],
+  horse:['post','rock','olive','bush'],east:['olive','olive','rock','bush'],muster:['tent','banner','rock','olive'],final:['olive','rock','tent','palm'],endless:['olive','rock','bush','palm']};
+function drawDecor(ctx,kind,x,y,k){
+  ctx.save();ctx.translate(x,y);ctx.lineJoin='round';
+  const shadow=(rx,ry)=>{ctx.fillStyle='rgba(90,55,40,.22)';ctx.beginPath();ctx.ellipse(.08,.1,rx,ry,0,0,TAU);ctx.fill();};
+  switch(kind){
+    case 'olive':shadow(.4,.36);ctx.fillStyle='#6E7F45';for(let i=0;i<5;i++){const a=i*1.3+k;ctx.beginPath();ctx.arc(Math.cos(a)*.16,Math.sin(a)*.16,.22,0,TAU);ctx.fill();}
+      ctx.fillStyle='#8FA05C';ctx.beginPath();ctx.arc(-.08,-.08,.15,0,TAU);ctx.fill();break;
+    case 'palm':shadow(.42,.42);ctx.strokeStyle='#5E7A3A';ctx.lineWidth=.12;ctx.lineCap='round';for(let i=0;i<7;i++){const a=i/7*TAU+k;ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(Math.cos(a+.3)*.25,Math.sin(a+.3)*.25,Math.cos(a)*.42,Math.sin(a)*.42);ctx.stroke();}
+      ctx.fillStyle='#7B5A36';ctx.beginPath();ctx.arc(0,0,.08,0,TAU);ctx.fill();break;
+    case 'rock':shadow(.3,.22);ctx.fillStyle='#B8A58C';ctx.beginPath();ctx.moveTo(-.28,.1);ctx.lineTo(-.18,-.16);ctx.lineTo(.12,-.22);ctx.lineTo(.3,.02);ctx.lineTo(.16,.18);ctx.lineTo(-.18,.2);ctx.closePath();ctx.fill();
+      ctx.fillStyle='#CDBDA4';ctx.beginPath();ctx.moveTo(-.18,-.16);ctx.lineTo(.12,-.22);ctx.lineTo(.04,-.02);ctx.closePath();ctx.fill();break;
+    case 'bush':shadow(.26,.2);ctx.fillStyle='#8C9A55';ctx.beginPath();ctx.arc(-.1,0,.15,0,TAU);ctx.arc(.1,.03,.14,0,TAU);ctx.arc(0,-.1,.13,0,TAU);ctx.fill();break;
+    case 'sheep':shadow(.25,.16);ctx.fillStyle='#FBF6EC';ctx.beginPath();ctx.ellipse(0,0,.22,.15,0,0,TAU);ctx.fill();ctx.fillStyle='#4A3A33';ctx.beginPath();ctx.ellipse(.22,-.02,.08,.06,0,0,TAU);ctx.fill();break;
+    case 'basket':shadow(.22,.18);ctx.fillStyle='#B58A4E';ctx.beginPath();ctx.arc(0,0,.2,0,TAU);ctx.fill();ctx.fillStyle='#9FB8C6';ctx.beginPath();ctx.ellipse(-.04,-.02,.1,.04,.4,0,TAU);ctx.ellipse(.05,.04,.1,.04,-.3,0,TAU);ctx.fill();break;
+    case 'pillar':shadow(.26,.26);ctx.fillStyle='#E2CFA9';ctx.beginPath();ctx.arc(0,0,.2,0,TAU);ctx.fill();ctx.strokeStyle='#B79A6B';ctx.lineWidth=.03;ctx.beginPath();ctx.arc(0,0,.13,0,TAU);ctx.stroke();break;
+    case 'pot':case 'jar':shadow(.2,.2);ctx.fillStyle=kind==='pot'?'#B5653F':'#C98B5A';ctx.beginPath();ctx.arc(0,0,.17,0,TAU);ctx.fill();ctx.fillStyle='#5A3324';ctx.beginPath();ctx.arc(0,0,.07,0,TAU);ctx.fill();break;
+    case 'cart':shadow(.32,.22);ctx.fillStyle='#8A6038';ctx.fillRect(-.28,-.16,.56,.32);ctx.fillStyle='#5A3E26';ctx.fillRect(-.22,-.24,.14,.06);ctx.fillRect(.08,-.24,.14,.06);ctx.fillRect(-.22,.18,.14,.06);ctx.fillRect(.08,.18,.14,.06);break;
+    case 'pool':ctx.fillStyle='#C7A777';ctx.beginPath();ctx.ellipse(0,0,.4,.3,0,0,TAU);ctx.fill();ctx.fillStyle='#5FA8B5';ctx.beginPath();ctx.ellipse(0,0,.32,.22,0,0,TAU);ctx.fill();ctx.fillStyle='rgba(255,255,255,.35)';ctx.beginPath();ctx.ellipse(-.1,-.06,.1,.03,0,0,TAU);ctx.fill();break;
+    case 'flower':shadow(.18,.16);ctx.fillStyle='#8C9A55';ctx.beginPath();ctx.arc(0,0,.15,0,TAU);ctx.fill();ctx.fillStyle='#E07A8A';for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(Math.cos(i*1.6+k)*.08,Math.sin(i*1.6+k)*.08,.04,0,TAU);ctx.fill();}break;
+    case 'post':shadow(.14,.14);ctx.fillStyle='#7A5634';ctx.beginPath();ctx.arc(0,0,.1,0,TAU);ctx.fill();ctx.strokeStyle='#A88456';ctx.lineWidth=.03;ctx.beginPath();ctx.moveTo(.08,0);ctx.quadraticCurveTo(.3,.1,.32,.3);ctx.stroke();break;
+    case 'tent':shadow(.42,.34);ctx.fillStyle='#A8574A';ctx.beginPath();ctx.moveTo(-.38,.28);ctx.lineTo(0,-.32);ctx.lineTo(.38,.28);ctx.closePath();ctx.fill();ctx.fillStyle='#C9786A';ctx.beginPath();ctx.moveTo(0,-.32);ctx.lineTo(.38,.28);ctx.lineTo(0,.28);ctx.closePath();ctx.fill();break;
+    case 'banner':shadow(.16,.12);ctx.strokeStyle='#6B4A2B';ctx.lineWidth=.05;ctx.beginPath();ctx.moveTo(0,.25);ctx.lineTo(0,-.35);ctx.stroke();ctx.fillStyle='#2F7D9C';ctx.beginPath();ctx.moveTo(0,-.35);ctx.lineTo(.3,-.25);ctx.lineTo(0,-.12);ctx.fill();break;
+  }
+  ctx.restore();
+}
+let BG=null,BGkey='';
+function drawPathStroke(ctx,path,w,col){ctx.strokeStyle=col;ctx.lineWidth=w;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();
+  const pts=path.pts;const f=pts[0],s=pts[1];const L=Math.hypot(s.x-f.x,s.y-f.y)||1;ctx.moveTo(f.x-(s.x-f.x)/L*2,f.y-(s.y-f.y)/L*2);
+  for(const p of pts)ctx.lineTo(p.x,p.y);ctx.stroke();}
+function buildBG(G){
+  const T=Math.max(8,Math.ceil(V.s*V.dpr));const key=G.idx+'|'+T+'|'+G.mode;if(BG&&BGkey===key)return BG;
+  const c=document.createElement('canvas');c.width=COLS*T;c.height=ROWS*T;const x=c.getContext('2d');x.setTransform(T,0,0,T,0,0);
+  // sand
+  const g=x.createLinearGradient(0,0,COLS,ROWS);g.addColorStop(0,'#F4E1B8');g.addColorStop(1,'#E2C08A');x.fillStyle=g;x.fillRect(0,0,COLS,ROWS);
+  for(let cc=0;cc<BUILD_COLS;cc++)for(let r=0;r<ROWS;r++){if((cc+r)%2===0){x.fillStyle='rgba(255,255,255,.05)';x.fillRect(cc,r,1,1);}}
+  for(const s of G.geom.specks){x.fillStyle=s.a>.5?'rgba(150,100,60,.18)':'rgba(255,250,235,.35)';x.beginPath();x.arc(s.x,s.y,s.s,0,TAU);x.fill();}
+  // dunes ripples
+  x.strokeStyle='rgba(170,120,70,.12)';x.lineWidth=.04;for(let i=0;i<14;i++){const yy=(i*.77)%10,xx=(i*3.1)%14;x.beginPath();x.moveTo(xx,yy);x.quadraticCurveTo(xx+.6,yy-.18,xx+1.3,yy);x.stroke();}
+  // road
+  for(const p of G.geom.paths)drawPathStroke(x,p,.98,'#B88553');
+  for(const p of G.geom.paths)drawPathStroke(x,p,.84,'#D4A672');
+  for(const p of G.geom.paths){x.setLineDash([.08,.32]);drawPathStroke(x,p,.05,'rgba(140,95,55,.35)');x.setLineDash([]);}
+  // build spots: soft corner marks
+  x.fillStyle='rgba(150,105,60,.16)';
+  for(let cc=0;cc<BUILD_COLS;cc++)for(let r=0;r<ROWS;r++){if(G.geom.blocked[cc][r])continue;for(const [dx,dy] of [[.12,.12],[.88,.12],[.12,.88],[.88,.88]]){x.beginPath();x.arc(cc+dx,r+dy,.03,0,TAU);x.fill();}}
+  const kinds=THEME_DECOR[G.cfg.theme]||THEME_DECOR.endless;
+  for(const d of G.geom.decor)drawDecor(x,kinds[d.k%kinds.length],d.c+.5,d.r+.5,d.k);
+  // city beyond the wall
+  x.fillStyle='#D8B988';x.fillRect(16,0,1,ROWS);
+  const rr=RNG(G.idx*31+7);
+  for(let r=0;r<ROWS;r+=.5+rr()*.4){const w=.35+rr()*.4,h=.35+rr()*.3;x.fillStyle=rr()>.5?'#EBD3A6':'#E0C38F';x.fillRect(16.08+rr()*.3,r,w,h);x.fillStyle='rgba(120,80,50,.25)';x.fillRect(16.08,r+h-.06,w,.06);}
+  x.fillStyle='#F0DCB0';x.beginPath();x.arc(16.55,ROWS*.3,.28,Math.PI,0);x.fill();
+  // wall footing
+  x.fillStyle='#BFA073';x.fillRect(15.05,0,.9,ROWS);
+  BG=c;BGkey=key;return c;
+}
+const SECTION_ROWS=[[0,1,2],[3,4],[5,6],[7,8,9]];
+function drawWall(ctx,G,time,R){
+  const g=G.cfg.gate;
+  for(let si=0;si<4;si++){const fixed=si<G.sections;const anim=R.repairAnim[si]||0;
+    for(const r of SECTION_ROWS[si]){if(r===g)continue;
+      if(fixed){ctx.fillStyle='#D9BE8C';ctx.fillRect(15.1,r,.8,1);ctx.strokeStyle='rgba(120,85,50,.45)';ctx.lineWidth=.03;
+        for(let k=0;k<3;k++){ctx.beginPath();ctx.moveTo(15.1,r+k*.33);ctx.lineTo(15.9,r+k*.33);ctx.stroke();ctx.beginPath();const off=(k%2)*.2;ctx.moveTo(15.3+off,r+k*.33);ctx.lineTo(15.3+off,r+k*.33+.33);ctx.moveTo(15.7+off*.5,r+k*.33);ctx.lineTo(15.7+off*.5,r+k*.33+.33);ctx.stroke();}
+        ctx.fillStyle='#E8D2A4';ctx.fillRect(15.1,r+.05,.18,.24);ctx.fillRect(15.1,r+.55,.18,.24);
+        if(anim>0){ctx.strokeStyle='rgba(122,74,34,'+anim+')';ctx.lineWidth=.05;ctx.beginPath();ctx.moveTo(15,r);ctx.lineTo(15,r+1);ctx.moveTo(14.9,r+.2);ctx.lineTo(15.2,r+.2);ctx.moveTo(14.9,r+.7);ctx.lineTo(15.2,r+.7);ctx.stroke();}
+      }else{
+        ctx.fillStyle='#C8AC7C';ctx.beginPath();ctx.moveTo(15.55,r);ctx.lineTo(15.9,r);ctx.lineTo(15.9,r+1);ctx.lineTo(15.6,r+1);ctx.lineTo(15.7,r+.6);ctx.lineTo(15.45,r+.35);ctx.closePath();ctx.fill();
+        ctx.fillStyle='#A99377';for(let k=0;k<4;k++){const yy=r+.15+k*.22,xx=15.15+((k*37+r*13)%5)*.06;ctx.beginPath();ctx.rect(xx,yy,.16,.12);ctx.fill();}
+        ctx.fillStyle='rgba(60,40,30,.25)';ctx.fillRect(15.1,r+.4,.3,.06);
+      }}}
+  // the gate
+  const gy=g;ctx.fillStyle='#CDB282';ctx.fillRect(15.0,gy-.15,1,.22);ctx.fillRect(15.0,gy+.93,1,.22);
+  ctx.fillStyle='#3B2A26';ctx.fillRect(15.1,gy+.07,.8,.86);
+  if(G.sections>=4){ctx.fillStyle='#8A5A34';ctx.fillRect(15.12,gy+.09,.36,.82);ctx.fillRect(15.52,gy+.09,.36,.82);ctx.strokeStyle='#4A4A52';ctx.lineWidth=.05;
+    ctx.beginPath();ctx.moveTo(15.12,gy+.3);ctx.lineTo(15.88,gy+.3);ctx.moveTo(15.12,gy+.7);ctx.lineTo(15.88,gy+.7);ctx.stroke();ctx.fillStyle='#E0B04A';ctx.beginPath();ctx.arc(15.44,gy+.5,.04,0,TAU);ctx.arc(15.56,gy+.5,.04,0,TAU);ctx.fill();}
+  else{ctx.strokeStyle='#2A1E1A';ctx.lineWidth=.07;ctx.beginPath();ctx.moveTo(15.2,gy+.2);ctx.lineTo(15.6,gy+.8);ctx.moveTo(15.8,gy+.25);ctx.lineTo(15.45,gy+.75);ctx.stroke();}
+  // a warm glow at the gate to show where shadows are heading
+  const pg=ctx.createRadialGradient(15.5,gy+.5,0,15.5,gy+.5,1.4);pg.addColorStop(0,'rgba(255,200,120,'+(.18+Math.sin(time*2)*.05)+')');pg.addColorStop(1,'rgba(255,200,120,0)');ctx.fillStyle=pg;ctx.beginPath();ctx.arc(15.5,gy+.5,1.4,0,TAU);ctx.fill();
+}
+let NIGHT=null;
+function drawNight(ctx,G,amount,time){
+  if(amount<=.02)return;
+  const T=Math.max(4,Math.ceil(V.s*V.dpr/2));
+  if(!NIGHT||NIGHT.width!==COLS*T){NIGHT=document.createElement('canvas');NIGHT.width=COLS*T;NIGHT.height=ROWS*T;}
+  const n=NIGHT.getContext('2d');n.setTransform(1,0,0,1,0,0);n.globalCompositeOperation='source-over';n.clearRect(0,0,NIGHT.width,NIGHT.height);
+  n.setTransform(T,0,0,T,0,0);n.fillStyle='rgba(18,14,48,'+amount+')';n.fillRect(0,0,COLS,ROWS);
+  n.globalCompositeOperation='destination-out';
+  const hole=(x,y,r,a)=>{const g=n.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,'rgba(0,0,0,'+a+')');g.addColorStop(1,'rgba(0,0,0,0)');n.fillStyle=g;n.beginPath();n.arc(x,y,r,0,TAU);n.fill();};
+  for(const t of G.towers){const s=towerStats(G,t);hole(t.x,t.y,Math.max(1.4,(s.range||1.6)*.85),.9);}
+  hole(15.5,G.cfg.gate+.5,1.6,.8);
+  for(const sh of G.shots)hole(sh.x,sh.y,.5,.8);
+  for(const f of G.fx)if(f.k==='beam')hole((f.x+f.x2)/2,(f.y+f.y2)/2,1.2,.6*(1-f.t/f.life));
+  for(let r=0;r<ROWS;r+=2)hole(16.5,r+.5,.7,.5);
+  n.globalCompositeOperation='source-over';
+  ctx.drawImage(NIGHT,0,0,COLS,ROWS);
+}
+
+// particles and floating text that live only on screen
+const R_={P:[],F:[],repairAnim:[0,0,0,0],shake:0,leakFlash:0};
+function addBurst(x,y,col,n,spd){for(let i=0;i<n;i++){const a=Math.random()*TAU,s=(spd||1)*(.6+Math.random()*1.4);R_.P.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-.6,t:0,life:.5+Math.random()*.5,col,r:.04+Math.random()*.05});}}
+function addFloat(x,y,text,col){R_.F.push({x,y,text,col:col||'#FFE7A8',t:0,life:1.1});}
+
+function renderGame(ctx,G,time,hover,placing,selected,kbd){
+  const c=ctx.canvas;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,c.width,c.height);
+  // backdrop outside the map
+  setWorld(ctx);
+  let sx=0,sy=0;if(R_.shake>0){sx=(Math.random()-.5)*R_.shake*.15;sy=(Math.random()-.5)*R_.shake*.15;}
+  ctx.translate(sx,sy);
+  ctx.save();ctx.beginPath();ctx.rect(0,0,COLS,ROWS);ctx.clip();
+  ctx.drawImage(buildBG(G),0,0,COLS,ROWS);
+  // gatekeeper circles and choir circles
+  for(const t of G.towers){if(t.type==='keeper'){const s=towerStats(G,t);ctx.fillStyle=t.active?'rgba(124,140,58,.17)':'rgba(124,140,58,.09)';ctx.beginPath();ctx.arc(t.x,t.y,s.range,0,TAU);ctx.fill();
+      ctx.strokeStyle='rgba(124,140,58,.35)';ctx.lineWidth=.03;ctx.setLineDash([.12,.1]);ctx.lineDashOffset=-time*.3;ctx.stroke();ctx.setLineDash([]);}
+    if(t.type==='choir'){const s=towerStats(G,t);ctx.strokeStyle='rgba(47,156,149,.28)';ctx.lineWidth=.03;ctx.setLineDash([.06,.12]);ctx.beginPath();ctx.arc(t.x,t.y,s.range,0,TAU);ctx.stroke();ctx.setLineDash([]);}}
+  drawWall(ctx,G,time,R_);
+  // hover tile and placement preview
+  const ht=hover&&hover.c!=null?hover:null;
+  if(ht&&ht.c>=0&&ht.c<BUILD_COLS&&ht.r>=0&&ht.r<ROWS){
+    const ok=canBuild(G,ht.c,ht.r);const occupied=G.towers.find(t=>t.c===ht.c&&t.r===ht.r);
+    ctx.fillStyle=occupied?'rgba(255,255,255,.12)':ok?'rgba(255,240,200,.28)':'rgba(200,70,60,.18)';ctx.fillRect(ht.c+.04,ht.r+.04,.92,.92);
+    if(kbd){ctx.strokeStyle='#FFF2C8';ctx.lineWidth=.06;ctx.strokeRect(ht.c+.05,ht.r+.05,.9,.9);}
+    if(placing&&ok){const fake={type:placing,tier:0,master:false,boost:0,dmgBoost:0};const s=towerStats(G,fake);
+      if(s.range){ctx.fillStyle='rgba(255,236,180,.14)';ctx.strokeStyle='rgba(255,236,180,.7)';ctx.lineWidth=.03;ctx.beginPath();ctx.arc(ht.c+.5,ht.r+.5,s.range,0,TAU);ctx.fill();ctx.stroke();}}
+  }
+  if(selected){const s=towerStats(G,selected);if(s.range){ctx.fillStyle='rgba(255,236,180,.12)';ctx.strokeStyle='rgba(255,236,180,.85)';ctx.lineWidth=.035;ctx.setLineDash([.15,.1]);ctx.beginPath();ctx.arc(selected.x,selected.y,s.range,0,TAU);ctx.fill();ctx.stroke();ctx.setLineDash([]);}}
+  // trumpet rings (under shadows)
+  for(const f of G.fx){if(f.k==='ring'){const k=f.t/f.life;ctx.strokeStyle='rgba(255,179,107,'+(1-k)*.8+')';ctx.lineWidth=.08*(1-k)+.02;ctx.beginPath();ctx.arc(f.x,f.y,f.r*(.3+k*.7),0,TAU);ctx.stroke();}}
+  // shadows
+  const ens=G.enemies.slice().sort((a,b)=>a.y-b.y);
+  for(const e of ens){upright(ctx,e.x+sx*0,e.y);drawEnemy(ctx,e,time,isHidden(e,G));}
+  // helpers
+  const tw=G.towers.slice().sort((a,b)=>a.y-b.y);
+  for(const t of tw){upright(ctx,t.x,t.y);
+    const born=Math.min(1,(G.t-t.born)/.25);const sc=born<1?.6+.4*born:1;ctx.scale(sc,sc);
+    if(t.flash>0&&TOWERS[t.type].kind!=='pulse'){ctx.fillStyle='rgba(255,236,170,.35)';ctx.beginPath();ctx.arc(0,0,.5,0,TAU);ctx.fill();}
+    if(t===selected){ctx.strokeStyle='#FFF2C8';ctx.lineWidth=.05;ctx.beginPath();ctx.arc(0,0,.47,0,TAU);ctx.stroke();}
+    drawTowerIcon(ctx,t.type,.4,t.tier,t.master,time+t.id);
+    if(t.boost>0){ctx.fillStyle='#2F9C95';ctx.font='bold .22px Nunito, sans-serif';ctx.textAlign='center';ctx.fillText('♪',.36,-.3+Math.sin(time*3+t.id)*.04);}
+  }
+  // light bolts, beams, sparks
+  setWorld(ctx);ctx.translate(sx,sy);
+  for(const f of G.fx){if(f.k==='beam'){const k=1-f.t/f.life;ctx.strokeStyle='rgba(190,195,255,'+k+')';ctx.lineWidth=.16*k;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.lineTo(f.x2,f.y2);ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,'+k+')';ctx.lineWidth=.05*k;ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.lineTo(f.x2,f.y2);ctx.stroke();}
+    else if(f.k==='spark'){const k=f.t/f.life;ctx.fillStyle='rgba(255,236,160,'+(1-k)+')';ctx.beginPath();ctx.arc(f.x,f.y,.08+k*.18,0,TAU);ctx.fill();}}
+  for(const sh of G.shots){const g=ctx.createRadialGradient(sh.x,sh.y,0,sh.x,sh.y,.22);g.addColorStop(0,'rgba(255,255,240,1)');g.addColorStop(.4,'rgba(255,214,110,.9)');g.addColorStop(1,'rgba(255,214,110,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(sh.x,sh.y,.22,0,TAU);ctx.fill();}
+  for(const p of R_.P){const k=p.t/p.life;ctx.globalAlpha=1-k;ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,p.r*(1-k*.5),0,TAU);ctx.fill();}ctx.globalAlpha=1;
+  // dusk and night
+  drawNight(ctx,G,G.cfg.night,time);
+  if(R_.leakFlash>0){ctx.fillStyle='rgba(200,60,50,'+R_.leakFlash*.25+')';ctx.fillRect(14.5,0,2.5,ROWS);}
+  ctx.restore();
+  // floating numbers in screen space
+  ctx.setTransform(V.dpr,0,0,V.dpr,0,0);ctx.textAlign='center';
+  for(const f of R_.F){const k=f.t/f.life;const p=toScreen(f.x,f.y);ctx.globalAlpha=1-k*k;ctx.font='800 '+Math.max(12,V.s*.34)+'px Nunito, sans-serif';
+    ctx.lineWidth=3;ctx.strokeStyle='rgba(46,33,64,.7)';ctx.strokeText(f.text,p.x,p.y-k*V.s*.6);ctx.fillStyle=f.col;ctx.fillText(f.text,p.x,p.y-k*V.s*.6);}
+  ctx.globalAlpha=1;
+}
+function stepParticles(dt){
+  for(const p of R_.P){p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=1.2*dt;}R_.P=R_.P.filter(p=>p.t<p.life);
+  for(const f of R_.F)f.t+=dt;R_.F=R_.F.filter(f=>f.t<f.life);
+  R_.shake=Math.max(0,R_.shake-dt*3);R_.leakFlash=Math.max(0,R_.leakFlash-dt*2);
+  for(let i=0;i<4;i++)R_.repairAnim[i]=Math.max(0,R_.repairAnim[i]-dt*.5);
+}
+
+// ---------- title backdrop ----------
+function drawTitle(cv,time){
+  const ctx=cv.getContext('2d');const dpr=Math.min(2,window.devicePixelRatio||1);const w=cv.clientWidth,h=cv.clientHeight;
+  if(cv.width!==Math.round(w*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#1E1838');g.addColorStop(.45,'#5A3E63');g.addColorStop(.75,'#D9774A');g.addColorStop(1,'#F2B36B');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+  for(let i=0;i<70;i++){const x=(i*137.5)%w,y=(i*71.3)%(h*.45);ctx.fillStyle='rgba(255,245,220,'+(.3+.4*Math.sin(time*1.5+i))+')';ctx.fillRect(x,y,1.5,1.5);}
+  const sy=h*.74;ctx.fillStyle='rgba(255,214,140,.9)';ctx.beginPath();ctx.arc(w*.7,sy,Math.min(w,h)*.09,0,TAU);ctx.fill();
+  // far hills
+  ctx.fillStyle='#8E4E4A';ctx.beginPath();ctx.moveTo(0,h*.78);for(let x=0;x<=w;x+=20)ctx.lineTo(x,h*.76+Math.sin(x*.01)*14+Math.sin(x*.023)*8);ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.fill();
+  // the wall
+  const wy=h*.8;ctx.fillStyle='#5B3346';ctx.fillRect(0,wy,w,h-wy);
+  for(let x=0;x<w;x+=24)ctx.fillRect(x,wy-10,14,10);
+  for(let i=0;i<4;i++){const gx=w*(.15+i*.25);ctx.fillRect(gx-26,wy-34,52,34);for(let k=0;k<3;k++)ctx.fillRect(gx-26+k*20,wy-44,12,10);
+    ctx.fillStyle='#2A1830';ctx.beginPath();ctx.moveTo(gx-12,h);ctx.lineTo(gx-12,wy-8);ctx.arc(gx,wy-8,12,Math.PI,0);ctx.lineTo(gx+12,h);ctx.fill();ctx.fillStyle='#5B3346';}
+  // watchmen's lamps on the wall
+  for(let i=0;i<9;i++){const x=w*(.06+i*.11),y=wy-16;const f=.6+.4*Math.sin(time*3+i*1.7);const gg=ctx.createRadialGradient(x,y,0,x,y,26);gg.addColorStop(0,'rgba(255,214,120,'+.8*f+')');gg.addColorStop(1,'rgba(255,214,120,0)');ctx.fillStyle=gg;ctx.beginPath();ctx.arc(x,y,26,0,TAU);ctx.fill();ctx.fillStyle='#FFF0C0';ctx.beginPath();ctx.arc(x,y,2.5,0,TAU);ctx.fill();}
+  // drifting sand
+  for(let i=0;i<40;i++){const x=((i*97+time*30*(1+i%3))%(w+40))-20,y=h*.82+((i*53)%(h*.18));ctx.fillStyle='rgba(255,220,170,.25)';ctx.fillRect(x,y,2,1);}
+}
+
+// ---------- the map of Jerusalem ----------
+const MAP_GATES=[[.62,.17],[.46,.12],[.30,.19],[.25,.45],[.37,.80],[.50,.85],[.58,.66],[.62,.52],[.66,.39],[.68,.27]];
+const MAP_FINAL=[.47,.45],MAP_ENDLESS=[.86,.34];
+function mapHit(mx,my,w,h){
+  const pts=MAP_GATES.concat([MAP_FINAL,MAP_ENDLESS]);
+  for(let i=0;i<pts.length;i++){const dx=pts[i][0]*w-mx,dy=pts[i][1]*h-my;if(dx*dx+dy*dy<Math.pow(Math.max(18,w*.035),2))return i===10?10:i===11?-1:i;}
+  return null;
+}
+function drawMap(cv,save,time,hoverIdx){
+  const ctx=cv.getContext('2d');const dpr=Math.min(2,window.devicePixelRatio||1);const w=cv.clientWidth,h=Math.round(w*.62);
+  cv.style.height=h+'px';if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const g=ctx.createLinearGradient(0,0,w,h);g.addColorStop(0,'#F2DDB0');g.addColorStop(1,'#DDBB85');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+  // Mount of Olives and the Kidron valley
+  ctx.fillStyle='rgba(111,127,58,.25)';ctx.beginPath();ctx.ellipse(w*.88,h*.36,w*.12,h*.3,0,0,TAU);ctx.fill();
+  for(let i=0;i<14;i++){ctx.fillStyle='rgba(95,110,50,.45)';ctx.beginPath();ctx.arc(w*(.82+((i*37)%10)/80),h*(.15+((i*53)%40)/90),w*.012,0,TAU);ctx.fill();}
+  ctx.strokeStyle='rgba(120,150,170,.45)';ctx.lineWidth=w*.008;ctx.beginPath();ctx.moveTo(w*.74,0);ctx.bezierCurveTo(w*.72,h*.4,w*.7,h*.7,w*.62,h);ctx.stroke();
+  ctx.fillStyle='rgba(120,80,50,.6)';ctx.font='700 '+Math.max(10,w*.016)+'px Nunito, sans-serif';ctx.textAlign='center';
+  ctx.fillText('Mount of Olives',w*.88,h*.08);ctx.fillText('Kidron Valley',w*.74,h*.94);ctx.fillText('Hinnom Valley',w*.2,h*.9);
+  // city interior
+  ctx.fillStyle='rgba(235,210,160,.85)';ctx.beginPath();MAP_GATES.forEach((p,i)=>{i?ctx.lineTo(p[0]*w,p[1]*h):ctx.moveTo(p[0]*w,p[1]*h);});ctx.closePath();ctx.fill();
+  // little houses and the temple
+  const rr=RNG(42);for(let i=0;i<60;i++){const x=.32+rr()*.32,y=.2+rr()*.6;if(!pointIn(x,y))continue;ctx.fillStyle=rr()>.5?'rgba(200,160,110,.6)':'rgba(215,180,130,.6)';ctx.fillRect(x*w,y*h,w*.012,w*.01);}
+  ctx.fillStyle='#E9D3A3';ctx.strokeStyle='#B08D57';ctx.lineWidth=1.5;ctx.fillRect(w*.53,h*.23,w*.07,h*.09);ctx.strokeRect(w*.53,h*.23,w*.07,h*.09);
+  ctx.fillStyle='rgba(120,80,50,.7)';ctx.fillText('Temple',w*.565,h*.36);
+  // wall segments: gate i to gate i+1 rebuilt when gate i is done
+  const done=i=>!!save.stars[i];
+  for(let i=0;i<MAP_GATES.length;i++){const a=MAP_GATES[i],b=MAP_GATES[(i+1)%MAP_GATES.length];
+    if(done(i)){ctx.strokeStyle=save.stars[10]?'#E7B54A':'#C9A26A';ctx.lineWidth=w*.012;ctx.setLineDash([]);}
+    else{ctx.strokeStyle='rgba(120,90,60,.55)';ctx.lineWidth=w*.007;ctx.setLineDash([w*.012,w*.01]);}
+    ctx.lineCap='round';ctx.beginPath();ctx.moveTo(a[0]*w,a[1]*h);ctx.lineTo(b[0]*w,b[1]*h);ctx.stroke();ctx.setLineDash([]);
+    if(!done(i)){ctx.fillStyle='rgba(120,90,60,.5)';for(let k=1;k<4;k++){const t=k/4;ctx.fillRect((a[0]+(b[0]-a[0])*t)*w+(k%2?3:-4),(a[1]+(b[1]-a[1])*t)*h+(k%2?-4:3),3,3);}}}
+  // markers
+  const R=Math.max(13,w*.024);
+  const marker=(p,i,label)=>{const x=p[0]*w,y=p[1]*h;const open=i===-1?!!save.stars[10]:i<=save.unlocked;const st=i>=0?(save.stars[i]||0):0;
+    const pulse=open&&!st&&i>=0?1+Math.sin(time*4)*.08:1;
+    ctx.fillStyle=open?(st?'#F2B33D':'#FFF2D6'):'#C9B89A';ctx.strokeStyle=hoverIdx===i?'#2E2140':'#7A4A22';ctx.lineWidth=hoverIdx===i?3:2;
+    ctx.beginPath();ctx.arc(x,y,R*pulse,0,TAU);ctx.fill();ctx.stroke();
+    // little arch
+    ctx.fillStyle=open?'#5A3324':'#9C8A70';ctx.beginPath();ctx.moveTo(x-R*.35,y+R*.45);ctx.lineTo(x-R*.35,y-R*.05);ctx.arc(x,y-R*.05,R*.35,Math.PI,0);ctx.lineTo(x+R*.35,y+R*.45);ctx.fill();
+    if(st&&i>=0&&i<10){ctx.fillStyle='#8A5A34';ctx.fillRect(x-R*.3,y-R*.1,R*.6,R*.55);}
+    ctx.font='800 '+Math.max(10,w*.015)+'px Nunito, sans-serif';ctx.textAlign='center';
+    ctx.lineWidth=3;ctx.strokeStyle='rgba(255,247,232,.9)';ctx.strokeText(label,x,y+R+12);ctx.fillStyle=open?'#2E2140':'#8C7A62';ctx.fillText(label,x,y+R+12);
+    if(i>=0){let s='';for(let k=0;k<3;k++)s+=k<st?'★':'☆';ctx.fillStyle='#C9821A';ctx.strokeText(s,x,y+R+25);ctx.fillText(s,x,y+R+25);
+      if(save.vigil[i]){ctx.fillStyle='#5B5EA6';ctx.beginPath();ctx.arc(x+R*.85,y-R*.75,R*.32,0,TAU);ctx.fill();ctx.fillStyle='#fff';ctx.font='800 '+R*.4+'px Nunito';ctx.fillText('✓',x+R*.85,y-R*.6);}}
+  };
+  MAP_GATES.forEach((p,i)=>marker(p,i,LEVELS[i].name.replace('The ','')));
+  marker(MAP_FINAL,10,'Last Breach');
+  if(save.stars[10])marker(MAP_ENDLESS,-1,'Night Watch');
+}
+function pointIn(x,y){let ins=false;const P=MAP_GATES;for(let i=0,j=P.length-1;i<P.length;j=i++){const xi=P[i][0],yi=P[i][1],xj=P[j][0],yj=P[j][1];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))ins=!ins;}return ins;}
+
+// ============================================================
+//  saving, sound, screens and controls
+// ============================================================
+const $=id=>document.getElementById(id);
+const SAVE_KEY='watchmenOnTheWalls.save.v1';
+const save={unlocked:0,stars:{},vigil:{},up:{},verses:{},codex:{},helpers:{},endlessBest:0,endlessHope:0,sound:true,speed:1,prologue:false,finished:false,inProgress:null,coach:{}};
+function loadSave(){try{const s=localStorage.getItem(SAVE_KEY);if(s){const o=JSON.parse(s);if(o&&typeof o==='object')for(const k in save)if(k in o&&o[k]!=null)save[k]=o[k];}}catch(e){}
+  ['stars','vigil','up','verses','codex','helpers','coach'].forEach(k=>{if(!save[k]||typeof save[k]!=='object')save[k]={};});
+  save.unlocked=clamp(save.unlocked|0,0,10);if(![1,2,3].includes(save.speed))save.speed=1;}
+function writeSave(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){}}
+function totalHope(){let h=0;for(const k in save.stars)h+=save.stars[k]|0;for(const k in save.vigil)if(save.vigil[k])h++;return h+(save.endlessHope|0);}
+function spentHope(){let s=0;for(const u of UPGRADES){const r=save.up[u.id]|0;for(let i=0;i<r;i++)s+=u.costs[i];}return s;}
+function hopeLeft(){return totalHope()-spentHope();}
+function modsFromSave(){const m={stones:save.up.stones|0,power:save.up.power|0,resolve:save.up.resolve|0,range:save.up.range|0,cheap:save.up.cheap|0,masters:{}};
+  for(const u of UPGRADES)if(u.tower&&save.up[u.id])m.masters[u.tower]=true;return m;}
+function seeVerse(id){if(VERSES[id]&&!save.verses[id]){save.verses[id]=1;writeSave();}}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function verseHTML(id){seeVerse(id);const v=VERSES[id];return '<div class="verse">'+esc(v[1])+'<b>'+esc(v[0])+'</b></div>';}
+function starsHTML(n){let s='<span class="stars">';for(let i=0;i<3;i++)s+=i<n?'★':'<span class="off">★</span>';return s+'</span>';}
+
+// ---------- sound ----------
+const AU={ctx:null,master:null,last:{}};
+function audioInit(){if(AU.ctx){if(AU.ctx.state==='suspended')AU.ctx.resume();return;}
+  try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;AU.ctx=new C();AU.master=AU.ctx.createGain();AU.master.gain.value=.55;AU.master.connect(AU.ctx.destination);}catch(e){AU.ctx=null;}}
+function tone(freq,dur,type,vol,slideTo,delay){
+  if(!save.sound||!AU.ctx)return;try{const t0=AU.ctx.currentTime+(delay||0);const o=AU.ctx.createOscillator(),g=AU.ctx.createGain();o.type=type||'sine';
+  o.frequency.setValueAtTime(freq,t0);if(slideTo)o.frequency.exponentialRampToValueAtTime(slideTo,t0+dur);
+  g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol||.1,t0+.012);g.gain.exponentialRampToValueAtTime(.0005,t0+dur);
+  o.connect(g);g.connect(AU.master);o.start(t0);o.stop(t0+dur+.03);}catch(e){}}
+function sfx(name){const now=performance.now();const gap={shoot:70,kill:60,beam:90,pulse:120}[name]||0;if(gap&&AU.last[name]&&now-AU.last[name]<gap)return;AU.last[name]=now;
+  switch(name){
+    case 'shoot':tone(1250+Math.random()*200,.07,'sine',.035,1700);break;
+    case 'pulse':tone(147,.55,'sawtooth',.05,185);tone(220,.55,'triangle',.05,277,.04);break;
+    case 'beam':tone(660,.2,'triangle',.05,990);break;
+    case 'kill':tone(880+Math.random()*80,.12,'sine',.05);tone(1320,.18,'sine',.035,null,.05);break;
+    case 'leak':tone(110,.32,'square',.06,70);break;
+    case 'build':tone(220,.08,'triangle',.1);tone(330,.1,'triangle',.07,null,.06);break;
+    case 'up':[523,659,784].forEach((f,i)=>tone(f,.16,'triangle',.07,null,i*.06));break;
+    case 'repair':for(let i=0;i<3;i++)tone(170+i*25,.07,'square',.045,null,i*.11);break;
+    case 'wave':tone(196,.75,'sawtooth',.05,247);tone(294,.75,'triangle',.045,370,.06);break;
+    case 'clear':[392,494,587,784].forEach((f,i)=>tone(f,.26,'triangle',.06,null,i*.08));break;
+    case 'win':[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,.32,'triangle',.07,null,i*.13));break;
+    case 'click':tone(720,.04,'sine',.04);break;
+    case 'no':tone(160,.12,'square',.04);break;
+    case 'doors':[262,330,392,523].forEach((f,i)=>tone(f,.5,'triangle',.06,null,i*.1));break;
+  }}
+
+// ---------- app state ----------
+const A={G:null,hover:null,placing:null,sel:null,kbd:false,cursor:{c:7,r:5},time:0,last:0,mapHover:null,coach:-1,hudCache:{},popupTile:null,downAt:null,lastVerse:null};
+const TARGET_NAMES={first:'Nearest the gate',strong:'Strongest',close:'Closest'};
+
+function anyScreen(){return !!document.querySelector('.screen.show');}
+function showScreen(id){document.body.classList.toggle('nogame',!A.G);document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('show',s.id===id));if(id)hidePopup();}
+function toast(html,cls,ms){const box=$('toast');const d=document.createElement('div');d.className='tmsg'+(cls?' '+cls:'');d.innerHTML=html;box.appendChild(d);
+  while(box.children.length>3)box.removeChild(box.firstChild);setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),450);},ms||3200);}
+function coach(text){const c=$('coach');if(!text){c.classList.remove('show');return;}c.innerHTML=text;c.classList.add('show');}
+
+// ---------- title ----------
+function buildTitle(){
+  const m=$('titleMenu');m.innerHTML='';
+  const add=(label,fn,pri)=>{const b=document.createElement('button');b.className='btn'+(pri?' pri':'');b.textContent=label;b.onclick=()=>{audioInit();sfx('click');fn();};m.appendChild(b);return b;};
+  const ip=save.inProgress;
+  if(ip&&ip.snap){const nm=ip.idx<0?'the Night Watch':LEVELS[ip.idx].name;add('Continue: '+nm+', wave '+(ip.snap.wave+1),()=>resumeLevel(),true);}
+  if(!save.prologue)add('Begin the work',()=>showPrologue(),!ip);
+  else add('The walls of Jerusalem',()=>openMap(),!ip);
+  add('Workshop'+(hopeLeft()>0?' ('+hopeLeft()+' Hope to spend)':''),()=>openShop('title'));
+  add('Book of Remembrance',()=>openBook('title','verses'));
+  add('How to play',()=>openHelp('title'));
+  add('Sound: '+(save.sound?'on':'off'),()=>{save.sound=!save.sound;writeSave();buildTitle();});
+  add('About and credits',()=>openAbout('title'));
+}
+function openTitle(){A.G=null;hideSel();coach(null);buildTitle();showScreen('title');}
+
+// ---------- story pages ----------
+function showStory(pages,done){
+  let i=0;const card=$('storyCard');
+  const draw=()=>{const p=pages[i];card.innerHTML=(p.kicker?'<div class="sub">'+esc(p.kicker)+'</div>':'')+'<h2>'+esc(p.title)+'</h2>'+p.html+
+    '<div class="row"><button class="btn pri full" id="stNext">'+(i<pages.length-1?'Next':(p.last||'Continue'))+'</button>'+(i>0?'<button class="btn ghost" id="stBack">Back</button>':'')+'</div><p class="small" style="margin-top:10px">Page '+(i+1)+' of '+pages.length+'</p>';
+    $('stNext').onclick=()=>{sfx('click');if(i<pages.length-1){i++;draw();card.scrollTop=0;}else done();};
+    if($('stBack'))$('stBack').onclick=()=>{i--;draw();};$('stNext').focus();};
+  showScreen('storyScr');draw();
+}
+function showPrologue(){
+  showStory([
+    {kicker:'Susa, the winter palace of Persia',title:'The wall is broken down',html:'<p>Nehemiah serves wine to King Artaxerxes, far from home. One day his brother arrives from Jerusalem with news.</p>'+verseHTML('n1_3')+'<p>Nehemiah sits down and weeps. For days he fasts and prays. Then he asks the king for something bold: let me go and rebuild it.</p>'},
+    {kicker:'Jerusalem, by night',title:'Let us rise up and build',html:'<p>The king says yes. Nehemiah rides around the ruined walls in the dark, past heaps of burned stone, telling no one yet. Then he gathers the people.</p>'+verseHTML('n2_17')+verseHTML('n2_18')},
+    {kicker:'Your part',title:'Keep watch on the walls',html:'<p>Every family takes a stretch of wall beside a gate. You keep watch while they build.</p><p>Shadows of discouragement drift up the road toward each gate: Mockery, Fear, Weariness, Rubble, Distraction and more. Place helpers on the sand beside the road. Their light, trumpets, songs and scrolls turn every shadow back into light. Nobody is hurt; the shadows simply dissolve.</p><p>Spend stones to build helpers, raise their rank, and repair the wall itself. Rebuild all ten gates and close the last breach.</p>',last:'To the walls'}
+  ],()=>{save.prologue=true;writeSave();openMap();});
+}
+
+// ---------- map ----------
+function openMap(){
+  A.G=null;hideSel();coach(null);showScreen('mapScr');
+  $('mapHope').textContent='Hope '+hopeLeft()+' to spend · '+totalHope()+' earned';
+  const b=$('mapBtns');b.innerHTML='';
+  const add=(label,fn,cls)=>{const x=document.createElement('button');x.className='btn '+(cls||'');x.textContent=label;x.onclick=()=>{sfx('click');fn();};b.appendChild(x);return x;};
+  const next=Math.min(save.unlocked,10);
+  add((save.stars[next]?'Play ':'Next: ')+LEVELS[next].name,()=>openBrief(next),'pri');
+  for(let i=0;i<=next;i++)if(i!==next)add(LEVELS[i].name.replace('The ','')+' '+'★'.repeat(save.stars[i]||0),()=>openBrief(i),'ghost');
+  if(save.stars[10])add('Night Watch (best wave '+(save.endlessBest||0)+')',()=>openBrief(-1),'ghost');
+  add('Workshop',()=>openShop('map'));add('Book of Remembrance',()=>openBook('map','verses'));
+  $('mapBack').onclick=()=>{sfx('click');openTitle();};
+}
+function mapCoords(ev){const cv=$('mapCv');const r=cv.getBoundingClientRect();return{x:ev.clientX-r.left,y:ev.clientY-r.top,w:r.width,h:r.height};}
+
+// ---------- level briefing ----------
+function openBrief(idx){
+  const card=$('briefCard');const cfg=levelCfg(idx);
+  if(idx<0){
+    card.innerHTML='<div class="sub">After the wall is finished</div><h2>The Night Watch</h2><p>The wall stands, but watchmen still keep watch. Shadows come in waves that never end, each a little stronger. How long can you hold the gate?</p>'+verseHTML('i62_6')+
+    '<div class="kv"><b>Best</b><span>Wave '+(save.endlessBest||0)+'</span><b>Hope</b><span>One Hope every 10 waves, up to 10 ('+(save.endlessHope|0)+' earned so far)</span></div>'+
+    '<div class="row"><button class="btn pri full" id="bGo">Keep watch</button><button class="btn ghost" id="bBack">Back</button></div>';
+    $('bGo').onclick=()=>{sfx('click');startLevel(-1,'endless');};$('bBack').onclick=()=>openMap();showScreen('briefScr');return;}
+  const st=save.stars[idx]||0;const vg=VIGILS.find(v=>v.id===LEVEL_VIGIL[idx]);
+  const shadows=cfg.pool.map(p=>p[0]).concat(cfg.boss?[cfg.boss]:[]);
+  const helpers=TOWER_ORDER.filter(t=>TOWERS[t].unlock<=idx);
+  const newHelper=TOWER_ORDER.find(t=>TOWERS[t].unlock===idx&&idx>0);
+  card.innerHTML='<div class="sub">Chapter '+(cfg.ch+1)+': '+esc(CHAPTERS[cfg.ch])+' · Gate '+(idx+1)+' of 11</div><h2>'+esc(cfg.name)+'</h2><p>'+esc(cfg.intro)+'</p>'+verseHTML(cfg.v[0])+
+   '<div class="kv"><b>Waves</b><span>'+cfg.waves+(cfg.paths.length>1?' · shadows come by '+cfg.paths.length+' roads':'')+'</span>'+
+   '<b>Shadows</b><span>'+shadows.map(s=>esc(ENEMIES[s].name)+(save.codex[s]?'':' (new)')).join(', ')+'</span>'+
+   '<b>Helpers</b><span>'+helpers.map(t=>esc(TOWERS[t].name)+(t===newHelper?' (new)':'')).join(', ')+'</span>'+
+   '<b>Stars</b><span>'+starsHTML(st)+'</span></div>'+
+   '<p class="small">One star for rebuilding the gate. A second for finishing with at least 60% of your Resolve. A third for repairing all four wall sections without trying a wave again.</p>'+
+   '<div class="row"><button class="btn pri full" id="bGo">'+(st?'Play again':'Begin')+'</button>'+
+   (st?'<button class="btn full" id="bVig">Keep the Vigil: '+esc(vg.name)+(save.vigil[idx]?' ✓':'')+'</button>':'')+
+   '<button class="btn ghost" id="bBack">Back</button></div>'+(st?'<p class="small" style="margin-top:8px"><b>Vigil:</b> '+esc(vg.desc)+' Every helper you have unlocked may be used. Keeping it earns 1 Hope'+(save.vigil[idx]?' (already kept)':'')+'.</p>':'');
+  $('bGo').onclick=()=>{sfx('click');startLevel(idx,'story');};
+  if($('bVig'))$('bVig').onclick=()=>{sfx('click');startLevel(idx,'vigil');};
+  $('bBack').onclick=()=>openMap();
+  showScreen('briefScr');$('bGo').focus();
+}
+
+// ---------- playing ----------
+function startLevel(idx,mode,snap){
+  audioInit();
+  const G=newGame(idx,mode,modsFromSave());A.G=G;A.sel=null;A.placing=null;A.hover=null;hidePopup();
+  if(snap)restore(G,snap);
+  for(const k in save.codex)G.seen[k]=1;
+  BG=null;R_.P=[];R_.F=[];R_.repairAnim=[0,0,0,0];
+  showScreen(null);resize();buildPalette();hideSel();updateHUD(true);
+  save.inProgress={idx,mode,snap:snapshot(G)};writeSave();
+  const nm=idx<0?'Night Watch':G.cfg.name;
+  toast('<b>'+esc(nm)+'</b>'+(mode==='vigil'?' · Vigil: '+esc(VIGILS.find(v=>v.id===G.vigil).name):''),'',2600);
+  const nh=TOWER_ORDER.find(t=>TOWERS[t].unlock===idx&&idx>0);
+  if(nh&&mode==='story'&&!save.helpers[nh]){save.helpers[nh]=1;writeSave();setTimeout(()=>toast('New helper: <b>'+TOWERS[nh].name+'</b>. '+esc(TOWERS[nh].blurb),'',7000),900);}
+  A.coach=(idx===0&&mode==='story'&&!save.coach.done&&!snap)?0:-1;
+  if(A.coach===0)coach('Tap an open patch of sand next to the road, then choose <b>Watchman</b>.<br><small>Keyboard: press 1, then click a spot.</small>');else coach(null);
+}
+function resumeLevel(){const ip=save.inProgress;if(!ip||!ip.snap){openMap();return;}
+  if(ip.idx>=0&&!LEVELS[ip.idx]){save.inProgress=null;writeSave();openMap();return;}
+  startLevel(ip.idx,ip.mode,ip.snap);toast('Back at wave '+(A.G.wave+1)+'. Start it when you are ready.','',3000);}
+
+function buildPalette(){
+  const p=$('palette');p.innerHTML='';const G=A.G;
+  for(const type of TOWER_ORDER){const def=TOWERS[type];const allowed=towerAllowed(G,type);
+    const locked=G.idx>=0&&def.unlock>G.idx&&G.mode!=='vigil';
+    if(G.idx>=0&&def.unlock>Math.max(G.idx,save.unlocked)&&G.mode!=='endless')continue;
+    const b=document.createElement('button');b.className='tbtn'+(locked?' locked':'');b.dataset.type=type;
+    b.innerHTML='<canvas width="76" height="76"></canvas><span>'+esc(def.name)+'</span><span class="c">'+(locked?'Later':towerCost(G,type))+'</span><span class="key">key '+def.key+'</span>';
+    b.title=def.name+': '+def.blurb;
+    b.onclick=()=>{audioInit();if(!towerAllowed(A.G,type)){sfx('no');toast(locked?def.name+' joins you at a later gate.':'Not allowed in this Vigil.');return;}choosePlacing(type);};
+    p.appendChild(b);miniIcon(b.querySelector('canvas'),type);}
+}
+function miniIcon(cv,type,tier,master){const x=cv.getContext('2d');x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,cv.width,cv.height);x.setTransform(cv.width*.42,0,0,cv.width*.42,cv.width/2,cv.height/2);drawTowerIcon(x,type,1,tier||0,!!master,1.3,{flat:true});}
+function choosePlacing(type){
+  if(A.placing===type){A.placing=null;}else{A.placing=type;A.sel=null;hideSel();}
+  hidePopup();refreshPalette();
+  if(A.placing&&A.popupTile){const t=A.popupTile;}
+  if(A.placing)toast('Place a '+TOWERS[type].name+': tap open sand. '+esc(TOWERS[type].blurb),'',3200);
+}
+function refreshPalette(){const G=A.G;if(!G)return;document.querySelectorAll('#palette .tbtn').forEach(b=>{const t=b.dataset.type;b.classList.toggle('sel',A.placing===t);
+  const ok=towerAllowed(G,t)&&G.stones>=towerCost(G,t);b.disabled=false;b.style.opacity=towerAllowed(G,t)?(ok?1:.55):.3;});}
+
+function hidePopup(){$('popup').classList.remove('show');A.popupTile=null;}
+function placePopup(el,c,r){
+  const st=$('stage').getBoundingClientRect();const p=toScreen(c+.5,r+.5);
+  el.style.left='0px';el.style.top='0px';el.classList.add('show');
+  const w=el.offsetWidth,h=el.offsetHeight;let x=p.x-w/2,y=p.y+V.s*.6;if(y+h>st.height-4)y=p.y-V.s*.6-h;
+  x=clamp(x,4,st.width-w-4);y=clamp(y,4,st.height-h-4);el.style.left=x+'px';el.style.top=y+'px';}
+function openBuildPopup(c,r){
+  const G=A.G;const el=$('popup');el.innerHTML='<div class="pop-t">Build here</div>';A.popupTile={c,r};
+  let n=0;
+  for(const type of TOWER_ORDER){if(!towerAllowed(G,type))continue;n++;const cost=towerCost(G,type);
+    const b=document.createElement('button');b.className='tbtn';b.innerHTML='<canvas width="76" height="76"></canvas><span>'+esc(TOWERS[type].name)+'</span><span class="c">'+cost+'</span>';
+    b.disabled=G.stones<cost||(G.vigil==='few'&&G.towers.length>=6);
+    b.onclick=(ev)=>{ev.stopPropagation();doBuild(type,c,r);};el.appendChild(b);miniIcon(b.querySelector('canvas'),type);}
+  if(G.vigil==='few')el.insertAdjacentHTML('beforeend','<div class="small" style="color:#FFE7A8;width:100%;padding:0 4px">Few Hands: '+G.towers.length+' of 6 helpers</div>');
+  placePopup(el,c,r);
+}
+function openWallPopup(){
+  const G=A.G;const el=$('popup');const c=repairCost(G);
+  el.innerHTML='<div class="pop-t">The wall · '+G.sections+' of 4 sections repaired</div>';
+  const b=document.createElement('button');b.className='hbtn go';b.textContent=c==null?'The wall here is whole':'Repair a section ('+c+' stones)';b.disabled=c==null||G.stones<c;
+  b.onclick=(ev)=>{ev.stopPropagation();doRepair();hidePopup();};el.appendChild(b);
+  el.insertAdjacentHTML('beforeend','<div class="small" style="color:#FFE7A8;width:100%;padding:2px 4px">Each section adds 4 Resolve and a tenth more stones after every wave. All four set the gate\'s doors.</div>');
+  A.popupTile={c:15,r:G.cfg.gate};placePopup(el,14,G.cfg.gate);
+}
+function doBuild(type,c,r){const G=A.G;const res=build(G,type,c,r);
+  if(typeof res==='string'){sfx('no');toast(esc(res));}else{hidePopup();if(!A.kbd)A.placing=null;refreshPalette();if(A.coach===0){A.coach=1;coach('Good. Add another helper or two, then tap <b>Start wave</b>.<br><small>Keyboard: Space</small>');}}}
+function doRepair(){const r=repair(A.G);if(r!==true){sfx('no');toast(esc(r));}}
+
+function showSel(){
+  const t=A.sel,G=A.G,el=$('sel');if(!t||!G){hideSel();return;}
+  const def=TOWERS[t.type];const s=towerStats(G,t);const uc=upgradeCost(G,t);
+  const rank=t.master?'Master: '+def.master.title:'Rank '+(t.tier+1)+' of 3';
+  let next='';if(uc!=null){const f={type:t.type,tier:t.tier<2?t.tier+1:2,master:t.tier>=2,boost:t.boost,dmgBoost:t.dmgBoost};next=' · Next: '+statLine(G,f,towerStats(G,f))+(t.tier>=2?' ('+def.master.desc+')':'');}
+  else if(t.tier>=2&&!t.master)next=' · A fourth rank can be learned in the Workshop.';
+  el.innerHTML='<canvas width="76" height="76" style="width:38px;height:38px"></canvas><div><div class="nm">'+esc(def.name)+'</div><div class="small" style="color:#FFE7A8">'+esc(rank)+'</div></div>'+
+   '<div class="st">'+esc(statLine(G,t,s))+esc(next)+(t.kills?' · '+t.kills+' turned to light':'')+'</div>'+
+   (uc!=null?'<button class="hbtn go" id="sUp">Upgrade ('+uc+')</button>':'')+
+   (['bolt','beam'].includes(def.kind)?'<button class="hbtn" id="sMode" title="Who to aim at (T)">Aim: '+TARGET_NAMES[t.mode]+'</button>':'')+
+   '<button class="hbtn" id="sSell" title="Take down (X)">Take down (+'+sellValue(t)+')</button><button class="hbtn" id="sX" title="Close">✕</button>';
+  miniIcon(el.querySelector('canvas'),t.type,t.tier,t.master);
+  if($('sUp')){$('sUp').disabled=G.stones<uc;$('sUp').onclick=()=>doUpgrade();}
+  if($('sMode'))$('sMode').onclick=()=>cycleMode();
+  $('sSell').onclick=()=>doSell();$('sX').onclick=()=>{A.sel=null;hideSel();};
+  el.classList.add('show');A.selSig=selSig();
+}
+function selSig(){const t=A.sel;return t?[t.id,t.tier,t.master,t.mode,A.G.stones>=(upgradeCost(A.G,t)||1e9),t.kills,t.boost].join('|'):'';}
+function hideSel(){$('sel').classList.remove('show');$('sel').innerHTML='';}
+function statLine(G,t,s){const r=s.range?(' · reach '+s.range.toFixed(1)):'';
+  switch(t.type){
+    case 'watch':return 'Light '+Math.round(s.dmg)+(s.multi?' twice':'')+' · '+s.rate.toFixed(1)+' a second'+r;
+    case 'trumpet':return 'Blast '+Math.round(s.dmg)+' to all nearby · slows '+Math.round(s.slow*100)+'%'+(s.stun?' and stops':'')+r;
+    case 'mason':return '+'+s.income+' stones after each wave'+(s.heal?' · mends '+s.heal+' Resolve':'');
+    case 'choir':return 'Nearby helpers work '+Math.round(s.boost*100)+'% faster'+(s.dmgBoost?' and '+Math.round(s.dmgBoost*100)+'% harder':'')+r;
+    case 'scribe':return 'Truth '+Math.round(s.dmg)+' through armor'+(s.pierce?', through every shadow in line':'')+' · shows Rumors'+r;
+    case 'keeper':return 'Slows '+Math.round(s.slow*100)+'% · fades '+Math.round(s.dps)+' a second'+(s.mark?' · marked shadows take 25% more':'')+r;
+  }return '';}
+function doUpgrade(){const t=A.sel;if(!t)return;const r=upgrade(A.G,t);if(typeof r==='string'){sfx('no');toast(esc(r));}showSel();}
+function doSell(){const t=A.sel;if(!t)return;sell(A.G,t);A.sel=null;hideSel();refreshPalette();}
+function cycleMode(){const t=A.sel;if(!t)return;const m=['first','strong','close'];t.mode=m[(m.indexOf(t.mode)+1)%3];showSel();}
+
+function updateHUD(force){
+  const G=A.G;if(!G)return;const c=A.hudCache;
+  const set=(id,v,prop)=>{if(force||c[id]!==v){c[id]=v;if(prop==='w')$(id).style.width=v;else $(id).textContent=v;}};
+  set('hLvl',G.idx<0?'Night Watch':G.cfg.name+(G.mode==='vigil'?' · Vigil':''));
+  set('hRes',Math.ceil(G.resolve)+'');set('hResBar',Math.max(0,G.resolve/G.maxResolve*100)+'%','w');
+  set('hSt',Math.floor(G.stones)+'');
+  set('hWave',G.idx<0?(G.wave+(G.waveActive?1:0))+'':Math.min(G.waves,G.wave+(G.waveActive?1:0))+'/'+G.waves);
+  const rc=repairCost(G);set('bRepair',rc==null?'Wall whole':'Repair wall · '+rc);
+  const rb=$('bRepair');const rd=rc==null||G.stones<rc;if(rb.disabled!==rd)rb.disabled=rd;
+  let wl;if(G.waveActive)wl='Wave '+(G.wave+1)+'…';else if(G.autoT>0)wl='Next in '+Math.ceil(G.autoT);else wl='Start wave '+(G.wave+1);
+  set('bWave',wl);const wb=$('bWave');const wd=G.waveActive||G.over;if(wb.disabled!==wd)wb.disabled=wd;wb.classList.toggle('pulse',!wd);
+  set('bSpeed',save.speed+'×');
+  const sig=G.stones+'|'+G.towers.length;if(force||c.pal!==sig){c.pal=sig;refreshPalette();}
+  if(A.sel&&selSig()!==A.selSig)showSel();
+}
+
+// ---------- events from the game ----------
+function saveBetween(G){if(!G.waveActive&&!G.over){save.inProgress={idx:G.idx,mode:G.mode,snap:snapshot(G)};writeSave();}}
+function handleEvents(){
+  const G=A.G;if(!G)return;const evs=G.events;G.events=[];
+  for(const ev of evs){
+    switch(ev.type){
+      case 'build':sfx('build');saveBetween(G);addBurst(ev.t.x,ev.t.y+.2,'#D4B585',10,.8);if(!save.helpers[ev.t.type]){save.helpers[ev.t.type]=1;writeSave();}break;
+      case 'upgrade':sfx('up');saveBetween(G);addBurst(ev.t.x,ev.t.y,'#FFD46E',16,1.2);addFloat(ev.t.x,ev.t.y-.3,ev.t.master?'Master!':'Rank '+(ev.t.tier+1));break;
+      case 'sell':saveBetween(G);addFloat(ev.t.x,ev.t.y,'+'+ev.v,'#FFE7A8');addBurst(ev.t.x,ev.t.y,'#D4B585',8,.6);break;
+      case 'repair':sfx('repair');saveBetween(G);R_.repairAnim[ev.n-1]=1;addBurst(15.5,SECTION_ROWS[ev.n-1][0]+.8,'#D9BE8C',18,1.4);
+        toast('Wall section '+ev.n+' of 4 rebuilt: +4 Resolve, and more stones after every wave.','',3000);
+        if(A.coach===3){A.coach=4;coach(null);}break;
+      case 'doors':sfx('doors');toast('<b>The doors are set</b>, with bolts and bars. This gate is whole.','',4200);break;
+      case 'waveStart':sfx('wave');if(ev.boss)toast('<b>'+esc(ENEMIES[ev.boss].name)+'</b> is coming. '+esc(ENEMIES[ev.boss].blurb),'',6000);
+        save.inProgress={idx:G.idx,mode:G.mode,snap:G.snap};writeSave();
+        if(A.coach===1){A.coach=2;coach('Shadows that reach the gate cost Resolve. Your helpers turn them back into light.');}
+        if(A.coach===3){A.coach=4;coach(null);}break;
+      case 'kill':sfx('kill');addBurst(ev.e.x,ev.e.y,ev.e.def.boss?'#FFE7A8':'#FFD46E',ev.e.def.boss?40:9,ev.e.def.boss?2:1);if(R_.F.length<14||ev.e.def.boss)addFloat(ev.e.x,ev.e.y-.2,'+'+ev.rw);
+        if(ev.e.def.boss)toast('<b>'+esc(ev.e.def.name)+'</b> has dissolved into light.','',3500);break;
+      case 'leak':sfx('leak');R_.shake=1;R_.leakFlash=1;addFloat(15.2,G.cfg.gate+.5,'−'+ev.e.def.harm,'#FF9C8A');break;
+      case 'shoot':sfx('shoot');break;
+      case 'pulse':sfx('pulse');break;
+      case 'beam':sfx('beam');break;
+      case 'newEnemy':if(!save.codex[ev.etype]){save.codex[ev.etype]=1;writeSave();const d=ENEMIES[ev.etype];if(!d.boss&&ev.etype!=='mote')toast('New shadow: <b>'+esc(d.name)+'</b>. '+esc(d.blurb),'',6500);}break;
+      case 'waveEnd':sfx('clear');
+        for(const t of G.towers)if(t.type==='mason'){const s=towerStats(G,t);addFloat(t.x,t.y-.3,'+'+s.income,'#FFE7A8');addBurst(t.x,t.y,'#CFC3B2',8,.8);}
+        if(!G.won)toast('Wave '+ev.n+' cleared: +'+ev.bonus+' stones'+(ev.income?', +'+ev.income+' from Stonemasons':'')+(ev.heal?', +'+ev.heal+' Resolve':''),'',2800);
+        if(!G.won){save.inProgress={idx:G.idx,mode:G.mode,snap:snapshot(G)};writeSave();}
+        if(A.coach===2){A.coach=3;coach('Between waves: tap a helper to <b>upgrade</b> it, or tap <b>Repair wall</b>. Each section adds Resolve, and all four earn a star.');}
+        break;
+      case 'midVerse':{const id=G.cfg.v[1];const v=VERSES[id];seeVerse(id);toast(esc(v[1])+'<b>'+esc(v[0])+'</b>','verse',11000);break;}
+      case 'milestone':toast('Wave '+ev.n+' held: <b>+1 Hope</b>','',3500);break;
+      case 'victory':setTimeout(()=>onVictory(G),900);break;
+      case 'defeat':setTimeout(()=>onDefeat(G),700);break;
+    }
+  }
+}
+
+// ---------- results ----------
+function onVictory(G){
+  if(A.G!==G)return;sfx('win');coach(null);A.sel=null;hideSel();
+  const card=$('resultCard');const idx=G.idx;
+  if(G.mode==='vigil'){const first=!save.vigil[idx];save.vigil[idx]=1;save.inProgress=null;writeSave();
+    card.innerHTML='<div class="sub">'+esc(G.cfg.name)+'</div><h2>Vigil kept</h2><p>You kept watch through '+esc(VIGILS.find(v=>v.id===G.vigil).name)+'. '+(first?'<b>+1 Hope.</b> A blue seal now marks this gate on the map.':'You had kept this one before.')+'</p>'+verseHTML(G.cfg.v[2])+
+    '<div class="row"><button class="btn pri full" id="rMap">Back to the map</button></div>';
+    showScreen('resultScr');$('rMap').onclick=()=>openMap();return;}
+  const stars=starsFor(G);const old=save.stars[idx]||0;if(stars>old)save.stars[idx]=stars;
+  const wasUnlocked=save.unlocked;save.unlocked=Math.max(save.unlocked,Math.min(10,idx+1));
+  save.inProgress=null;if(!save.coach.done&&idx===0)save.coach.done=1;
+  const firstFinal=idx===10&&!save.finished;if(idx===10)save.finished=true;
+  writeSave();
+  const gained=Math.max(0,stars-old);
+  const newHelper=TOWER_ORDER.find(t=>TOWERS[t].unlock===idx+1);
+  const why=[];why.push('★ Gate rebuilt');why.push((G.resolve>=G.maxResolve*.6?'★':'☆')+' At least 60% Resolve left ('+Math.ceil(G.resolve)+' of '+G.maxResolve+')');
+  why.push((G.sections>=4&&G.retries===0?'★':'☆')+' All four wall sections repaired'+(G.retries?' (a wave was tried again)':' ('+G.sections+' of 4)'));
+  card.innerHTML='<div class="sub">Chapter '+(G.cfg.ch+1)+': '+esc(CHAPTERS[G.cfg.ch])+'</div><h2>'+esc(G.cfg.name)+(idx===10?' : the wall is finished!':' is rebuilt!')+'</h2>'+
+   '<p style="font-size:30px;margin:2px 0 6px">'+starsHTML(stars)+'</p><p class="small">'+why.join('<br>')+'</p>'+
+   '<p>'+esc(G.cfg.outro)+'</p>'+verseHTML(G.cfg.v[2])+
+   '<div class="kv"><b>Shadows turned to light</b><span>'+G.kills+'</span><b>Helpers on the wall</b><span>'+G.towers.length+'</span>'+
+   (gained?'<b>Hope</b><span>+'+gained+' (spend it in the Workshop)</span>':'')+
+   (newHelper&&wasUnlocked<idx+1?'<b>New helper</b><span>'+esc(TOWERS[newHelper].name)+' joins you at the next gate</span>':'')+
+   (idx<10&&wasUnlocked<idx+1?'<b>Unlocked</b><span>'+esc(LEVELS[idx+1].name)+', and this gate\'s Vigil</span>':'')+'</div>'+
+   '<div class="row">'+(idx<10?'<button class="btn pri full" id="rNext">Next: '+esc(LEVELS[idx+1].name)+'</button>':'<button class="btn pri full" id="rNext">Continue</button>')+
+   '<button class="btn ghost" id="rMap">Map</button><button class="btn ghost" id="rAgain">Play again</button></div>';
+  showScreen('resultScr');
+  $('rMap').onclick=()=>{firstFinal?showEnding():openMap();};
+  $('rAgain').onclick=()=>startLevel(idx,'story');
+  $('rNext').onclick=()=>{if(idx<10)openBrief(idx+1);else if(firstFinal)showEnding();else openMap();};
+}
+function onDefeat(G){
+  if(A.G!==G)return;coach(null);A.sel=null;hideSel();
+  const card=$('resultCard');
+  if(G.mode==='endless'){const best=Math.max(save.endlessBest||0,G.wave);const gained=G.endlessHope;
+    save.endlessBest=best;save.endlessHope=Math.min(10,(save.endlessHope|0)+0);save.inProgress=null;writeSave();
+    card.innerHTML='<h2>The Night Watch ends</h2><p>You held the gate through <b>'+G.wave+'</b> waves. Your best is '+best+'.</p>'+verseHTML('n13_31')+
+      '<div class="row"><button class="btn pri full" id="rAgain">Keep watch again</button><button class="btn ghost" id="rMap">Map</button></div>';
+    showScreen('resultScr');$('rAgain').onclick=()=>startLevel(-1,'endless');$('rMap').onclick=()=>openMap();return;}
+  const g=GRACE[Math.floor(Math.random()*GRACE.length)];
+  card.innerHTML='<h2>The work paused</h2><p>Resolve ran out during wave '+(G.wave+1)+'. That happens to every builder. Everything you built is still standing.</p>'+verseHTML(g)+
+   '<div class="row"><button class="btn pri full" id="rRetry">Try wave '+(G.wave+1)+' again</button><button class="btn ghost" id="rRestart">Start the gate over</button><button class="btn ghost" id="rMap">Map</button></div>'+
+   '<p class="small" style="margin-top:8px">Trying a wave again puts everything back the way it was when the wave began. The third star needs a run with no retries.</p>';
+  showScreen('resultScr');
+  $('rRetry').onclick=()=>{if(A.G!==G)return;restore(G,G.snap);G.retries++;G.events=[];R_.P=[];showScreen(null);updateHUD(true);buildPalette();};
+  $('rRestart').onclick=()=>startLevel(G.idx,G.mode);
+  $('rMap').onclick=()=>openMap();
+}
+function endlessTick(){const G=A.G;if(G&&G.mode==='endless'&&G.endlessHope){const room=10-(save.endlessHope|0);const add=Math.min(room,G.endlessHope);if(add>0){save.endlessHope=(save.endlessHope|0)+add;}G.endlessHope=0;save.endlessBest=Math.max(save.endlessBest||0,G.wave);writeSave();}}
+function showEnding(){
+  showStory([
+    {kicker:'The twenty-fifth day of Elul',title:'Fifty-two days',html:verseHTML('n6_15')+verseHTML('n6_16')+'<p>The mockers had said it could not be done. It was done, and everyone could see who had really done it.</p>'},
+    {kicker:'At the Water Gate',title:'The joy of the LORD',html:'<p>The people gather in the square before the Water Gate. Ezra the scribe reads the Law from early morning until midday, and the Levites explain it so that everyone understands. The people weep. Nehemiah tells them not to.</p>'+verseHTML('n8_10')},
+    {kicker:'On top of the wall',title:'The dedication',html:'<p>Two great choirs climb onto the wall and walk around it in opposite directions, singing, until they meet at the temple.</p>'+verseHTML('n12_27')+verseHTML('n12_43')},
+    {kicker:'A wall that lasts',title:'The repairer of the breach',html:'<p>Nehemiah\'s wall was stone, and stone wears down. But God had promised something deeper through Isaiah.</p>'+verseHTML('i58_12')+
+      '<p>That promise points to Jesus, who builds a people instead of a wall, and is himself the cornerstone.</p>'+verseHTML('e2_19')+verseHTML('c3_11')},
+    {kicker:'For you',title:'Nothing is beyond repair',html:verseHTML('r21_5')+'<p>Whatever lies in ruins, you do not rebuild alone, and you do not rebuild in your own strength.</p>'+verseHTML('ph1_6')+
+      '<p><b>The Night Watch is open</b> on the Mount of Olives: endless waves, and more Hope to earn. Every gate also has a Vigil to keep.</p>',last:'Back to the map'}
+  ],()=>openMap());
+}
+
+// ---------- pause, help, workshop, book, about ----------
+function openPause(){
+  if(!A.G)return;const G=A.G;const card=$('pauseCard');
+  card.innerHTML='<h2>Paused</h2><p class="sub">'+esc(G.idx<0?'Night Watch':G.cfg.name)+' · wave '+(G.wave+(G.waveActive?1:0))+'</p>'+
+  '<div class="row" style="flex-direction:column;align-items:stretch"><button class="btn pri" id="pRes">Resume</button><button class="btn" id="pHelp">Controls and help</button>'+
+  '<button class="btn" id="pSnd">Sound: '+(save.sound?'on':'off')+'</button><button class="btn ghost" id="pRestart">Start this gate over</button><button class="btn ghost" id="pMap">Leave for the map (your place is saved)</button><button class="btn ghost" id="pTitle">Title screen</button></div>';
+  showScreen('pauseScr');
+  $('pRes').onclick=()=>showScreen(null);$('pHelp').onclick=()=>openHelp('pause');
+  $('pSnd').onclick=()=>{save.sound=!save.sound;writeSave();openPause();};
+  $('pRestart').onclick=()=>startLevel(G.idx,G.mode);$('pMap').onclick=()=>openMap();$('pTitle').onclick=()=>openTitle();
+  $('pRes').focus();
+}
+let backTo=null;
+function goBack(){const b=backTo;backTo=null;if(b==='pause')openPause();else if(b==='map')openMap();else if(b==='game')showScreen(null);else openTitle();}
+function openHelp(from){backTo=from;const card=$('helpCard');
+  card.innerHTML='<h2>How to play</h2>'+
+  '<p>Shadows of discouragement walk the road toward the gate. Place helpers on open sand beside the road; they turn the shadows back into light. A shadow that reaches the gate costs <b>Resolve</b>. If Resolve runs out, the work pauses and you can try that wave again.</p>'+
+  '<p>Turning shadows to light, finishing waves and Stonemasons all bring <b>stones</b>. Spend them to build, to raise a helper\'s rank, and to <b>repair the wall</b>: each of the four sections adds Resolve and more stones per wave, and all four set the gate\'s doors.</p>'+
+  '<h3>Touch and mouse</h3><div class="keys"><kbd>Tap sand</kbd><span>Choose a helper to build there</span><kbd>Tap a helper</kbd><span>Upgrade it, change its aim, or take it down</span><kbd>Tap the wall</kbd><span>Repair a section</span><kbd>Bottom row</kbd><span>Pick a helper, then tap sand to place it</span><kbd>Start wave</kbd><span>Send the next wave when you are ready</span></div>'+
+  '<h3>Keyboard</h3><div class="keys"><kbd>1 to 6</kbd><span>Pick a helper to place</span><kbd>Arrows or W A S D</kbd><span>Move the cursor</span><kbd>Enter</kbd><span>Build, or select the helper under the cursor</span><kbd>Space</kbd><span>Start the next wave</span><kbd>U</kbd><span>Upgrade the selected helper</span><kbd>T</kbd><span>Change its aim</span><kbd>X</kbd><span>Take it down</span><kbd>R</kbd><span>Repair the wall</span><kbd>F</kbd><span>Game speed</span><kbd>M</kbd><span>Sound on or off</span><kbd>H</kbd><span>This help</span><kbd>Escape or P</kbd><span>Cancel, or pause</span></div>'+
+  '<h3>Helpers</h3><div class="list">'+TOWER_ORDER.map(t=>'<div class="item"><canvas width="88" height="88" data-t="'+t+'"></canvas><div class="t"><b>'+esc(TOWERS[t].name)+' · '+TOWERS[t].cost+' stones</b><span>'+esc(TOWERS[t].blurb)+'</span></div></div>').join('')+'</div>'+
+  '<h3>Stars and Hope</h3><p>Each gate gives up to three stars. Every star is one <b>Hope</b> to spend in the Workshop on lasting help: more stones, more Resolve, stronger and farther-reaching helpers, and a fourth rank for each helper. Vigils and the Night Watch earn more Hope.</p>'+
+  '<p class="small">Taking down a helper returns all its stones if no wave has started since you built it, and most of them after that. Your place is saved at the start and end of every wave.</p>'+
+  '<div class="row"><button class="btn pri full" id="hBack">Back</button></div>';
+  card.querySelectorAll('canvas[data-t]').forEach(c=>miniIcon(c,c.dataset.t));
+  showScreen('helpScr');$('hBack').onclick=()=>goBack();$('hBack').focus();card.scrollTop=0;
+}
+function openShop(from){backTo=from;const card=$('shopCard');
+  const draw=()=>{const left=hopeLeft();
+    card.innerHTML='<h2>Workshop</h2><p>Spend Hope on lasting help. It carries into every gate, Vigil and Night Watch.</p><p><span class="pill">Hope to spend: '+left+'</span> <span class="small">'+totalHope()+' earned in all</span></p><div class="list">'+
+    UPGRADES.map(u=>{const r=save.up[u.id]|0;const max=u.costs.length;const cost=r<max?u.costs[r]:null;
+      return '<div class="item"><div class="t"><b>'+esc(u.name)+' <span class="pips">'+'●'.repeat(r)+'○'.repeat(max-r)+'</span></b><span>'+esc(u.desc)+(max>1?' (up to '+max+' times)':'')+'</span></div>'+
+      (cost==null?'<span class="pips">Done</span>':'<button class="btn '+(left>=cost?'pri':'')+'" data-u="'+u.id+'" '+(left>=cost?'':'disabled')+'>'+cost+' Hope</button>')+'</div>';}).join('')+
+    '</div><div class="row"><button class="btn pri full" id="wBack">Back</button><button class="btn ghost" id="wReset">Take back all Hope</button></div>'+
+    '<p class="small" style="margin-top:8px">Earn Hope from stars at each gate, from keeping Vigils, and from the Night Watch. Taking it back lets you choose again.</p>';
+    card.querySelectorAll('button[data-u]').forEach(b=>b.onclick=()=>{const u=UPGRADES.find(x=>x.id===b.dataset.u);const r=save.up[u.id]|0;if(r<u.costs.length&&hopeLeft()>=u.costs[r]){save.up[u.id]=r+1;writeSave();sfx('up');draw();}});
+    $('wBack').onclick=()=>goBack();$('wReset').onclick=()=>{save.up={};writeSave();sfx('click');draw();};};
+  draw();showScreen('shopScr');
+}
+function openBook(from,tab){backTo=from||backTo;const card=$('bookCard');
+  const nv=VERSE_ORDER.filter(k=>save.verses[k]).length;
+  let body='';
+  if(tab==='verses'){body='<p class="small">'+nv+' of '+VERSE_ORDER.length+' verses found. Each gate, each shadow and the story itself hold more.</p><div class="list">'+
+    VERSE_ORDER.map(k=>save.verses[k]?'<div class="verse" style="margin:0">'+esc(VERSES[k][1])+'<b>'+esc(VERSES[k][0])+'</b></div>':'<div class="verse locked-v" style="margin:0">Not found yet. Keep building.</div>').join('')+'</div>';}
+  else if(tab==='shadows'){const ks=Object.keys(ENEMIES);body='<p class="small">Every shadow has an answer.</p><div class="list">'+ks.map(k=>{const d=ENEMIES[k];if(!save.codex[k])return '<div class="item locked-v"><div class="t"><b>Not met yet</b></div></div>';
+      seeVerse(d.answer);return '<div class="item"><canvas width="88" height="88" data-e="'+k+'"></canvas><div class="t"><b>'+esc(d.name)+'</b><span>'+esc(d.blurb)+'</span><div class="verse" style="margin:6px 0 0">'+esc(VERSES[d.answer][1])+'<b>'+esc(VERSES[d.answer][0])+'</b></div></div></div>';}).join('')+'</div>';}
+  else{body='<div class="list">'+TOWER_ORDER.map(t=>{const d=TOWERS[t];if(!save.helpers[t])return '<div class="item locked-v"><div class="t"><b>Not met yet</b></div></div>';seeVerse(d.verse);
+      return '<div class="item"><canvas width="88" height="88" data-t="'+t+'"></canvas><div class="t"><b>'+esc(d.name)+'</b><span>'+esc(d.blurb)+'</span><div class="verse" style="margin:6px 0 0">'+esc(VERSES[d.verse][1])+'<b>'+esc(VERSES[d.verse][0])+'</b></div></div></div>';}).join('')+'</div>';}
+  card.innerHTML='<h2>Book of Remembrance</h2><div class="tabs"><button data-tab="verses" class="'+(tab==='verses'?'on':'')+'">Verses</button><button data-tab="shadows" class="'+(tab==='shadows'?'on':'')+'">Shadows</button><button data-tab="helpers" class="'+(tab==='helpers'?'on':'')+'">Helpers</button></div>'+body+
+   '<div class="row"><button class="btn pri full" id="kBack">Back</button></div>';
+  card.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{sfx('click');openBook(null,b.dataset.tab);card.scrollTop=0;});
+  card.querySelectorAll('canvas[data-t]').forEach(c=>miniIcon(c,c.dataset.t));
+  card.querySelectorAll('canvas[data-e]').forEach(c=>{const x=c.getContext('2d');x.setTransform(c.width*.9,0,0,c.width*.9,c.width/2,c.height/2);const d=ENEMIES[c.dataset.e];
+    drawEnemy(x,{def:d,wob:1.2,a:0,hp:1,maxHp:1,hitT:0,stunT:0},0,false);});
+  $('kBack').onclick=()=>goBack();showScreen('bookScr');
+}
+function openAbout(from){backTo=from;const card=$('aboutCard');
+  card.innerHTML='<h2>About Watchmen on the Walls</h2><p>A tower defense game about Nehemiah rebuilding the walls of Jerusalem, told from the book of Nehemiah. Made by Brandon Bridges, for anyone who would rather build something than give up.</p>'+
+  '<p>The story is told in my own words between the verses. Names, gates and events follow Nehemiah chapters 1 to 12; the shadows are pictures of the discouragements the builders faced, not the people who opposed them.</p>'+
+  '<h3>Scripture</h3><p class="small">'+esc(ESV_NOTICE)+'</p><p class="small">'+esc(ESV_TRADEMARK)+'</p><p class="small">This game quotes '+VERSE_ORDER.length+' verses or verse groups.</p>'+
+  '<h3>Your saved game</h3><p class="small">Progress is kept in this browser on this device. Clearing your browser data erases it.</p>'+
+  '<div class="row"><button class="btn pri full" id="aBack">Back</button><button class="btn ghost" id="aWipe">Erase saved game</button></div>';
+  $('aBack').onclick=()=>goBack();
+  $('aWipe').onclick=()=>{if($('aWipe').dataset.sure){try{localStorage.removeItem(SAVE_KEY);}catch(e){}location.reload();}else{$('aWipe').dataset.sure=1;$('aWipe').textContent='Tap again to erase everything';}};
+  showScreen('aboutScr');
+}
+
+// ---------- input ----------
+function resize(){const st=$('stage');const cv=$('cv');const w=st.clientWidth,h=st.clientHeight;if(!w||!h)return;layoutView(w,h);
+  const W=Math.round(w*V.dpr),H=Math.round(h*V.dpr);if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}BG=null;hidePopup();}
+function tileAt(ev){const r=$('cv').getBoundingClientRect();const w=toWorld(ev.clientX-r.left,ev.clientY-r.top);return{c:Math.floor(w.x),r:Math.floor(w.y)};}
+function tapTile(c,r){
+  const G=A.G;if(!G||G.over)return;audioInit();
+  const t=G.towers.find(t=>t.c===c&&t.r===r);
+  if(t){hidePopup();A.placing=null;refreshPalette();A.sel=(A.sel===t?null:t);A.sel?showSel():hideSel();sfx('click');return;}
+  if(A.sel){A.sel=null;hideSel();}
+  if(c===15||c===16){A.placing=null;refreshPalette();openWallPopup();return;}
+  if(A.placing){if(canBuild(G,c,r)){doBuild(A.placing,c,r);}else{sfx('no');}return;}
+  if(canBuild(G,c,r)){if(A.popupTile&&A.popupTile.c===c&&A.popupTile.r===r){hidePopup();return;}openBuildPopup(c,r);return;}
+  hidePopup();
+}
+function setupInput(){
+  const cv=$('cv');
+  cv.addEventListener('pointerdown',ev=>{A.downAt={x:ev.clientX,y:ev.clientY,t:performance.now()};if(ev.pointerType!=='mouse'){A.hover=tileAt(ev);}});
+  cv.addEventListener('pointermove',ev=>{if(ev.pointerType==='mouse'){A.hover=tileAt(ev);A.kbd=false;}});
+  cv.addEventListener('pointerleave',()=>{if(!A.kbd)A.hover=null;});
+  cv.addEventListener('pointerup',ev=>{const d=A.downAt;A.downAt=null;if(!d)return;if(Math.hypot(ev.clientX-d.x,ev.clientY-d.y)>14)return;const t=tileAt(ev);A.kbd=false;
+    if(ev.pointerType!=='mouse')A.hover=t;if(ev.shiftKey&&A.placing){const G=A.G;if(canBuild(G,t.c,t.r)){build(G,A.placing,t.c,t.r);return;}}tapTile(t.c,t.r);});
+  cv.addEventListener('contextmenu',ev=>{ev.preventDefault();A.placing=null;A.sel=null;hideSel();hidePopup();refreshPalette();});
+  $('bWave').onclick=()=>{audioInit();if(A.G&&startWave(A.G)){hidePopup();}};
+  $('bSpeed').onclick=()=>{save.speed=save.speed%3+1;writeSave();updateHUD(true);};
+  $('bRepair').onclick=()=>{audioInit();doRepair();};
+  $('bHelp').onclick=()=>openHelp('game');
+  $('bMenu').onclick=()=>openPause();
+  const mc=$('mapCv');
+  mc.addEventListener('pointermove',ev=>{const p=mapCoords(ev);A.mapHover=mapHit(p.x,p.y,p.w,p.h);mc.style.cursor=A.mapHover!=null?'pointer':'default';});
+  mc.addEventListener('click',ev=>{const p=mapCoords(ev);const i=mapHit(p.x,p.y,p.w,p.h);if(i==null)return;
+    if(i===-1){if(save.stars[10])openBrief(-1);return;}if(i<=save.unlocked){sfx('click');openBrief(i);}else{sfx('no');toast('Rebuild the gates before it first.');}});
+  window.addEventListener('keydown',onKey);
+  window.addEventListener('resize',()=>{resize();});
+  if(window.ResizeObserver)new ResizeObserver(()=>resize()).observe($('stage'));
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&A.G&&!anyScreen()&&!A.G.over)openPause();});
+  document.addEventListener('pointerdown',ev=>{if(!$('popup').contains(ev.target)&&ev.target!==cv)hidePopup();},true);
+}
+function onKey(ev){
+  const k=ev.key;
+  if(anyScreen()){
+    if(k==='Escape'){const s=document.querySelector('.screen.show');if(s.id==='pauseScr')showScreen(null);else if(['helpScr','shopScr','bookScr','aboutScr'].includes(s.id))goBack();else if(s.id==='briefScr')openMap();}
+    return;}
+  const G=A.G;if(!G)return;
+  if(ev.ctrlKey||ev.metaKey||ev.altKey)return;
+  const lk=k.toLowerCase();
+  const moveCur=(dc,dr)=>{A.kbd=true;A.cursor.c=clamp(A.cursor.c+dc,0,16);A.cursor.r=clamp(A.cursor.r+dr,0,ROWS-1);A.hover={c:A.cursor.c,r:A.cursor.r};ev.preventDefault();};
+  // arrows move in screen directions, so turn them when the field is turned
+  const dir={arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0],arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1]}[lk];
+  if(dir){let [dc,dr]=dir;if(V.rot){const t=dc;dc=dr;dr=-t;}moveCur(dc,dr);return;}
+  if(k>='1'&&k<='6'){const type=TOWER_ORDER[+k-1];if(towerAllowed(G,type)){A.kbd=true;if(!A.hover)A.hover={c:A.cursor.c,r:A.cursor.r};choosePlacing(type);}else{sfx('no');}return;}
+  switch(lk){
+    case 'enter':case 'e':{const h=A.hover||A.cursor;A.kbd=true;if(A.placing&&canBuild(G,h.c,h.r)){doBuild(A.placing,h.c,h.r);}else tapTile(h.c,h.r);ev.preventDefault();break;}
+    case ' ':ev.preventDefault();startWave(G);break;
+    case 'u':doUpgrade();break;
+    case 'x':case 'delete':case 'backspace':doSell();break;
+    case 't':cycleMode();break;
+    case 'r':doRepair();break;
+    case 'f':save.speed=save.speed%3+1;writeSave();updateHUD(true);break;
+    case 'm':save.sound=!save.sound;writeSave();toast('Sound '+(save.sound?'on':'off'));break;
+    case 'h':case '?':openHelp('game');break;
+    case 'escape':case 'p':if(A.placing||A.sel||$('popup').classList.contains('show')){A.placing=null;A.sel=null;hideSel();hidePopup();refreshPalette();}else openPause();break;
+  }
+}
+
+// ---------- main loop ----------
+function frame(ts){
+  const now=ts/1000;const dt=Math.min(.05,Math.max(0,now-(A.last||now)));A.last=now;A.time+=dt;
+  try{
+    if($('title').classList.contains('show'))drawTitle($('titleCv'),A.time);
+    if($('mapScr').classList.contains('show'))drawMap($('mapCv'),save,A.time,A.mapHover);
+    const G=A.G;
+    if(G){
+      if(!anyScreen()&&!G.over){let rem=dt*save.speed;while(rem>1e-6){const h=Math.min(1/60,rem);update(G,h);rem-=h;if(G.events.length)handleEvents();if(G.over)break;}}
+      if(G.events.length)handleEvents();
+      if(G.mode==='endless')endlessTick();
+      if(A.sel&&!G.towers.includes(A.sel)){A.sel=null;hideSel();}
+      stepParticles(anyScreen()?0:dt);
+      renderGame($('cv').getContext('2d'),G,A.time,A.hover||(A.kbd?A.cursor:null),A.placing,A.sel,A.kbd);
+      updateHUD(false);
+    }
+  }catch(err){console.error(err);}
+  requestAnimationFrame(frame);
+}
+
+// test hooks for automated checks
+window.__wotw={A,save,LEVELS,VERSES,startLevel,openMap,openBrief,startWave:()=>A.G&&startWave(A.G),
+  build:(t,c,r)=>doBuild(t,c,r),tick:(sec)=>{const G=A.G;let rem=sec;while(rem>0&&!G.over){update(G,1/60);rem-=1/60;handleEvents();}handleEvents();},
+  tapTile,onKey:(key)=>onKey({key,preventDefault(){},ctrlKey:false,metaKey:false,altKey:false}),openShop,openBook,openHelp,openAbout,openPause,showEnding,resumeLevel};
+
+loadSave();setupInput();resize();openTitle();requestAnimationFrame(frame);
+</script>
+</body>
+</html>
