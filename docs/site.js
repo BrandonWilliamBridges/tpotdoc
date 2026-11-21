@@ -77,3 +77,18 @@
     });
     document.getElementById('faq-empty').hidden = shown > 0;
   });
+
+  // Menu (the three-line button): it opens without this script; this closes it after a link is chosen,
+  // on Escape, or on a tap outside, and keeps the open list within the screen so it can scroll.
+  var menu = document.querySelector('details.menu');
+  if (menu) {
+    var menuNav = menu.querySelector('nav');
+    menu.addEventListener('toggle', function () {
+      if (menu.open) menuNav.style.maxHeight = Math.max(240, window.innerHeight - menuNav.getBoundingClientRect().top - 12) + 'px';
+    });
+    menuNav.addEventListener('click', function (e) { if (e.target.closest('a')) menu.open = false; });
+    document.addEventListener('click', function (e) { if (menu.open && !menu.contains(e.target)) menu.open = false; });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && menu.open) { menu.open = false; menu.querySelector('summary').focus(); }
+    });
+  }
