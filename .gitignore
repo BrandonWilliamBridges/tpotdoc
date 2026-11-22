@@ -5,3 +5,8 @@ source-material/
 admin/.wrangler/
 admin/node_modules/
 .dev.vars
+
+# Claude Code: personal settings and temporary worktrees stay local
+.claude/settings.local.json
+CLAUDE.local.md
+.claude/worktrees/
