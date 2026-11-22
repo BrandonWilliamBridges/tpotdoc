@@ -148,7 +148,8 @@ if not SHOW_CARDS:
 GAMES = [
     {"slug": "lamp-unto-my-feet", "name": "Lamp Unto My Feet", "genre": "Adventure",
      "title": "Lamp Unto My Feet: A Free Bible Adventure Game",
-     "swap": [('<a id="home" href="/">&larr; Home</a>', '<a id="home" href="../../">&larr; Home</a>')]},
+     "swap": [('<a id="home" href="/">&larr; Home</a>', '<a id="home" href="../../">&larr; Home</a>'),
+              ("  drawAcctButton();\n", "")]},  # no account button: sign-in needs linkbridges.org's game server
     {"slug": "armor-of-light", "name": "Armor of Light", "genre": "Card game",
      "title": "Armor of Light: A Free Christian Card Game",
      "swap": [('<a class="homelink center" href="/">Back to all games</a>', '<a class="homelink center" href="../../churches/#youth">Back to all games</a>'),
@@ -156,7 +157,10 @@ GAMES = [
     {"slug": "watchmen-on-the-walls", "name": "Watchmen on the Walls", "genre": "Tower defense",
      "title": "Watchmen on the Walls: A Free Nehemiah Bible Game",
      "swap": [('A game by <a href="/">linkbridges.org</a>', 'A game by Brandon Bridges &middot; <a href="../../churches/#youth">More games</a>'),
-              ('Made for <a href="/">linkbridges.org</a>,', "Made by Brandon Bridges,")]},
+              ('Made for <a href="/">linkbridges.org</a>,', "Made by Brandon Bridges,"),
+              ("Progress is kept in this browser on this device. Sign in from the title screen with a username and a 4-digit passcode "
+               "to keep it in your account too, and pick it up on any device. Erasing here forgets this device’s copy and signs it out; "
+               "your account keeps its copy.", "Progress is kept in this browser on this device. Erasing here forgets it.")]},
 ]
 LESSON_ORDER = ["repentance", "faith", "baptisms", "laying-on-of-hands", "resurrection", "eternal-judgment", "fruitful"]
 
@@ -435,6 +439,14 @@ def build_games(og_image):
             if old not in s:
                 raise SystemExit(f"games/{g['slug']}.html: expected text not found (re-check the swap list in GAMES): {old}")
             s = s.replace(old, new)
+        # Sign-in and cloud saves need linkbridges.org's game server (/api), which this site doesn't have, and an account
+        # would break the privacy page's promise that only the Ask & Pray form collects anything. So the games stay
+        # on-device here: every call to the server answers "no connection" without sending anything, and the
+        # Sign In buttons are hidden. Progress still saves in the browser.
+        s, n = re.subn(r"fetch\('/api',", "Promise.resolve(null)||fetch('/api',", s)
+        if n != 1:
+            raise SystemExit(f"games/{g['slug']}.html: expected one call to the game server, found {n}; re-check build_games()")
+        s = s.replace("</head>", "<style>.acct-btn,.acct-status{display:none!important}</style>\n</head>", 1)
         # Google Fonts would break the privacy page's promise, so the games use the self-hosted copies in games/fonts/.
         s, n = re.subn(r'<link\b[^>]*fonts\.(?:googleapis|gstatic)\.com[^>]*>\s*', "", s)
         if n:
