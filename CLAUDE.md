@@ -10,9 +10,11 @@ Live at https://tpotdoc.com (GitHub Pages, served from `main` → `docs/`; DNS o
   - Redirects from the old `/v2/` comparison URLs, plus a home-page script that forwards old one-page links like `/#ask`.
   - `sitemap.xml`, `robots.txt`, `llms.txt` and `llms-full.txt`.
   - Every page gets a title, meta description, canonical URL, Open Graph tags and JSON-LD.
+  - Dates follow content, not the build: a page's `dateModified` and its sitemap date change only when that page's content changes, and the footer's "Last updated" is the newest of them. Building twice in a row changes nothing.
 - `printables/measure-of-faith/` holds the card source (`cards.js`, `cards.css`). `render.sh` regenerates the PDF and card PNGs.
 - `source-material/` holds Yv'e's original photos and journal pages. It is git-ignored and must never be published.
 - `scripts/check_site.py` checks the build for SEO and AI-search problems.
+- `.github/workflows/checks.yml` runs the build and that check on every pull request, and fails if the committed `docs/` doesn't match the build.
 - `admin/` is a separate Cloudflare Worker for the private analytics dashboard at admin.tpotdoc.com, protected by Cloudflare Access. It is deployed with Wrangler, not GitHub Pages. See `admin/README.md`.
 
 ## Standing rules
