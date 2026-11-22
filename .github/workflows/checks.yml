@@ -1,0 +1,37 @@
+# Checks every pull request and every push to main:
+#   1. ./build.sh runs cleanly,
+#   2. scripts/check_site.py finds no search or AI-search problems,
+#   3. the committed docs/ folder (what GitHub Pages serves) matches what the build produces.
+# If step 3 fails, someone edited prototype/ or build.py without running ./build.sh and committing the result.
+name: Check the site
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Build
+        run: ./build.sh
+      - name: Check for search and AI-search problems
+        run: python3 scripts/check_site.py
+      - name: docs/ matches the build
+        run: |
+          if [ -n "$(git status --porcelain -- docs)" ]; then
+            echo "::error::docs/ is out of date. Run ./build.sh and commit the result."
+            git status --short -- docs
+            git diff --stat -- docs
+            exit 1
+          fi

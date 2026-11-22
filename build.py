@@ -15,7 +15,6 @@ import html
 import json
 import re
 import shutil
-import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -245,15 +244,48 @@ def rewrite_links(fragment, root, home):
     return fragment
 
 
-def last_updated():
-    """Date the site content last changed: today if prototype/ has uncommitted edits, else its last commit."""
-    try:
-        if subprocess.run(["git", "status", "--porcelain", "prototype"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip():
-            return datetime.date.today()
-        out = subprocess.run(["git", "log", "-1", "--format=%cs", "--", "prototype"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
-        return datetime.date.fromisoformat(out) if out else datetime.date.today()
-    except (OSError, subprocess.CalledProcessError, ValueError):
-        return datetime.date.today()
+DATE_MODIFIED = re.compile(r'"dateModified": "\d{4}-\d{2}-\d{2}"')
+FOOTER_TIME = re.compile(r'<time datetime="[^"]*">[^<]*</time>')
+LASTMOD = re.compile(r"<url><loc>([^<]+)</loc><lastmod>(\d{4}-\d{2}-\d{2})</lastmod></url>")
+
+
+def undated(text):
+    """A page with its dates blanked, so two builds of the same content compare equal."""
+    return FOOTER_TIME.sub("<time></time>", DATE_MODIFIED.sub('"dateModified": ""', text))
+
+
+def snapshot():
+    """What the last build left in docs/: every page's text, and each address's date from sitemap.xml."""
+    pages = {f.relative_to(OUT).as_posix(): f.read_text() for f in OUT.rglob("*.html")} if OUT.exists() else {}
+    sitemap = OUT / "sitemap.xml"
+    return pages, (dict(LASTMOD.findall(sitemap.read_text())) if sitemap.exists() else {})
+
+
+def settle_dates(urls, old_pages, old_dates):
+    """Give each page the date its content last changed, not the date of this build.
+
+    The build first stamps today's date everywhere. Here a page whose content matches the last build gets its
+    old date back, so building twice changes nothing and search engines only see a new date when a page really
+    changed. The footer's "Last updated" is the newest of those dates. Returns {address: date}.
+    """
+    dates = {}
+    for url in urls:
+        rel = url[len(SITE_URL):].lstrip("/") + "index.html"
+        new = (OUT / rel).read_text()
+        same = rel in old_pages and undated(old_pages[rel]) == undated(new)
+        dates[url] = old_dates[url] if same and url in old_dates else TODAY
+    newest = datetime.date.fromisoformat(max(dates.values()))
+    footer_time = f'<time datetime="{newest.isoformat()}">{newest.strftime("%B")} {newest.day}, {newest.year}</time>'
+    by_rel = {url[len(SITE_URL):].lstrip("/") + "index.html": d for url, d in dates.items()}
+    for f in OUT.rglob("*.html"):
+        text = f.read_text()
+        fixed = FOOTER_TIME.sub(footer_time, text)
+        rel = f.relative_to(OUT).as_posix()
+        if rel in by_rel:
+            fixed = DATE_MODIFIED.sub(f'"dateModified": "{by_rel[rel]}"', fixed)
+        if fixed != text:
+            f.write_text(fixed)
+    return dates, newest.isoformat()
 
 
 def promote_heading(fragment):
@@ -458,6 +490,7 @@ def build():
     src = SRC.read_text()
     parts, sections = parse(src)
 
+    old_pages, old_dates = snapshot()
     if OUT.exists():
         for child in OUT.iterdir():
             shutil.rmtree(child) if child.is_dir() else child.unlink()
@@ -465,9 +498,6 @@ def build():
     for f in (ROOT / "prototype" / "img").iterdir():
         if f.suffix.lower() in (".jpg", ".png"):
             shutil.copy2(f, OUT / "img" / f.name)
-    updated = last_updated()
-    parts["footer"] = re.sub(r'<time datetime="[^"]*">[^<]*</time>',
-                             f'<time datetime="{updated.isoformat()}">{updated.strftime("%B")} {updated.day}, {updated.year}</time>', parts["footer"])
     cards = ROOT / "printables" / "measure-of-faith"
     if SHOW_CARDS:
         (OUT / "printables" / "measure-of-faith" / "img").mkdir(parents=True, exist_ok=True)
@@ -550,8 +580,9 @@ def build():
 
     # sitemap.xml
     urls = [page_url(p["slug"]) for p in PAGES] + [f"{SITE_URL}/games/{g['slug']}/" for g in GAMES]
+    dates, newest = settle_dates(urls, old_pages, old_dates)
     sm =['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-    sm += [f"  <url><loc>{u}</loc><lastmod>{TODAY}</lastmod></url>" for u in urls]
+    sm += [f"  <url><loc>{u}</loc><lastmod>{dates[u]}</lastmod></url>" for u in urls]
     sm.append("</urlset>")
     (OUT / "sitemap.xml").write_text("\n".join(sm) + "\n")
 
@@ -574,7 +605,7 @@ def build():
     lines += ["", "## Optional",f"- [Full text of every lesson]({SITE_URL}/llms-full.txt): all lessons as plain text"]
     (OUT / "llms.txt").write_text("\n".join(lines) + "\n")
 
-    full = [f"# {SITE_NAME}", f"Source: {SITE_URL}/", f"Updated: {TODAY}", ""]
+    full = [f"# {SITE_NAME}", f"Source: {SITE_URL}/", f"Updated: {newest}", ""]
     for p in PAGES[1:]:
         full += [f"## {p['title'].split(' | ')[0]}", f"URL: {page_url(p['slug'])}", "",
                  "\n\n".join(text_of(sections[k]) for k in p["sections"]), ""]
