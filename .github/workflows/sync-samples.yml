@@ -1,6 +1,6 @@
 # Mirrors tpotdoc.com to BrandonWilliamBridges/website-samples/tpotdoc/ on every push to main.
 # docs/ is built by ./build.sh and committed with each change (GitHub Pages serves it), so this copies docs/.
-# .github/scripts/sync-to-samples.py does the rest: it strips anything private, adjusts links and forms for the portfolio copy, and stops if anything looks like a secret.
+# The sync script (.github/scripts/sync-to-samples.py in website-samples, the only copy) does the rest: it strips anything private, adjusts links and forms for the portfolio copy, and stops if anything looks like a secret.
 # Needs the repo secret SAMPLES_TOKEN (fine-grained token: website-samples only, Contents read and write).
 name: Sync to website-samples
 
@@ -49,7 +49,7 @@ jobs:
 
       - name: Copy into website-samples and push
         run: |
-          python3 src/.github/scripts/sync-to-samples.py \
+          python3 samples/.github/scripts/sync-to-samples.py \
             --out "$RUNNER_TEMP/out" \
             --samples samples \
             --message "Sync tpotdoc from ${{ github.repository }}@${GITHUB_SHA::7}
