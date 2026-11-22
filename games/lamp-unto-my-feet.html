@@ -11,6 +11,30 @@
 html,body{margin:0;height:100%;background:#07060c;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 canvas{position:fixed;left:0;top:0;width:100%;height:100%;display:block;touch-action:none}
 #home{position:fixed;top:calc(8px + env(safe-area-inset-top));left:calc(12px + env(safe-area-inset-left));color:#e9d9a8;font:14px Georgia,serif;text-decoration:none;opacity:.85;z-index:2;padding:6px 12px;border:1px solid rgba(233,217,168,.35);border-radius:14px;background:rgba(0,0,0,.3)}
+#acct{position:fixed;inset:0;z-index:5;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;box-sizing:border-box;padding:max(16px,7vh) 16px 24px;background:rgba(7,6,12,.8);touch-action:manipulation;-webkit-user-select:none;user-select:none;font-family:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,"Times New Roman",serif;color:#f6ecd0}
+#acct.on{display:flex}
+#acct .box{width:min(380px,100%);box-sizing:border-box;margin:0;padding:20px 20px 18px;background:rgba(14,11,22,.97);border:1px solid rgba(233,217,168,.45);border-radius:12px;box-shadow:0 12px 48px rgba(0,0,0,.6),0 0 70px rgba(255,210,120,.09);text-align:center}
+#acct h2{margin:0 0 8px;font-weight:normal;font-style:italic;font-size:24px;color:#fff6dc}
+#acct p{margin:0 0 12px;font-size:14.5px;line-height:1.45;color:#e9d9a8}
+#acct b{font-weight:normal;color:#fff6dc}
+#acct p.st{color:#ffe9a8}
+#acct .tabs,#acct .row{display:flex;gap:8px}
+#acct .tabs{margin:2px 0 14px}
+#acct button{flex:1;min-height:42px;font:inherit;font-size:15px;padding:9px 10px;border-radius:10px;border:1px solid rgba(233,217,168,.45);background:rgba(14,11,22,.72);color:#e9d9a8;cursor:pointer;touch-action:manipulation}
+#acct button.main,#acct .tabs button.on{background:rgba(78,58,32,.9);border-color:#ffe9a8;color:#fff6dc}
+#acct .tabs button{min-height:36px;font-size:14px}
+#acct button:disabled{opacity:.55;cursor:default}
+#acct button:focus-visible,#acct input:focus-visible{outline:2px solid #ffe9a8;outline-offset:2px}
+#acct label{display:block;text-align:left;font-size:13px;color:#e0c070;margin:0 0 4px}
+#acct input{display:block;width:100%;box-sizing:border-box;margin:0 0 4px;padding:10px 12px;font:inherit;font-size:18px;border-radius:9px;border:1px solid rgba(233,217,168,.45);background:#0b0912;color:#fff6dc;-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+#acct input:focus{outline:none;border-color:#ffe9a8;box-shadow:0 0 0 3px rgba(255,226,138,.18)}
+#acct .hint{margin:0 0 12px;text-align:left;font-size:12.5px;line-height:1.4;color:rgba(233,217,168,.75)}
+#acct .hint.mid{text-align:center;margin:12px 0 0}
+#acct .box>.hint.mid:not(:last-child){margin:0 0 12px}
+#acct .err{min-height:19px;margin:0 0 10px;font-size:13.5px;line-height:1.4;color:#ffc4b2}
+#acct .err.ok{color:#bfe0ff}
+#acct .err.slim:empty{min-height:0;margin:0}
+@media (min-width:1000px) and (min-height:640px){#acct .box{zoom:1.25}}
 #safe{position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 </style>
 </head>
@@ -59,9 +83,209 @@ addEventListener('resize',resize);addEventListener('orientationchange',()=>setTi
 
 // ---------------- Save ----------------
 const SAVE_KEY='lampUntoMyFeet.save.v1';
-let save={unlocked:0,virtues:[false,false,false,false],scrolls:{},lost:{},best:{},glad:{},journal:{},rooms:{},mute:false,finished:false,started:false,retUnlocked:0,retDone:false};
-function loadSave(){try{const s=localStorage.getItem(SAVE_KEY);if(s){const o=JSON.parse(s);if(o&&typeof o==='object'){Object.assign(save,o);if(!Array.isArray(save.virtues)||save.virtues.length!==4)save.virtues=[false,false,false,false];if(!save.scrolls)save.scrolls={};if(!save.lost)save.lost={};if(!save.best)save.best={};for(const k of ['glad','journal','rooms'])if(!save[k]||typeof save[k]!=='object')save[k]={};}}}catch(e){}}
-function writeSave(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){}}
+function freshSave(){return {unlocked:0,virtues:[false,false,false,false],scrolls:{},lost:{},best:{},glad:{},journal:{},rooms:{},words:{},mute:false,finished:false,started:false,retUnlocked:0,retDone:false};}
+let save=freshSave();
+function normSave(){if(!Array.isArray(save.virtues)||save.virtues.length!==4)save.virtues=[false,false,false,false];for(const k of ['scrolls','lost','best','glad','journal','rooms','words'])if(!save[k]||typeof save[k]!=='object')save[k]={};}
+function loadSave(){try{const s=localStorage.getItem(SAVE_KEY);if(s){const o=JSON.parse(s);if(o&&typeof o==='object'){Object.assign(save,o);normSave();}}}catch(e){}}
+function replaceSave(o){for(const k in save)delete save[k];Object.assign(save,freshSave(),o||{});normSave();}
+function writeLocal(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){}}
+function writeSave(){writeLocal();cloudChanged();}
+
+// ---------------- Account ----------------
+// Sign in with a username (4 to 12 characters) and a 4-digit passcode, and the journey is kept on the
+// shared /api server too, so it can be picked up on any device. This device always keeps its own copy and
+// plays fine offline. Progress only ever grows, so the server merges what each device sends (see mergeLamp
+// in netlify/functions/api.mjs) and two devices can never erase each other's steps.
+const ACCT_KEY='lampUntoMyFeet.account.v1',GUEST_KEY='lampUntoMyFeet.guest.v1';
+const PROGRESS_FIELDS=['unlocked','retUnlocked','started','finished','retDone','shone','virtues','scrolls','lost','glad','journal','rooms','words','best'];
+const acct={token:null,name:'',key:'',pending:false};
+const sync={busy:null,timer:0,fails:0,ver:0,status:'',lastPull:0};
+function loadAcct(){try{const o=JSON.parse(localStorage.getItem(ACCT_KEY)||'null');if(o&&typeof o==='object')for(const k in acct)if(k in o)acct[k]=o[k];}catch(e){}}
+function writeAcct(){try{localStorage.setItem(ACCT_KEY,JSON.stringify(acct));}catch(e){}}
+function api(action,extra,keep){
+  if(typeof fetch!=='function')return Promise.resolve(null);
+  return fetch('/api',{method:'POST',headers:{'content-type':'application/json'},keepalive:!!keep,
+    body:JSON.stringify(Object.assign({action:action,game:'lamp',token:acct.token||null},extra||{}))})
+    .then(r=>r.json()).catch(()=>null);
+}
+// Combine two journeys: everything found on either one stays found. Keep in step with mergeLamp on the server.
+function mergeProgress(a,b){
+  const plain=x=>(x&&typeof x==='object'&&!Array.isArray(x))?x:{},okKey=k=>typeof k==='string'&&k.length<=24&&/^[A-Za-z0-9_-]+$/.test(k);
+  const stage=x=>Math.max(0,Math.min(17,Math.floor(Number(x)||0)));
+  a=plain(a);b=plain(b);
+  const out={unlocked:Math.max(stage(a.unlocked),stage(b.unlocked)),retUnlocked:Math.max(stage(a.retUnlocked),stage(b.retUnlocked))};
+  for(const f of ['started','finished','retDone','shone'])out[f]=!!(a[f]||b[f]);
+  const va=Array.isArray(a.virtues)?a.virtues:[],vb=Array.isArray(b.virtues)?b.virtues:[];
+  out.virtues=[0,1,2,3].map(i=>!!(va[i]||vb[i]));
+  for(const f of ['scrolls','lost','glad','journal','rooms','words']){const m={};let n=0;
+    for(const src of [plain(a[f]),plain(b[f])])for(const k in src)if(src[k]&&okKey(k)&&!m[k]&&n<400){m[k]=1;n++;}
+    out[f]=m;}
+  const best={};let n=0;
+  for(const src of [plain(a.best),plain(b.best)])for(const k in src){const t=Math.round(Number(src[k])*10)/10;
+    if(!okKey(k)||!(t>0)||!isFinite(t))continue;
+    if(best[k]===undefined){if(n<300){best[k]=t;n++;}}else if(t<best[k])best[k]=t;}
+  out.best=best;
+  return out;
+}
+function progressOf(s){const o={};for(const k of PROGRESS_FIELDS)o[k]=s[k];return o;}
+function hasProgress(s){return !!(s&&(s.started||s.unlocked>0||Object.keys(s.scrolls||{}).length));}
+function absorb(p){if(!p)return;Object.assign(save,mergeProgress(save,p));writeLocal();}
+function cloudChanged(){
+  sync.ver++;if(!acct.token)return;
+  if(!acct.pending){acct.pending=true;writeAcct();}
+  if(!sync.timer&&!sync.busy)sync.timer=setTimeout(pushSync,2500);
+}
+// Send this device's journey; the reply is the merged journey from every device, folded back in here.
+function pushSync(keep){
+  clearTimeout(sync.timer);sync.timer=0;
+  if(!acct.token)return Promise.resolve(false);
+  if(sync.busy)return sync.busy;
+  const ver=sync.ver,tok=acct.token;sync.lastPull=Date.now();
+  sync.busy=api('progress',{data:progressOf(save)},keep).then(j=>{
+    sync.busy=null;
+    if(acct.token!==tok){if(acct.token&&acct.pending&&!sync.timer)sync.timer=setTimeout(pushSync,300);return false;}
+    if(j&&j.ok){sync.fails=0;sync.status='';absorb(j.progress);
+      if(sync.ver===ver){acct.pending=false;writeAcct();}else if(!sync.timer)sync.timer=setTimeout(pushSync,1000);
+      return true;}
+    if(j&&j.error==='not logged in'){acct.token=null;writeAcct();sync.status='expired';return false;}
+    sync.fails++;sync.status='offline';
+    if(!sync.timer)sync.timer=setTimeout(pushSync,Math.min(60000,4000*Math.pow(2,sync.fails-1)));
+    return false;
+  });
+  return sync.busy;
+}
+function acctStatus(){
+  if(!acct.token)return sync.status==='expired'||save.acct?'Sign in again to keep saving':'Keep your journey on any device';
+  if(sync.status==='offline')return acct.pending?'Offline. Will save when it can.':'Offline';
+  if(sync.busy||acct.pending)return 'Saving…';
+  return 'Journey saved';
+}
+function journeyWords(s){
+  const n=Object.keys(s.scrolls||{}).length,sc=n+' of 54 scroll'+(n===1?'':'s');
+  if(s.finished)return 'the whole road walked, '+sc;
+  return 'Chapter '+NUMW[Math.min(5,(Math.min(17,s.unlocked||0)/3)|0)]+', '+sc;
+}
+function signIn(mode,name,pin){
+  return api('auth',{mode:mode,name:name,pin:pin,token:null}).then(j=>{
+    if(!j)return {err:'Can’t reach the server right now. Check your connection and try again.'};
+    if(!j.ok||!j.token||!j.me)return {err:String(j.error||'Could not sign in').replace(/\bPIN\b/g,'passcode')};
+    return {login:{token:j.token,name:j.me.name,key:j.me.key,cloud:j.progress||null,created:!!j.created}};
+  });
+}
+// choice: 'merge' adds this device's guest journey to the account; 'apart' sets it aside until sign-out.
+function finishSignIn(L,choice){
+  const mine=save.acct===L.key||choice==='merge',mute=save.mute;
+  if(choice==='apart'){try{localStorage.setItem(GUEST_KEY,JSON.stringify(save));}catch(e){}}
+  replaceSave(Object.assign(mergeProgress(mine?save:null,L.cloud),{mute:mute,acct:L.key}));
+  acct.token=L.token;acct.name=L.name;acct.key=L.key;acct.pending=true;writeAcct();writeLocal();
+  sync.status='';sync.fails=0;sync.ver++;pushSync();
+}
+function finishSignOut(){
+  const tok=acct.token,mute=save.mute;
+  if(tok)api('logout',{token:tok});
+  clearTimeout(sync.timer);sync.timer=0;sync.status='';
+  acct.token=null;acct.key='';acct.pending=false;writeAcct();
+  let g=null;try{g=JSON.parse(localStorage.getItem(GUEST_KEY)||'null');localStorage.removeItem(GUEST_KEY);}catch(e){}
+  replaceSave(Object.assign(g&&typeof g==='object'?g:{},{mute:mute}));delete save.acct;writeLocal();
+}
+function startCloud(){
+  loadAcct();
+  if(acct.token&&save.acct!==acct.key){save.acct=acct.key;writeLocal();}
+  if(acct.token)pushSync();
+  document.addEventListener('visibilitychange',()=>{if(!acct.token)return;
+    if(document.hidden){if(acct.pending)pushSync(true);}
+    else if(Date.now()-sync.lastPull>5000)pushSync();});
+  addEventListener('pagehide',()=>{if(acct.token&&acct.pending)pushSync(true);});
+  addEventListener('online',()=>{if(acct.token)pushSync();});
+}
+
+// The sign-in window is a plain HTML form over the canvas, so phones bring up a real keyboard.
+const acctUI={open:false,el:null,view:'',mode:'login',login:null,busy:false};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+function openAccount(){
+  if(!acctUI.el){const el=document.createElement('div');el.id='acct';document.body.appendChild(el);acctUI.el=el;
+    el.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b)acctAction(b.getAttribute('data-a'));else if(e.target===el&&acctUI.view==='me'&&!acctUI.busy)acctAction('close');});
+    el.addEventListener('submit',e=>{e.preventDefault();acctSubmit();});
+    el.addEventListener('keydown',e=>{if(e.key==='Escape'&&!acctUI.busy){e.preventDefault();acctAction('close');}});
+    el.addEventListener('input',e=>{if(e.target.id==='acctP')e.target.value=e.target.value.replace(/\D/g,'').slice(0,4);if(!acctUI.busy)acctNote('');});}
+  for(const k in keys)keys[k]=false;for(const k in touches)delete touches[k];mouseShine=false;
+  acctUI.open=true;acctUI.el.className='on';acctUI.busy=false;
+  if(acct.token)acctView('me');else{acctUI.mode='login';acctView('form');}
+}
+function closeAccount(){acctUI.open=false;acctUI.busy=false;acctUI.login=null;if(acctUI.el){acctUI.el.className='';acctUI.el.innerHTML='';}try{document.activeElement.blur();}catch(e){}}
+function acctView(v,note){
+  acctUI.view=v;const el=acctUI.el,c=acctUI.mode==='create';let h='';
+  if(v==='form'){
+    const again=!!(acct.name&&save.acct&&!c);
+    h='<form class="box" role="dialog" aria-modal="true" aria-labelledby="acctH" novalidate><h2 id="acctH">Your Account</h2>'+
+      '<p>'+(again?'Sign in again to keep saving your journey.':'Sign in to keep your journey safe and pick it up again on any device.')+'</p>'+
+      '<div class="tabs"><button type="button" data-a="login"'+(c?'':' class="on" aria-pressed="true"')+'>Sign In</button><button type="button" data-a="create"'+(c?' class="on" aria-pressed="true"':'')+'>New Account</button></div>'+
+      '<label for="acctN">Username</label><input id="acctN" name="username" maxlength="12" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" value="'+esc(c?'':acct.name||'')+'">'+
+      '<div class="hint">4 to 12 letters or numbers</div>'+
+      '<label for="acctP">Passcode</label><input id="acctP" name="passcode" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="'+(c?'new-password':'current-password')+'">'+
+      '<div class="hint">'+(c?'Choose 4 numbers. Write your username and passcode down: you will need both on your other devices.':'4 numbers')+'</div>'+
+      '<div class="err" role="alert">'+esc(note||'')+'</div>'+
+      '<div class="row"><button type="button" data-a="close">Cancel</button><button type="submit" class="main">'+(c?'Create Account':'Sign In')+'</button></div></form>';
+  }else if(v==='choice'){
+    const L=acctUI.login;
+    h='<div class="box" role="dialog" aria-modal="true" aria-labelledby="acctH"><h2 id="acctH">Bring This Journey?</h2>'+
+      '<p>This device has a journey that is not saved to any account: <b>'+esc(journeyWords(save))+'</b>.</p>'+
+      '<p>'+(hasProgress(L.cloud)?'<b>'+esc(L.name)+'</b> already has <b>'+esc(journeyWords(L.cloud))+'</b>. Add this one too, and everything found on either is kept.':'Add it to <b>'+esc(L.name)+'</b> to keep it safe and take it to your other devices.')+'</p>'+
+      '<div class="row"><button type="button" data-a="apart">Keep It Apart</button><button type="button" class="main" data-a="merge">Add It</button></div>'+
+      '<div class="hint mid">If you keep it apart, it waits on this device and comes back when you sign out.</div></div>';
+  }else if(v==='me'){
+    const s=acctStatus(),ok=s==='Journey saved';
+    h='<div class="box" role="dialog" aria-modal="true" aria-labelledby="acctH"><h2 id="acctH">Your Account</h2>'+
+      '<p>Signed in as <b>'+esc(acct.name)+'</b></p>'+
+      '<p class="st">'+(ok?'Your journey is saved to your account: '+esc(journeyWords(save))+'.':esc(s))+'</p>'+
+      '<div class="hint mid">To keep going on another phone or computer, open Lamp Unto My Feet there and sign in with the same username and passcode.</div>'+
+      '<div class="err slim" role="alert">'+esc(note||'')+'</div>'+
+      '<div class="row"><button type="button" data-a="out">Sign Out</button><button type="button" class="main" data-a="close">Done</button></div></div>';
+  }else if(v==='outfail'){
+    h='<div class="box" role="dialog" aria-modal="true" aria-labelledby="acctH"><h2 id="acctH">Not Saved Yet</h2>'+
+      '<p>The server can’t be reached, so your newest steps are only on this device. If you sign out now, they will be lost.</p>'+
+      '<div class="row"><button type="button" data-a="outnow">Sign Out Anyway</button><button type="button" class="main" data-a="me">Stay Signed In</button></div></div>';
+  }
+  el.innerHTML=h;
+  let f=null;
+  if(v==='form'){const n=el.querySelector('#acctN');f=n&&n.value?el.querySelector('#acctP'):n;}
+  else f=el.querySelector('.main');
+  try{if(f)f.focus();}catch(e){}
+}
+function acctNote(t,ok){const e=acctUI.el&&acctUI.el.querySelector('.err');if(e){e.textContent=t;e.classList.toggle('ok',!!ok);}}
+function acctSubmit(){
+  if(acctUI.busy||acctUI.view!=='form')return;
+  const el=acctUI.el,raw=el.querySelector('#acctN').value,pin=el.querySelector('#acctP').value,c=acctUI.mode==='create';
+  const name=raw.replace(/\s+/g,' ').trim();
+  if(/[^A-Za-z0-9 _-]/.test(name))return acctNote('Usernames can use letters, numbers, spaces, - and _');
+  if(name.length<4)return acctNote('Your username needs at least 4 letters or numbers');
+  if(!/^\d{4}$/.test(pin))return acctNote('Your passcode is 4 numbers');
+  acctUI.busy=true;acctNote(c?'Making your account…':'Signing in…',true);
+  for(const b of el.querySelectorAll('button'))b.disabled=true;
+  signIn(c?'create':'login',name,pin).then(r=>{
+    if(!acctUI.open)return;acctUI.busy=false;
+    if(r.err){for(const b of el.querySelectorAll('button'))b.disabled=false;acctNote(r.err);return;}
+    const L=r.login;
+    if(!save.acct&&hasProgress(save)){acctUI.login=L;acctView('choice');return;}
+    welcome(L,null);
+  });
+}
+function welcome(L,choice){finishSignIn(L,choice);closeAccount();ui.msg=L.created?'Welcome, '+L.name+'. Your journey will be saved to your account.':'Welcome back, '+L.name+'. Your journey is here.';sfx('cp');}
+function acctAction(a){
+  if(acctUI.busy&&a!=='outnow')return;
+  if(a==='close'){closeAccount();return;}
+  if(a==='login'||a==='create'){if(acctUI.mode!==a){const n=acctUI.el.querySelector('#acctN'),keep=n?n.value:'';acctUI.mode=a;acctView('form');const m=acctUI.el.querySelector('#acctN');if(m&&keep)m.value=keep;}return;}
+  if(a==='merge'||a==='apart'){const L=acctUI.login;if(L)welcome(L,a);return;}
+  if(a==='me'){acctView('me');return;}
+  if(a==='outnow'){finishSignOut();closeAccount();ui.msg='Signed out. This device has forgotten the journey, but your account still has it.';return;}
+  if(a==='out'){
+    const done=()=>{const nm=acct.name;finishSignOut();closeAccount();ui.msg='Signed out. Your journey is safe in '+nm+'’s account.';};
+    if(!acct.pending&&!sync.busy){done();return;}
+    acctUI.busy=true;acctNote('Saving your journey first…',true);
+    const run=()=>pushSync().then(ok=>{if(!acctUI.open)return;acctUI.busy=false;if(ok&&acct.pending&&acct.token)return run();if(ok)done();else if(!acct.token){done();}else acctView('outfail');});
+    run();
+  }
+}
 
 // ---------------- Audio ----------------
 let AC=null,master=null,musG=null,sfxG=null,noiseBuf=null,hum=null;
@@ -79,7 +303,87 @@ function initAudio(){
     if(AC.state==='suspended')AC.resume();
   }catch(e){AC=null;}
 }
-function setMute(m){save.mute=m;writeSave();if(master&&AC)master.gain.setTargetAtTime(m?0:0.9,AC.currentTime,0.05);}
+function setMute(m){save.mute=m;writeLocal();if(master&&AC)master.gain.setTargetAtTime(m?0:0.9,AC.currentTime,0.05);if(m)hush();}
+
+// ---------------- Voice ----------------
+// A gentle reading voice for verses, signs, story and prompts. It uses the speech built into the browser:
+// free, offline, nothing to install. The nicest English voice on the device is chosen, and the player can
+// pick another, slow it down, or turn it off under Sound and Voice. These choices stay on this device.
+const VOICE_KEY='lampUntoMyFeet.voice.v1';
+const voice={ok:typeof speechSynthesis!=='undefined'&&typeof SpeechSynthesisUtterance!=='undefined',on:true,uri:'',rate:0.9,list:[],v:null,pri:0,gen:0,speaking:false,
+  unlocked:false,gesture:false,waiting:null,q:[],cancelAt:0,startAt:0,err:'',spoke:false};
+const VOICE_SPEEDS=[[0.8,'Gentle'],[0.9,'Steady'],[1.02,'Brisk']];
+function loadVoicePrefs(){try{const o=JSON.parse(localStorage.getItem(VOICE_KEY)||'null');if(o&&typeof o==='object'){if(typeof o.on==='boolean')voice.on=o.on;if(typeof o.uri==='string')voice.uri=o.uri;if(o.rate>=0.6&&o.rate<=1.3)voice.rate=o.rate;}}catch(e){}}
+function writeVoicePrefs(){try{localStorage.setItem(VOICE_KEY,JSON.stringify({on:voice.on,uri:voice.uri,rate:voice.rate}));}catch(e){}}
+// Prefer warm, natural voices; keep novelty voices (bells, robots, whispers) out of the list.
+function voiceScore(v){const n=v.name||'';let s=0;
+  if(/^en[-_]US/i.test(v.lang))s+=3;else if(/^en[-_](GB|AU|IE|NZ|CA)/i.test(v.lang))s+=2;else if(/^en/i.test(v.lang))s+=1;
+  if(/natural|neural|premium|enhanced/i.test(n))s+=10;if(/online/i.test(n))s+=3;
+  if(/Google (US|UK) English/i.test(n))s+=6;
+  if(/Samantha|Ava|Allison|Susan|Serena|Karen|Moira|Tessa|Fiona|Kate|Aria|Jenny|Libby|Sonia|Emma|Michelle|Natasha|Clara|Zira|Daniel|Arthur|Guy/i.test(n))s+=4;
+  return s;}
+const NOVELTY=/albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|jester|junior|organ|ralph|fred|superstar|trinoids|whisper|wobble|zarvox|eddy|flo|grandma|grandpa|reed|rocko|sandy|shelley|kathy|espeak/i;
+function loadVoices(){if(!voice.ok)return;let all=[];try{all=speechSynthesis.getVoices()||[];}catch(e){}
+  voice.list=all.filter(v=>/^en/i.test(v.lang||'')&&!NOVELTY.test(v.name||'')).sort((a,b)=>voiceScore(b)-voiceScore(a)||String(a.name).localeCompare(String(b.name)));
+  voice.v=voice.list.find(v=>v.voiceURI===voice.uri)||voice.list[0]||null;}
+// Browsers let a page start speaking only while someone is tapping, clicking or pressing a key, and on phones
+// the moment a finger touches the screen does not count: only the lift does. The game reacts on the touch,
+// so anything it wants to say before the voice is awake waits, and is spoken when that same finger lifts.
+// After the first line, the browser lets the voice speak whenever the game needs it.
+function voiceGesture(e){
+  if(!voice.ok||(e&&e.isTrusted===false))return;
+  voice.gesture=true;setTimeout(()=>{voice.gesture=false;},0);
+  const w=voice.waiting;
+  if(w){voice.waiting=null;if(voiceOn())speakNow(w.text,w.o);return;}
+  // nothing to say yet: wake the voice with a whisper on a lift or click, so lines during play are heard at once
+  if(!voice.unlocked&&voiceOn()&&e&&(e.type==='touchend'||e.type==='pointerup'||e.type==='click')){
+    try{const u=new SpeechSynthesisUtterance(' ');u.volume=0.01;u.onerror=ev=>{if(ev&&ev.error==='not-allowed')voice.unlocked=false;};voice.q=[u];speechSynthesis.speak(u);voice.unlocked=true;}catch(_){}}
+}
+if(voice.ok)for(const ev of ['touchend','pointerup','click','mousedown','keydown'])addEventListener(ev,voiceGesture,{capture:true,passive:true});
+function voiceOn(){return voice.ok&&voice.on&&!save.mute;}
+// Read a reference the way a person says it: "1 John 4:18" -> "First John 4, verse 18".
+function sayRef(k){let r=refOf(k).replace(/;.*/,'');const m=r.match(/^([123]) (.+)$/);if(m)r=['First','Second','Third'][+m[1]-1]+' '+m[2];
+  return r.replace(/(\d+):(\d+)-(\d+)/,'$1, verses $2 to $3').replace(/(\d+):(\d+)/,'$1, verse $2');}
+function speakable(t){return String(t).replace(/LORD/g,'Lord').replace(/\bGOD\b/g,'God').replace(/[“”]/g,'').replace(/[‘’]/g,"'").replace(/—/g,', ').replace(/\s+/g,' ').trim();}
+function chunks(t){const out=[];let cur='';for(const s of t.match(/[^.!?;]+[.!?;]*\s*/g)||[t]){if((cur+s).length>180&&cur){out.push(cur.trim());cur='';}cur+=s;}if(cur.trim())out.push(cur.trim());return out;}
+function duck(on){if(musG&&AC)musG.gain.setTargetAtTime(on?0.16:0.5,AC.currentTime,0.25);}
+function speechBusy(){if(voice.speaking&&Date.now()-voice.startAt>25000){voice.speaking=false;voice.pri=0;}   // a voice that never said it finished
+  try{return speechSynthesis.speaking||speechSynthesis.pending;}catch(e){return false;}}
+function cancelSpeech(){try{speechSynthesis.cancel();}catch(e){}voice.cancelAt=Date.now();}
+// Speak now. Utterances are kept in voice.q so the browser cannot throw them away mid-sentence.
+function speakNow(text,o){
+  const pri=o.pri||2,gen=++voice.gen,parts=chunks(speakable(text));if(!parts.length)return;
+  try{if(speechSynthesis.paused)speechSynthesis.resume();}catch(e){}
+  if(voice.gesture)voice.unlocked=true;
+  voice.pri=pri;voice.speaking=true;voice.startAt=Date.now();duck(true);voice.q=[];
+  const done=()=>{if(gen===voice.gen){voice.speaking=false;voice.pri=0;duck(false);}};
+  parts.forEach((c,i)=>{const u=new SpeechSynthesisUtterance(c);if(voice.v){u.voice=voice.v;u.lang=voice.v.lang;}else u.lang='en-US';
+    u.rate=voice.rate*(o.rate||1);u.pitch=o.pitch||1;u.volume=1;voice.q.push(u);
+    u.onstart=()=>{voice.spoke=true;voice.err='';};
+    u.onerror=ev=>{const er=ev&&ev.error;
+      if(er==='not-allowed'){voice.unlocked=false;if(i===0&&gen===voice.gen)voice.waiting={text:text,o:o};}   // try again on the next tap
+      else if(er&&er!=='interrupted'&&er!=='canceled')voice.err=er;
+      if(i===parts.length-1)done();};
+    if(i===parts.length-1)u.onend=done;
+    try{speechSynthesis.speak(u);}catch(e){voice.err='failed';}});
+}
+// pri: 3 the Word and story, 2 signs and helpers, 1 small notes. Something more important interrupts; less important waits its turn or is skipped.
+function say(text,o){
+  o=Object.assign({pri:2},o||{});if(!voiceOn()||!text)return;
+  if(!voice.unlocked&&!voice.gesture){if(!voice.waiting||o.pri>=voice.waiting.o.pri)voice.waiting={text:text,o:o};return;}
+  const busy=speechBusy();
+  if(busy&&voice.speaking&&o.pri<voice.pri)return;
+  if(busy)cancelSpeech();
+  // speaking straight after stopping can be dropped by some browsers, so leave a moment between
+  const wait=Math.max(0,120-(Date.now()-voice.cancelAt));
+  if(!wait||voice.gesture){speakNow(text,o);return;}
+  const gen=++voice.gen;voice.pri=o.pri;voice.speaking=true;voice.startAt=Date.now();
+  setTimeout(()=>{if(gen===voice.gen)speakNow(text,o);},wait);
+}
+function sayVerse(k,extra,o){say(V(k)+' '+sayRef(k)+'.'+(extra?' '+extra:''),Object.assign({pri:3},o||{}));}
+function hush(){voice.gen++;voice.waiting=null;if(voice.ok&&speechBusy())cancelSpeech();voice.speaking=false;voice.pri=0;duck(false);}
+function voiceSample(){say('Your word is a lamp to my feet and a light to my path. Psalm 119, verse 105.',{pri:3});}
+loadVoicePrefs();if(voice.ok){loadVoices();try{speechSynthesis.addEventListener('voiceschanged',loadVoices);}catch(e){try{speechSynthesis.onvoiceschanged=loadVoices;}catch(_){}}}
 function tone(f,t,dur,type,vol,dest,f2){if(!AC)return;try{const o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol,t+0.012);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(dest||sfxG);o.start(t);o.stop(t+dur+0.05);}catch(e){}}
 function pad(f,t,dur,vol){if(!AC)return;try{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol,t+dur*0.35);g.gain.linearRampToValueAtTime(0.0001,t+dur*1.15);o.connect(g);g.connect(musG);o.start(t);o.stop(t+dur*1.2);}catch(e){}}
 function noise(t,dur,vol,fc){if(!AC)return;try{const s=AC.createBufferSource(),g=AC.createGain(),f=AC.createBiquadFilter();s.buffer=noiseBuf;s.loop=true;f.type='lowpass';f.frequency.value=fc;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);s.connect(f);f.connect(g);g.connect(sfxG);s.start(t);s.stop(t+dur+0.02);}catch(e){}}
@@ -100,6 +404,9 @@ function sfx(n){if(!AC)return;const t=AC.currentTime;switch(n){
   case 'thunder':noise(t,1.8,0.22,150);break;
   case 'splash':noise(t,0.35,0.2,1200);break;
   case 'grow':tone(196,t,0.9,'triangle',0.1,null,392);break;
+  case 'key':tone(587,t,0.14,'sine',0.11);tone(1175,t,0.1,'sine',0.03);break;
+  case 'word':[659,784,988].forEach((f,i)=>tone(f,t+i*0.07,0.5,'triangle',0.12));break;
+  case 'nope':tone(233,t,0.16,'triangle',0.07,null,196);break;
 }}
 const SCALES={maj:[0,2,4,5,7,9,11],dor:[0,2,3,5,7,9,10],lyd:[0,2,4,6,7,9,11],aeo:[0,2,3,5,7,8,10],mix:[0,2,4,5,7,9,10]};
 const _=null;
@@ -284,7 +591,43 @@ const VERSES={
   "Matthew 27:60":"and laid it in his own new tomb, which he had cut in the rock. And he rolled a great stone to the entrance of the tomb and went away.",
   "Matthew 28:6":"He is not here, for he has risen, as he said. Come, see the place where he lay.",
   "John 14:2":"In my Father's house are many rooms. If it were not so, would I have told you that I go to prepare a place for you?",
-  "Matthew 25:21":"His master said to him, ‘Well done, good and faithful servant. You have been faithful over a little; I will set you over much. Enter into the joy of your master.’"
+  "Matthew 25:21":"His master said to him, ‘Well done, good and faithful servant. You have been faithful over a little; I will set you over much. Enter into the joy of your master.’",
+  // The road ahead: verses read at waystones and checkpoints, each pointing to what comes next
+  "Psalm 32:8":"I will instruct you and teach you in the way you should go; I will counsel you with my eye upon you.",
+  "Isaiah 30:21":"And your ears shall hear a word behind you, saying, “This is the way, walk in it,” when you turn to the right or when you turn to the left.",
+  "Psalm 119:11":"I have stored up your word in my heart, that I might not sin against you.",
+  "Psalm 18:29":"For by you I can run against a troop, and by my God I can leap over a wall.",
+  "Psalm 18:36":"You gave a wide place for my steps under me, and my feet did not slip.",
+  "Habakkuk 3:19a":"GOD, the Lord, is my strength; he makes my feet like the deer's; he makes me tread on my high places.",
+  "Mark 4:21":"And he said to them, “Is a lamp brought in to be put under a basket, or under a bed, and not on a stand?",
+  "John 12:35":"So Jesus said to them, “The light is among you for a little while longer. Walk while you have the light, lest darkness overtake you. The one who walks in the darkness does not know where he is going.",
+  "Isaiah 42:16":"And I will lead the blind in a way that they do not know, in paths that they have not known I will guide them. I will turn the darkness before them into light, the rough places into level ground. These are the things I do, and I do not forsake them.",
+  "Proverbs 4:18":"But the path of the righteous is like the light of dawn, which shines brighter and brighter until full day.",
+  "Matthew 7:7":"“Ask, and it will be given to you; seek, and you will find; knock, and it will be opened to you.",
+  "Luke 15:8":"“Or what woman, having ten silver coins, if she loses one coin, does not light a lamp and sweep the house and seek diligently until she finds it?",
+  "Ecclesiastes 4:9":"Two are better than one, because they have a good reward for their toil.",
+  "Ecclesiastes 4:10":"For if they fall, one will lift up his fellow. But woe to him who is alone when he falls and has not another to lift him up!",
+  "Ecclesiastes 4:12":"And though a man might prevail against one who is alone, two will withstand him—a threefold cord is not quickly broken.",
+  "1 Thessalonians 5:11":"Therefore encourage one another and build one another up, just as you are doing.",
+  "Genesis 28:12":"And he dreamed, and behold, there was a ladder set up on the earth, and the top of it reached to heaven. And behold, the angels of God were ascending and descending on it!",
+  "Exodus 17:12":"But Moses' hands grew weary, so they took a stone and put it under him, and he sat on it, while Aaron and Hur held up his hands, one on one side, and the other on the other side. So his hands were steady until the going down of the sun.",
+  "Mark 16:3":"And they were saying to one another, “Who will roll away the stone for us from the entrance of the tomb?”",
+  "Luke 5:7":"They signaled to their partners in the other boat to come and help them. And they came and filled both the boats, so that they began to sink.",
+  "Mark 2:3":"And they came, bringing to him a paralytic carried by four men.",
+  "Mark 2:4":"And when they could not get near him because of the crowd, they removed the roof above him, and when they had made an opening, they let down the bed on which the paralytic lay.",
+  "Luke 19:4":"So he ran on ahead and climbed up into a sycamore tree to see him, for he was about to pass that way.",
+  "Psalm 66:12":"you let men ride over our heads; we went through fire and through water; yet you have brought us out to a place of abundance.",
+  "Matthew 8:26":"And he said to them, “Why are you afraid, O you of little faith?” Then he rose and rebuked the winds and the sea, and there was a great calm.",
+  "Hebrews 12:2":"looking to Jesus, the founder and perfecter of our faith, who for the joy that was set before him endured the cross, despising the shame, and is seated at the right hand of the throne of God.",
+  "Hebrews 12:1":"Therefore, since we are surrounded by so great a cloud of witnesses, let us also lay aside every weight, and sin which clings so closely, and let us run with endurance the race that is set before us,",
+  "Psalm 55:22":"Cast your burden on the LORD, and he will sustain you; he will never permit the righteous to be moved.",
+  "Mark 11:25":"And whenever you stand praying, forgive, if you have anything against anyone, so that your Father also who is in heaven may forgive you your trespasses.”",
+  "Psalm 130:6":"my soul waits for the Lord more than watchmen for the morning, more than watchmen for the morning.",
+  "Romans 13:12":"The night is far gone; the day is at hand. So then let us cast off the works of darkness and put on the armor of light.",
+  "Isaiah 60:1":"Arise, shine, for your light has come, and the glory of the LORD has risen upon you.",
+  "Psalm 91:11":"For he will command his angels concerning you to guard you in all your ways.",
+  "Psalm 91:12":"On their hands they will bear you up, lest you strike your foot against a stone.",
+  "Psalm 121:8":"The LORD will keep your going out and your coming in from this time forth and forevermore."
 };
 let esvShown=false;
 function V(k){const v=VERSES[k];if(v===undefined){try{console.warn('Missing verse: '+k);}catch(e){}return '';}return v;}
@@ -292,6 +635,86 @@ function refOf(k){return k.replace(/(\d)[ab]$/,'$1');}
 // The first reference shown carries the translation name; later ones are plain.
 function refLabel(k,force){const r=refOf(k);if(force||!esvShown){esvShown=true;return r+' (ESV)';}return r;}
 const GRACE=["2 Corinthians 12:9a","Psalm 37:24","Lamentations 3:22-23","Isaiah 41:10","Proverbs 24:16a","Psalm 145:14","Micah 7:8","Psalm 40:2","Psalm 94:18","Romans 8:1","Psalm 73:26","Philippians 1:6"];
+// Hints for the road ahead. A waystone or checkpoint shows the verse with a line saying what it points to,
+// and a small light flies ahead to the thing it means ('look'). Fall in that stretch, and this is the verse
+// you type from to rise again, so the words that light the next step are the ones you remember.
+const HINTS={
+  way:{v:'Psalm 32:8',gloss:'Read the verses along the road. Each one tells you what lies ahead.'},
+  listen:{v:'Isaiah 30:21',gloss:'Signs and verses will tell you the way. Read them, and walk in it.'},
+  lamp:{v:'Mark 4:21',gloss:'Do not hide the lamp. Hold Shine, and let your light out.',look:'tile:S'},
+  leap:{v:'Psalm 18:29',gloss:'Gaps and high steps ahead. Hold Jump longer to leap higher.'},
+  heights:{v:'Habakkuk 3:19a',gloss:'Steep heights ahead. Leap from step to step, and do not look down.'},
+  wall:{v:'John 1:5',gloss:'A wall of Shadow stands ahead. Hold Shine, and it gives way to the light.',look:'tile:S'},
+  flee:{v:'Psalm 27:1',gloss:'Shadows drift on the road ahead. Shine on them, and they fade.',look:'sh'},
+  creep:{v:'John 12:35',gloss:'Some Shadows ahead creep only in the dark. Keep the lamp lit, and they stand still.',look:'sh'},
+  swarm:{v:'Romans 12:21',gloss:'A great Shadow ahead breaks into pieces. Keep shining until every piece is gone.',look:'sh'},
+  oil:{v:'Matthew 25:4',gloss:'The road ahead is long and dark. Gather oil, and shine only when you must.',look:'oil'},
+  faith:{v:'2 Corinthians 5:7',gloss:'There are bridges ahead you cannot see. Walk out where the air glimmers.',look:'tile:F'},
+  hidden:{v:'Isaiah 42:16',gloss:'Hidden paths ahead. Your lamp shows them as you step out.',look:'tile:F'},
+  wings:{v:'Isaiah 40:31',gloss:'Wide gaps ahead. Jump, then keep holding Jump to glide across.'},
+  love:{v:'Matthew 5:44',gloss:'Someone bitter blocks the way. Do not push. Hold Act, and offer your hand.',look:'wand'},
+  forgive:{v:'Colossians 3:13',gloss:'A grudge bars the gate ahead. Hold Act, and forgive.',look:'gate'},
+  forgive2:{v:'Mark 11:25',gloss:'More grudge gates ahead. Forgive, and they swing open.',look:'gate'},
+  weight:{v:'Hebrews 12:1',gloss:'Weights lie on the road ahead. They make you slow. Lay them aside at the cross.',look:'cross'},
+  rest:{v:'Matthew 11:28',gloss:'Carrying too much? The cross ahead is where you put it down.',look:'cross'},
+  cast:{v:'Psalm 55:22',gloss:'New burdens ahead, and a cross after them. Cast them down, and leap light again.',look:'cross'},
+  boats:{v:'Matthew 14:27',gloss:'Leap boat to boat. Watch how each one sways before you jump.',look:'boat'},
+  wind:{v:'Matthew 8:26',gloss:'The wind ahead pushes you back. Keep pressing forward.'},
+  crumble:{v:'Psalm 18:36',gloss:'The road ahead crumbles under your feet. Keep moving, and do not stand still.',look:'tile:C'},
+  storm:{v:'Psalm 46:1',gloss:'A storm is coming up behind you. Keep going, and do not turn back.'},
+  fire:{v:'Psalm 66:12',gloss:'Through the storm and the water: keep going. You will come out on the other side.'},
+  flood:{v:'Isaiah 43:2',gloss:'The water will rise behind you. Climb, and do not stop.'},
+  plant:{v:'1 Corinthians 3:7',gloss:'Soft earth ahead. Plant a seed there, and climb what grows.',look:'soil'},
+  climb:{v:'Luke 19:4',gloss:'Plant the last seed, then climb as the tree rises.',look:'soil'},
+  lost:{v:'Luke 15:8',gloss:'Someone is lost along this road. Look for them with your lamp: you will need each other.',look:'lost'},
+  seek:{v:'Luke 19:10',gloss:'Someone sits alone in the dark nearby. Find them, and bring them along.',look:'lost'},
+  two:{v:'Ecclesiastes 4:9',gloss:'Something ahead takes two. Do not leave your friend behind.',look:'help'},
+  lift:{v:'Ecclesiastes 4:10',gloss:'A wall ahead is too high to climb alone. A friend can hold the ladder.',look:'help'},
+  ladder:{v:'Genesis 28:12',gloss:'A ladder lies ahead. Someone must hold it steady while you climb.',look:'help'},
+  steady:{v:'Exodus 17:12',gloss:'Ask your friend to hold the ladder steady, then climb rung by rung.',look:'help'},
+  stone:{v:'Mark 16:3',gloss:'A great stone blocks the road ahead. It will take two to roll it away.',look:'help'},
+  cord:{v:'Ecclesiastes 4:12',gloss:'A gap ahead is too wide to leap. Two can lay a bridge across it.',look:'help'},
+  partners:{v:'Luke 5:7',gloss:'Open water ahead. A rowboat waits, but someone has to row.',look:'help'},
+  carry:{v:'Galatians 6:2',gloss:'He is heavy. Find a friend on the road, and they will help you carry him.',look:'lost'},
+  friends:{v:'Mark 2:3',gloss:'Friends carry each other. Find the one waiting ahead.',look:'lost'},
+  encourage:{v:'1 Thessalonians 5:11',gloss:'You are not walking alone. Keep your friends close.'},
+  water:{v:'Hebrews 12:2',gloss:'Keep walking toward the Light. If you stop or turn back, you start to sink.'},
+  wait:{v:'Psalm 130:6',gloss:'When the road ahead is shut, stand still, keep the lamp lit, and wait for morning.'},
+  vast:{v:'Psalm 23:4',gloss:'Something vast follows. You cannot drive it off. Keep the lamp lit, and keep walking.'},
+  armor:{v:'Romans 13:12',gloss:'The night is nearly over. Lift the lamp high, and walk through it.'},
+  arise:{v:'Isaiah 60:1',gloss:'The dawn is close. Climb the hill.'},
+  knock:{v:'Matthew 7:7',gloss:'Small doors along the road hide harder ways, and hidden scrolls behind them.',look:'door'},
+  guard:{v:'Psalm 91:12',gloss:'You may fall on the road ahead. When you do, you will be carried back.'},
+  dawn:{v:'Proverbs 4:18',gloss:'The path grows brighter the farther you go. Keep walking.'},
+  home:{v:'Luke 15:20',gloss:'Run! He has watched this road every evening.'},
+  lamb:{v:'Isaiah 40:11',gloss:'Lift the lamb onto your shoulders, and carry it up out of the ravine.'},
+  keep:{v:'Psalm 121:8',gloss:'The Lord keeps your going out and your coming in. Go on.'}
+};
+// Words to type for each verse: short, meaningful, and present in the verse itself. Others are chosen automatically.
+const KEYWORDS={
+  "Psalm 119:105":['lamp','light','path','word'],"Psalm 119:11":['word','heart','stored'],"Psalm 32:8":['way','teach','instruct','counsel'],
+  "Isaiah 30:21":['way','walk','word','hear'],"Psalm 18:29":['leap','wall','run','troop'],"Habakkuk 3:19a":['feet','high','strength','tread'],
+  "Mark 4:21":['lamp','stand','basket'],"John 1:5":['light','shines','darkness','overcome'],"Psalm 27:1":['light','fear','afraid','salvation'],
+  "John 12:35":['walk','light','darkness','overtake'],"Romans 12:21":['good','evil','overcome'],"Matthew 25:4":['oil','wise','lamps','flasks'],
+  "2 Corinthians 5:7":['faith','sight','walk'],"Isaiah 42:16":['guide','light','paths','level'],"Isaiah 40:31":['wings','eagles','renew','strength'],
+  "Matthew 5:44":['love','enemies','pray'],"Colossians 3:13":['forgive','forgiven','bearing'],"Mark 11:25":['forgive','praying','anyone'],
+  "Hebrews 12:1":['weight','run','race','endurance'],"Matthew 11:28":['rest','come','heavy'],"Psalm 55:22":['burden','cast','sustain'],
+  "Matthew 14:27":['heart','afraid'],"Matthew 8:26":['calm','faith','afraid','winds'],"Psalm 18:36":['steps','slip','wide','feet'],
+  "Psalm 46:1":['refuge','help','strength','trouble'],"Psalm 66:12":['water','fire','abundance'],"Isaiah 43:2":['waters','pass','rivers','overwhelm'],
+  "1 Corinthians 3:7":['growth','plants','gives'],"Luke 19:4":['climbed','tree','sycamore','ran'],"Luke 15:8":['lamp','seek','sweep','finds'],
+  "Luke 19:10":['seek','save','lost'],"Ecclesiastes 4:9":['two','better','reward'],"Ecclesiastes 4:10":['lift','fellow','alone'],
+  "Genesis 28:12":['ladder','top','heaven','angels'],"Exodus 17:12":['steady','hands','held'],"Mark 16:3":['roll','stone','tomb'],
+  "Ecclesiastes 4:12":['cord','two','threefold','withstand'],"Luke 5:7":['help','partners','boat'],"Galatians 6:2":['bear','burdens','fulfill'],
+  "Mark 2:3":['carried','four','bringing'],"1 Thessalonians 5:11":['encourage','build'],"Hebrews 12:2":['looking','jesus','faith','joy'],
+  "Psalm 130:6":['waits','morning','watchmen'],"Psalm 23:4":['fear','valley','comfort','walk'],"Romans 13:12":['armor','light','night','day'],
+  "Isaiah 60:1":['arise','shine','light','glory'],"Matthew 7:7":['knock','seek','ask','find'],"Psalm 91:12":['hands','bear','foot'],
+  "Proverbs 4:18":['path','dawn','light','brighter'],"Luke 15:20":['father','ran','compassion','arose'],"Isaiah 40:11":['carry','lambs','arms','gently'],
+  "Psalm 121:8":['keep','going','coming'],"Matthew 14:31":['hand','doubt','faith'],
+  "2 Corinthians 12:9a":['grace','power','weakness','sufficient'],"Psalm 37:24":['fall','hand','upholds'],"Lamentations 3:22-23":['mercies','morning','love','faithfulness'],
+  "Isaiah 41:10":['fear','help','strengthen','uphold'],"Proverbs 24:16a":['rises','seven','falls'],"Psalm 145:14":['upholds','raises','falling'],
+  "Micah 7:8":['rise','light','fall'],"Psalm 40:2":['rock','feet','secure','steps'],"Psalm 94:18":['foot','love','held'],"Romans 8:1":['condemnation','christ','jesus'],
+  "Psalm 73:26":['strength','heart','portion'],"Philippians 1:6":['good','work','began','completion']
+};
 const WAYSIDE=["Psalm 119:105","Deuteronomy 31:8","Joshua 1:9","Psalm 121:3","Psalm 18:28","John 1:5","Matthew 5:14","Psalm 23:1","Isaiah 41:10","Psalm 46:1","Proverbs 3:6","Psalm 56:3","Matthew 5:16","Psalm 27:1","Romans 8:1","Lamentations 3:22-23"];
 
 const VIRTUES=[
@@ -332,7 +755,9 @@ const JOURNAL=[
   ['hidden','At the end of the harder way I found a hidden scroll. Since then my lamp holds more oil and throws its light farther. The narrow road made me stronger.'],
   ['end','I have come home. The door was open and the light was on. It was always going to be.'],
   ['return','I am walking the road again, and the Shadows are stronger. So is the lamp.'],
-  ['returnEnd','Twice now I have walked from the green hills to the empty tomb. The story does not wear out. It wears in.']
+  ['returnEnd','Twice now I have walked from the green hills to the empty tomb. The story does not wear out. It wears in.'],
+  ['word','I fell, and a word I had read along the road came back to me, letter by letter. I said it again, and I stood up.'],
+  ['helper','Someone I had found sitting alone in the dark held the way open for me. Two really are better than one.']
 ];
 function journal(id){if(!save.journal[id]){save.journal[id]=1;writeSave();if(typeof G!=='undefined'&&G&&state==='play')G.note={t:0,text:'A new page in your Testimony'};}}
 
@@ -399,7 +824,8 @@ BP.climb=function(h0,step,list,ch){for(let i=0;i<list.length;i++){const L=list[i
 BP.sw=function(dx,hh,w){hh=hh||5;w=w||1;for(let i=0;i<w;i++)for(let k=0;k<hh;k++)this.set(this.sx+dx+i,this.h+1+k,'S');return this;};
 BP.arch=function(dx){for(let k=4;k<=11;k++)this.set(this.sx+dx,this.h+k,'=');return this;};
 BP.e=function(type,dx,h,props){const o=Object.assign({type:type,x:(this.sx+dx+0.5)*T,y:(this.rows-(h===undefined||h===null?this.h:h))*T},props||{});this.ents.push(o);return this;};
-BP.cp=function(dx,h){return this.e('cp',dx,h);};
+BP.cp=function(dx,h,hint){return this.e('cp',dx,h,hint?{hint:hint}:{});};
+BP.hint=function(dx,id,h){return this.e('hint',dx,h,{id:id});};
 BP.sc=function(dx,h,i){return this.e('scroll',dx,h,{i:i===undefined?this.sci++:i});};
 BP.oil=function(dx,h){return this.e('oil',dx,h);};
 BP.glad=function(dx,h){return this.e('glad',dx,h);};
@@ -428,6 +854,17 @@ BP.flag=function(k,v){this.fg[k]=v;return this;};
 BP.mk=function(k){this.fg[k]=this.x*T;return this;};
 BP.gust=function(dx,w){this.gusts.push({x1:(this.sx+dx)*T,x2:(this.sx+dx+w)*T});return this;};
 BP.vigil=function(dx1,dx2){this.fg.vigil={x1:(this.sx+dx1)*T,x2:(this.sx+dx2)*T,t:0,done:false,off:0};for(let k=1;k<=8;k++)this.set(this.sx+dx2,this.h+k,'V');return this;};
+// Tasks that take two. A Lost One walking with you can hold a ladder, lower a bridge, push a stone or row a boat.
+// Without a friend these block the road, so a forgotten Lost One means going back for them.
+BP.ladder=function(dx,hh){return this.e('help',dx,null,{kind:'ladder',c:this.sx+dx,gh:this.h,hh:hh});};
+BP.bridge=function(dx,w,art){return this.e('help',dx,null,{kind:'bridge',c0:this.sx+dx+1,w:w,gh:this.h,art:art||'plank'});};
+BP.stone=function(dx){const c=this.sx+dx;for(let k=1;k<=3;k++){this.set(c,this.h+k,'O');this.set(c+1,this.h+k,'O');}
+  const o=this.e('help',dx,null,{kind:'stone',c:c,gh:this.h});this.ents[this.ents.length-1].x=(c+1)*T;return o;};
+// A low rock ceiling over part of the current ground, starting clear tiles above it and reaching the top of the level.
+BP.roof=function(dx0,dx1,clear){for(let c=this.sx+dx0;c<=this.sx+dx1;c++)for(let k=this.h+clear+1;k<=this.rows;k++)this.set(c,k,'#');return this;};
+// A rowboat at the end of a pier: it carries you dist tiles across open water, but only with someone at the oars.
+BP.ferry=function(dx,w,dist,h){const o={type:'boat',ferry:true,w:w*T,ax:0,per:5,ph:0,rest:true};o.fx0=(this.sx+dx+w/2)*T;o.fx1=o.fx0+dist*T;o.bx=o.fx0;o.by=(this.rows-(h||3.6))*T;o.x=o.bx;o.y=o.by;o.dx=0;o.dy=0;this.ents.push(o);
+  return this.e('help',dx-1,null,{kind:'ferry',boat:o,dist:dist});};
 BP.finish=function(){
   const W=Math.max(this.maxc+1,this.x),H=this.rows,tiles=[];
   for(let r=0;r<H;r++){const row=new Array(W);for(let c=0;c<W;c++)row[c]=this.t[r*8192+c]||' ';tiles.push(row);}
@@ -445,34 +882,34 @@ const ROOMS={};
 
 // ---- Chapter one: the lost sheep ----
 ST(0,'The Green Hills',20,b=>{b.dk(.08)
- .g(16,4).sign(4,'Walk the narrow way home. Jump over the gaps.').pit(2)
+ .g(16,4).sign(4,'Walk the narrow way home. Jump over the gaps.').hint(10,'way').pit(2)
  .g(8,4).g(4,5).g(5,6).sign(2,'Hold Jump longer to leap higher.').pit(3)
- .g(12,5).cp(3).p(6,8,3).sc(7,9)
+ .g(12,5).cp(3,null,'wall').p(6,8,3).sc(7,9)
  .g(5,4).g(12,3).sign(2,'A wall of Shadow. Hold Shine, and let your light shine.').sw(8)
  .g(12,3).oil(2).sign(4,'Shadows flee the light. You cannot fight them. You can only outshine them.').sh(6,5)
- .pit(3).g(6,4).pit(2).g(4,5).pit(2).g(10,6).cp(3).p(5,9,2).p(8,11,3).glad(9,12)
+ .pit(3).g(6,4).pit(2).g(4,5).pit(2).g(10,6).cp(3,null,'seek').p(5,9,2).p(8,11,3).glad(9,12)
  .g(8,4).sh(2,5).p(1,7,2).p(4,10,5).lost(6,10)
  .g(4,5).g(8,5).door(4).sign(1,'A small door in the hillside. Hold Act to go in. Harder ways hide better treasures.')
  .pit(6).p(1,5,4).p(0,2,6).sc(3,3)
- .g(10,5).sh(3,4).g(4,4).g(16,4).deco(9,'signpost').goal(12,'path');});
+ .g(10,5).sh(3,4).hint(8,'lift').g(7,4).ladder(6,6).g(16,10).deco(9,'signpost').goal(12,'path');});
 ROOMS['0-0']=b=>{b.dk(.3).g(8,4).pit(3).g(2,4).pit(3).g(2,5).pit(3).g(2,6).fl(0,9,1.2).pit(3).g(3,7).pit(3).g(10,6).sc(4,7,2).exit(7);};
 ST(0,'The Thorn Wood',20,b=>{b.dk(.2)
- .g(12,5).sign(3,'One lamb is missing. Listen. It is crying somewhere ahead.').g(4,4).g(4,3).pit(2).g(6,3).oil(3)
+ .g(12,5).sign(3,'One lamb is missing. Listen. It is crying somewhere ahead.').hint(8,'lamp').g(4,4).g(4,3).pit(2).g(6,3).oil(3)
  .dk(.4).g(3,2).g(12,2).sw(1).sh(4,5).p(7,5,3).sc(8,6)
- .pit(3).g(5,2).cp(2).pit(2).g(3,3).pit(3).g(3,3).pit(2).g(8,2).fl(4,5,1.5)
- .g(4,3).g(4,4).g(12,4).sw(2).oil(4).sh(6,5).p(8,7,2).p(11,9,4).lost(13,9)
- .pit(3).g(4,4).pit(3).g(12,3).cp(2).door(5).sw(8)
+ .pit(3).g(5,2).cp(2,null,'leap').pit(2).g(3,3).pit(3).g(3,3).pit(2).g(8,2).fl(4,5,1.5)
+ .g(4,3).hint(1,'lost').g(4,4).g(12,4).sw(2).oil(4).sh(6,5).p(8,7,2).p(11,9,4).lost(13,9)
+ .pit(3).g(4,4).pit(3).g(12,3).cp(2,null,'oil').door(5).sw(8)
  .dk(.55).g(14,2).sh(3,8).oil(10)
- .g(3,3).g(3,4).g(3,5).pit(2).g(5,5).sh(1,3).pit(3).g(4,6).p(5,9,3).sc(6,10).pit(2).g(6,6).cp(2)
- .g(3,7).g(3,8).pit(3).g(6,8).fl(3,11,1).p(-2,11,2).p(-6,13,3).glad(-5,14)
+ .g(3,3).g(3,4).g(3,5).pit(2).g(5,5).sh(1,3).pit(3).g(4,6).p(5,9,3).sc(6,10).pit(2).g(6,6).cp(2,null,'cord')
+ .g(3,7).g(4,8).bridge(3,8,'log').pit(8).g(6,8).fl(3,11,1).p(-2,11,2).p(-6,13,3).glad(-5,14)
  .g(8,6).g(6,4).sw(3).g(16,4).deco(11,'ravine').sign(5,'The crying comes from below, down in the ravine.').goal(10,'path');});
 ROOMS['0-1']=b=>{b.dk(.75).g(8,4).oil(5).g(10,4).sw(2).sh(4,5).pit(3).g(6,4).sw(3).pit(2).g(3,5).pit(2).g(3,6).fl(1,9,1).pit(3).g(10,5).sc(4,6,2).exit(7);};
 ST(0,'The Rising Flood',80,b=>{b.dk(.5).flag('flood',{speed:15,on:false}).flag('rain',1).flag('start',{col:4,h:3});b.startH=3;
  b.fill(0,31,1,3).fill(0,1,4,78).fill(30,31,4,66).fill(32,60,1,66);
- b.at(2,3).sign(3,'There, at the bottom of the ravine. Hold Act to lift the lamb onto your shoulders.').carry(8,'lamb').sign(14,'The rain is filling the ravine. Climb!');
+ b.at(2,3).hint(1,'lamb').sign(3,'There, at the bottom of the ravine. Hold Act to lift the lamb onto your shoulders.').carry(8,'lamb').sign(14,'The rain is filling the ravine. Climb!');
  b.climb(6,3,[[5,5],[10,4],[15,5],[21,6],[16,4],[10,5],[3,6,'#'],[9,4],[14,4],[19,5],[24,5],[19,4],[13,5],[6,6,'#'],[12,4],[17,4],[22,5],[16,5],[21,4],[25,4]]);
  b.at(0,0).p(26,18,3).sc(27,19).p(7,32,5).lost(8,32).p(25,41,3).sc(26,42).p(7,50,4).glad(8,51).p(11,59,4).sc(12,60);
- b.at(0,24).cp(5).oil(7).at(0,45).cp(8).oil(10);
+ b.at(0,24).cp(5,null,'flood').oil(7).at(0,45).cp(8,null,'heights').oil(10);
  b.at(0,0).fl(11,29,1).fl(15,44,1.2).dr(18,56,6).fl(22,35,1);
  b.at(32,66).deco(14,'fold').goal(11,'fold').sign(2,'Home is just ahead. The ninety-nine are waiting.');
 },{vertical:true});
@@ -480,156 +917,157 @@ ST(0,'The Rising Flood',80,b=>{b.dk(.5).flag('flood',{speed:15,on:false}).flag('
 // ---- Chapter two: the road to Jericho ----
 ST(1,'The Jericho Road',20,b=>{b.dk(.15)
  .g(14,5).sign(3,'The road goes down from Jerusalem to Jericho. It is steep, and robbers keep it.').g(4,4).pit(2).g(6,4).sh(1,4)
- .g(10,3).shrine(4,0).sign(8,'Step out where the air glimmers.').fb(6).g(8,3).cp(2).fb(4).g(3,3).fb(7)
+ .g(10,3).shrine(4,0).sign(8,'Step out where the air glimmers.').fb(6).g(8,3).cp(2,null,'faith').fb(4).g(3,3).fb(7)
  .g(8,4).oil(3).p(2,7,2).p(-2,9,3).sc(-1,10)
  .pit(3).g(4,4).g(10,4).sw(1).sh(3,4).dr(5,7,4)
- .g(3,5).g(3,6).fb(9).g(6,6).cp(2).fp(6,9,5).sc(9,10)
- .pit(3).g(5,5).fl(2,8,1.5).pit(2).g(4,4).fb(5).g(12,4).door(2).fp(4,7,3).fp(8,9,4).lost(10,9)
+ .g(3,5).g(3,6).fb(9).g(6,6).cp(2,null,'hidden').fp(6,9,5).sc(9,10)
+ .pit(3).g(5,5).fl(2,8,1.5).pit(2).g(4,4).fb(5).g(12,4).door(2).hint(6,'seek').fp(4,7,3).fp(8,9,4).lost(10,9)
  .g(6,4).sh(1,4).fb(6).p(1,7,2).fp(4,9,2).glad(4,10)
- .g(6,4).dr(2,7,4).pit(3).g(4,5).fb(8).g(16,5).deco(9,'signpost').goal(12,'path');});
+ .g(6,4).dr(2,7,4).pit(3).g(4,5).fb(8).g(15,5).hint(1,'stone').roof(4,14,3).stone(9).g(16,5).deco(9,'signpost').goal(12,'path');});
 ROOMS['1-0']=b=>{b.dk(.4).g(6,5).fb(4).pit(2).fb(4).dr(0,8,4).pit(3).fb(3).pit(2).fb(5).g(10,5).sc(4,6,2).exit(7);};
 ST(1,'The Thieves’ Pass',20,b=>{b.dk(.22)
- .g(12,4).sign(3,'Somewhere along this pass a man lies wounded. Two have already gone by.').g(4,5).pit(3).g(6,5).sh(1,4).fb(5).g(8,5).oil(2).cp(5).p(3,8,2).p(-1,10,3).sc(0,11)
+ .g(12,4).sign(3,'Somewhere along this pass a man lies wounded. Two have already gone by.').hint(9,'flee').g(4,5).pit(3).g(6,5).sh(1,4).fb(5).g(8,5).oil(2).cp(5,null,'friends').p(3,8,2).p(-1,10,3).sc(0,11)
  .g(4,4).g(4,3).pit(2).g(5,3).g(12,3).sw(1).fl(5,6,1.5).sh(7,4).p(3,6,2).p(6,8,3).lost(7,8)
- .pit(3).g(3,4).fb(6).g(4,4).dr(1,7,4).pit(3).g(8,5).cp(2).door(5)
+ .pit(3).g(3,4).fb(6).g(4,4).dr(1,7,4).pit(3).g(8,5).cp(2,null,'knock').door(5)
  .g(3,6).g(3,7).fb(8).g(5,7).pit(3).g(3,6).pit(3).g(3,5).pit(2).g(12,4).sw(3).oil(6).fp(7,7,3).fp(11,9,3).sc(12,10)
- .g(6,4).sh(1,4).fb(7).g(4,5).g(4,6).dr(1,9,5).pit(3).g(8,6).cp(2).p(4,9,2).p(7,11,2).glad(7,12)
- .g(4,5).g(4,4).g(18,4).deco(10,'wounded').sign(4,'There he is, beside the road.').goal(8,'wounded');});
+ .g(6,4).sh(1,4).fb(7).g(4,5).g(4,6).dr(1,9,5).pit(3).g(8,6).cp(2,null,'ladder').p(4,9,2).p(7,11,2).glad(7,12)
+ .g(4,5).g(8,4).ladder(7,7).g(18,11).deco(10,'wounded').sign(4,'There he is, beside the road.').goal(8,'wounded');});
 ROOMS['1-1']=b=>{b.dk(.45).g(6,4).pit(3).g(2,5).fb(5).dr(0,8,5).g(2,5).pit(3).g(2,6).fb(6).fl(3,9,1).g(10,6).sc(4,7,2).exit(7);};
 ST(1,'The Collapsing Road',20,b=>{b.dk(.3).flag('storm',{speed:78}).flag('startCarry','traveler')
- .g(14,5).sign(4,'A storm of sand is coming up the canyon. Carry him to the inn, and do not stop.').cr(5).g(4,5).pit(2).g(4,5).cr(6).g(3,6).g(8,7).cp(3).p(5,9,3).sc(6,10)
- .fb(5).g(4,7).g(3,6).cr(4).pit(2).cr(4).g(5,5).sh(1,3).g(3,4).cr(7).g(6,4).oil(2).pit(2).g(3,5).pit(2).g(3,6).g(8,6).cp(3)
+ .g(14,5).sign(4,'A storm of sand is coming up the canyon. Carry him to the inn, and do not stop.').hint(9,'carry').cr(5).g(4,5).pit(2).g(4,5).cr(6).g(3,6).g(8,7).cp(3,null,'crumble').p(5,9,3).sc(6,10)
+ .fb(5).g(4,7).g(3,6).cr(4).pit(2).cr(4).g(5,5).sh(1,3).g(3,4).cr(7).g(6,4).oil(2).pit(2).g(3,5).pit(2).g(3,6).g(8,6).cp(3,null,'storm')
  .cr(3).pit(2).cr(3).pit(2).cr(3).g(4,6).fb(6).g(6,6).p(1,8,2).p(4,10,3).sc(5,11).g(3,5).cr(8).fl(4,8,1.2)
- .g(4,5).g(3,6).g(3,7).g(10,8).cp(3).lost(7)
+ .g(4,5).g(3,6).g(3,7).g(10,8).cp(3,null,'cord').lost(7)
  .cr(4).pit(2).g(2,8).pit(2).cr(4).g(3,7).fb(7).g(4,7).cr(5).p(1,9,2).sc(1,10)
  .g(3,6).g(3,5).cr(6).g(6,5).p(2,7,2).glad(2,8).cr(5).pit(2).cr(4)
- .g(24,5).deco(14,'inn').goal(12,'inn');});
+ .g(5,5).bridge(4,8).pit(8).g(24,5).deco(14,'inn').goal(12,'inn');});
 
 // ---- Chapter three: the mustard seed ----
 ST(2,'The Garden',22,b=>{b.dk(.15)
- .g(14,4).sign(3,'You carry a pouch of mustard seed, the smallest of all seeds.').g(8,4).soil(4,6).sign(1,'Soft earth. Hold Act to plant a seed.')
- .g(8,10).cp(2).g(4,8).g(4,6).g(10,5).shrine(4,1).sign(8,'Hold Jump in the air. Hope will bear you up.')
- .pit(8).g(8,5).oil(3).pit(9).g(10,5).cp(2).soil(5,9).p(9,13,3).sc(10,14)
+ .g(14,4).sign(3,'You carry a pouch of mustard seed, the smallest of all seeds.').hint(9,'plant').g(8,4).soil(4,6).sign(1,'Soft earth. Hold Act to plant a seed.')
+ .g(8,10).cp(2,null,'wings').g(4,8).g(4,6).g(10,5).shrine(4,1).sign(8,'Hold Jump in the air. Hope will bear you up.')
+ .pit(8).g(8,5).oil(3).pit(9).g(10,5).cp(2,null,'creep').soil(5,9).p(9,13,3).sc(10,14)
  .pit(4).g(6,5).sh(1,4).g(4,6).g(8,6).sw(1).g(10,6).sign(1,'Some Shadows creep only in the dark. Keep your lamp lit and they stand still.').ch(7)
  .pit(9).g(6,5).door(3).g(8,5).soil(3,9).p(7,16,2).glad(7,17)
- .g(6,5).dr(2,8,4).g(3,6).g(3,7).pit(8).g(4,6).pit(7).g(6,6).cp(2)
+ .g(6,5).dr(2,8,4).g(3,6).g(3,7).pit(8).g(4,6).pit(7).g(6,6).cp(2,null,'lost')
  .g(8,6).soil(4,6).p(8,12,4).lost(10,12)
  .g(6,6).sh(1,4).pit(9).p(3,3,3).sc(4,4).p(7,5,2)
- .g(16,6).deco(9,'signpost').goal(12,'path');});
+ .g(8,6).hint(2,'steady').ladder(7,8).g(16,14).deco(9,'signpost').goal(12,'path');});
 ROOMS['2-0']=b=>{b.dk(.3).g(6,8).pit(10).g(2,6).pit(9).fl(4,8,1.5).g(2,5).pit(8).g(10,4).sc(4,5,2).exit(7);};
 ST(2,'The Wild Wood',24,b=>{b.dk(.38)
- .g(12,5).sign(3,'The wood grows wild here. Plant as you go, and climb what grows.').g(6,5).soil(3,6).g(6,11).sh(1,4).pit(9).g(5,9).oil(2).pit(8).g(8,7).cp(2).ch(6)
+ .g(12,5).sign(3,'The wood grows wild here. Plant as you go, and climb what grows.').hint(9,'plant').g(6,5).soil(3,6).g(6,11).sh(1,4).pit(9).g(5,9).oil(2).pit(8).g(8,7).cp(2,null,'creep').ch(6)
  .g(4,6).g(12,5).sw(2).dr(4,8,3).soil(8,9).p(12,13,3).sc(13,14)
- .pit(8).g(6,5).sh(1,4).pit(3).g(4,6).pit(9).g(8,6).cp(2).door(5)
+ .pit(8).g(6,5).sh(1,4).pit(3).g(4,6).pit(9).g(8,6).cp(2,null,'seek').door(5)
  .g(4,7).g(4,8).g(8,8).sw(1).ch(5).pit(9).p(2,3,4).lost(3,3).p(7,5,2).g(6,6)
  .g(8,6).soil(4,9).p(8,16,2).p(11,18,3).sc(12,19)
- .pit(8).g(6,6).dr(1,9,4).g(3,7).g(3,8).pit(9).g(4,7).pit(8).g(8,7).cp(2).oil(5)
+ .pit(8).g(6,6).dr(1,9,4).g(3,7).g(3,8).pit(9).g(4,7).pit(8).g(8,7).cp(2,null,'two').oil(5)
  .g(6,7).soil(3,6).g(6,13).ch(3).pit(10).g(8,10).p(4,12,2).p(7,14,2).glad(7,15)
- .pit(9).g(18,7).deco(10,'seedling').sign(4,'One seed is left in the pouch. Ahead is the best soil of all.').goal(12,'path');});
+ .pit(9).g(15,7).hint(1,'stone').roof(4,14,3).stone(9).g(18,7).deco(10,'seedling').sign(4,'One seed is left in the pouch. Ahead is the best soil of all.').goal(12,'path');});
 ROOMS['2-1']=b=>{b.dk(.5).g(8,4).soil(4,9).g(4,4).g(6,13).ch(3).pit(9).g(10,11).sc(4,12,2).exit(7);};
 ST(2,'The Great Tree',100,b=>{b.dk(.4).flag('grow',{on:false,y:0}).flag('start',{col:8,h:3}).flag('skyClimb',1);b.startH=3;
  b.fill(0,33,1,3);
- b.at(16,3).e('soil',0,3,{H:0,c:16,gh:3,great:true}).sign(-5,'The last seed. Hold Act to plant it, and climb as it rises.');
+ b.at(16,3).e('soil',0,3,{H:0,c:16,gh:3,great:true}).sign(-5,'The last seed. Hold Act to plant it, and climb as it rises.').hint(-11,'climb');
  b.climb(6,3,[[12,4],[17,5],[22,4],[17,4],[11,5],[5,5],[10,4],[15,6],[21,4],[26,5],[21,4],[15,5],[9,5],[3,5]],'B');
  b.climb(46,3,[[13,5],[18,4],[23,5],[28,4],[23,4],[17,5],[11,5]],'B');
  b.climb(65,3,[[22,5],[27,4],[21,5],[15,5],[9,5],[14,4],[19,4]],'B');
  b.climb(86,1,[[8,18]],'B');
  b.at(0,0).p(1,23,3,'B').sc(2,24).p(25,38,4,'B').glad(27,39).p(14,51,3,'B').sc(15,52).p(23,63,4,'B').lost(25,63).p(4,79,4,'B').sc(5,80);
- b.at(0,27).cp(17).at(0,52).cp(25).oil(24).at(0,74).cp(17).oil(16);
+ b.at(0,27).cp(17,null,'heights').at(0,52).cp(25,null,'creep').oil(24).at(0,74).cp(17,null,'flee').oil(16);
  b.at(0,0).dr(8,19,8).fl(24,31,1).ch(28,33).dr(4,43,8).fl(20,50,1.2).ch(24,58).dr(14,69,8).fl(12,78,1).dr(16,84,6);
  b.at(0,86).deco(13,'nest').deco(21,'nest').goal(17,'tree');
 },{vertical:true});
 
 // ---- Chapter four: the storm on the sea ----
 ST(3,'The Harbor',20,b=>{b.dk(.5).flag('sea',2).flag('rain',1)
- .g(12,4).sign(3,'The others have put out to sea, and the storm has come down on them.').g(8,4).sh(2,4).pit(3).g(6,4).shrine(3,2)
+ .g(12,4).sign(3,'The others have put out to sea, and the storm has come down on them.').hint(9,'listen').g(8,4).sh(2,4).pit(3).g(6,4).shrine(3,2)
  .g(10,4).wand(6,'Bitter Fisherman','No one ever stopped for me before. Go on. And thank you.').sign(2,'He will not let you pass. Do not push. Hold Act, and offer your hand.')
- .g(6,4).cp(2).pit(8).boat(1,3.6,5,1,5).g(5,4).fl(2,7,1.5).pit(9).boat(2,3.6,4,2,6).g(6,4).cp(2).door(4)
+ .g(6,4).cp(2,null,'boats').pit(8).boat(1,3.6,5,1,5).g(5,4).fl(2,7,1.5).pit(9).boat(2,3.6,4,2,6).g(6,4).cp(2,null,'swarm').door(4)
  .g(10,4).swm(6,6).sign(1,'Some Shadows scatter when the light finds them. Keep shining, and the pieces fade too.')
  .pit(7).boat(1,3.6,4,0.5,4).p(-3,7,2).p(0,9,3).sc(1,10)
- .g(8,4).wand(4,'Frightened Sailor','I thought no one would come. Bless you.').g(6,4).oil(2).pit(9).boat(1,3.6,4,2.5,6).g(6,5).p(2,8,2).p(5,10,3).lost(6,10)
- .pit(8).boat(1,3.6,4,1.5,5).p(2,6,2).sc(2,7).g(4,7).cp(2).pit(10).glad(5,8).g(6,4)
- .g(16,4).deco(10,'pier').sign(5,'The pier ends here. The boats are out in the storm.').goal(12,'path');});
+ .g(8,4).wand(4,'Frightened Sailor','I thought no one would come. Bless you.').g(6,4).oil(2).hint(4,'lost').pit(9).boat(1,3.6,4,2.5,6).g(6,5).p(2,8,2).p(5,10,3).lost(6,10)
+ .pit(8).boat(1,3.6,4,1.5,5).p(2,6,2).sc(2,7).g(4,7).cp(2,null,'partners').pit(10).glad(5,8).g(6,4)
+ .g(10,4).deco(3,'pier').sign(5,'The pier ends here. The far jetty is a long way out across the water.').pit(30).ferry(0,4,26)
+ .g(16,4).deco(2,'pier').sign(7,'The boats are out in the storm. Somewhere out there, a light is walking.').goal(12,'path');});
 ROOMS['3-0']=b=>{b.dk(.6).g(8,4).g(8,4).wand(4,'Angry Net Mender','I had forgotten what a kind hand felt like.').g(10,4).swm(5,6).g(8,4).wand(4,'Proud Captain','You owed me nothing. Thank you.').g(10,4).sc(4,5,2).exit(7);};
 ST(3,'The Storm',20,b=>{b.dk(.6).flag('sea',2).flag('rain',1).flag('lightning',1)
- .g(10,4).sign(3,'Boat to boat, across the storm. Watch how each one sways before you leap.')
- .pit(7).boat(1,3.6,5,1,5).pit(8).boat(1,3.6,5,2,6).g(4,5).oil(1).cp(2)
+ .g(10,4).sign(3,'Boat to boat, across the storm. Watch how each one sways before you leap.').hint(7,'boats')
+ .pit(7).boat(1,3.6,5,1,5).pit(8).boat(1,3.6,5,2,6).g(4,5).oil(1).cp(2,null,'wind')
  .pit(9).boat(2,3.6,4,2.5,5).fl(4,7,1.5).pit(8).boat(1,3.6,5,1.5,7).p(3,6,2).p(6,8,2).sc(6,9)
- .g(4,4).swm(2,6).pit(9).boat(1,3.6,4,3,6).gust(0,9).pit(8).boat(2,3.6,5,1,5).g(6,5).cp(2).door(4)
+ .g(4,4).swm(2,6).pit(9).boat(1,3.6,4,3,6).gust(0,9).pit(8).boat(2,3.6,5,1,5).g(6,5).cp(2,null,'fire').door(4)
  .pit(10).boat(1,3.6,4,3.5,7).g(2,4).pit(9).boat(1,3.6,5,2,5).fl(5,7,1.2).pit(9).boat(2,3.6,4,2,6).gust(0,9).g(4,6).oil(1)
- .pit(8).boat(1,3.6,5,0,5).lost(3,3.6).g(4,6).cp(2)
+ .pit(8).boat(1,3.6,5,0,5).lost(3,3.6).g(4,6).cp(2,null,'swarm')
  .pit(9).boat(1,3.6,4,3,5).swm(4,7).pit(9).boat(2,3.6,4,3,6).p(3,6,2).p(0,8,2).glad(0,9)
  .g(3,5).pit(10).boat(2,3.6,5,3,7).gust(0,10).pit(8).boat(1,3.6,5,1,5).p(3,6,2).sc(3,7)
  .g(3,5).pit(12).boat(1,3.6,10,0.3,6).deco(7,'disciples',3.6).goal(4,'boat',3.6).pit(4);});
 ROOMS['3-1']=b=>{b.dk(.65).flag('sea',2).g(6,4).pit(9).boat(1,3.6,3,3,4).pit(9).boat(1,3.6,3,3,5).swm(4,7).pit(9).boat(1,3.6,3,3,3.5).g(10,4).sc(4,5,2).exit(7);};
 ST(3,'On the Water',20,b=>{b.dk(.62).flag('waterwalk',1).flag('rain',1).flag('lightning',1)
- .g(8,4,'=').sign(3,'A figure of light is walking on the sea. Step out of the boat. Keep walking toward Him, and do not look back.');
+ .g(8,4,'=').sign(3,'A figure of light is walking on the sea. Step out of the boat. Keep walking toward Him, and do not look back.').hint(6,'water');
  b.mat='~';
  b.g(14,3).g(6,4).g(8,3).fl(4,6,1.5).g(5,2).g(8,3).gust(0,8).g(6,4).swm(3,7).g(10,3).p(4,6,2).p(7,8,3).sc(8,9)
- .g(6,2).g(8,3).cp(3).g(6,4).dr(1,7,5).g(8,3).gust(0,8).fl(5,6,1.2).g(5,5).g(6,3).swm(3,6).g(10,2).oil(4).p(5,5,2).p(8,7,3).lost(9,7)
- .g(8,3).cp(3).g(6,4).gust(0,6).g(6,5).fl(3,8,1.5).g(8,3).ch(5,3).g(8,4).p(3,7,2).p(6,9,2).glad(6,10).g(8,3).swm(4,6).gust(0,8)
- .g(6,2).g(6,3).p(2,6,3).sc(3,7).g(10,4).cp(3).fl(6,7,1.5).g(8,3).gust(0,8).dr(2,6,5).g(8,2).sc(5,3)
+ .g(6,2).g(8,3).cp(3,null,'wind').g(6,4).dr(1,7,5).g(8,3).gust(0,8).fl(5,6,1.2).g(5,5).g(6,3).swm(3,6).g(10,2).oil(4).p(5,5,2).p(8,7,3).lost(9,7)
+ .g(8,3).cp(3,null,'flee').g(6,4).gust(0,6).g(6,5).fl(3,8,1.5).g(8,3).ch(5,3).g(8,4).p(3,7,2).p(6,9,2).glad(6,10).g(8,3).swm(4,6).gust(0,8)
+ .g(6,2).g(6,3).p(2,6,3).sc(3,7).g(10,4).cp(3,null,'water').fl(6,7,1.5).g(8,3).gust(0,8).dr(2,6,5).g(8,2).sc(5,3)
  .g(8,3).swm(4,6).g(26,3).deco(17,'christ').goal(13,'peace');});
 
 // ---- Chapter five: the road home ----
 ST(4,'The Far Country',20,b=>{b.dk(.45)
- .g(14,4).deco(6,'pigs').sign(3,'A far country. The money is gone, and the friends with it.').burden(10,'Shame')
+ .g(14,4).deco(6,'pigs').sign(3,'A far country. The money is gone, and the friends with it.').hint(7,'weight').burden(10,'Shame')
  .g(10,4).sh(3,4).burden(8,'Regret').g(4,5).g(8,4).burden(4,'Pride').pit(1).g(10,4).sign(2,'How heavy it all is. You can barely leap.').burden(6,'Envy').deco(8,'pigs')
- .g(12,4).shrine(5,3).g(10,4).cross(5).sign(1,'Hold Act at the cross, and lay it all down.').g(4,7).g(6,7).cp(2)
+ .g(12,4).shrine(5,3).g(10,4).cross(5).sign(1,'Hold Act at the cross, and lay it all down.').g(4,7).g(6,7).cp(2,null,'love')
  .pit(3).g(4,7).p(3,10,2).p(6,12,3).sc(7,13)
  .g(4,6).g(10,5).sw(2).swm(6,7).pit(8).g(8,5).wand(4,'Old Companion','I left you when your purse was empty. And you came back for me?')
- .g(8,5).oil(2).burden(5,'Anger').g(8,5).burden(3,'Bitterness').sign(5,'New weights find you quickly here.').g(3,6).g(8,6).cross(4).cp(6).g(3,9)
- .g(6,9).door(3).pit(9).g(6,7).ch(3).pit(3).g(3,7).pit(8).g(8,6).cp(2).p(2,9,2).p(5,11,3).lost(6,11)
+ .g(8,5).oil(2).hint(2,'cast').burden(5,'Anger').g(8,5).burden(3,'Bitterness').sign(5,'New weights find you quickly here.').g(3,6).g(8,6).cross(4).cp(6,null,'seek').g(3,9)
+ .g(6,9).door(3).pit(9).g(6,7).ch(3).pit(3).g(3,7).pit(8).g(8,6).cp(2,null,'steady').p(2,9,2).p(5,11,3).lost(6,11)
  .pit(9).p(3,3,3).glad(4,4).p(7,5,2).g(8,6).fb(6).fp(1,9,2).fp(4,11,2).sc(4,12)
- .g(16,6).deco(9,'signpost').goal(12,'path');});
+ .g(7,6).ladder(6,8).g(16,14).deco(9,'signpost').goal(12,'path');});
 ROOMS['4-0']=b=>{b.dk(.5).g(8,4).burden(5,'Old Wound').g(6,4).burden(3,'Blame').g(8,4).cross(4).g(3,7).pit(9).g(3,7).pit(8).swm(4,9).g(10,6).sc(4,7,2).exit(7);};
 ST(4,'The Ruined City',20,b=>{b.dk(.5)
- .g(12,5).sign(3,'The road home runs through the ruins of what you wasted.').g(8,5).gate(5,'the friend who used you').sign(1,'A grudge bars this gate. Hold Act, and forgive.')
- .g(8,5).sh(2,4).pit(3).g(4,6).pit(8).g(8,5).cp(2).burden(5,'Resentment')
+ .g(12,5).sign(3,'The road home runs through the ruins of what you wasted.').hint(8,'forgive').g(8,5).gate(5,'the friend who used you').sign(1,'A grudge bars this gate. Hold Act, and forgive.')
+ .g(8,5).sh(2,4).pit(3).g(4,6).pit(8).g(8,5).cp(2,null,'rest').burden(5,'Resentment')
  .g(8,5).gate(5,'the one who laughed at you').g(6,5).cross(3).g(3,8).g(6,8).swm(3,10).pit(9).g(4,7).fb(7).p(1,10,2).p(-2,12,3).sc(-1,13)
- .g(8,7).cp(2).door(5).g(4,6).g(8,5).sw(2).ch(5)
+ .g(8,7).cp(2,null,'love').door(5).g(4,6).g(8,5).sw(2).ch(5)
  .g(8,5).wand(4,'Creditor','Every door was shut to you, and you hold nothing against me?').g(6,5).oil(3)
- .pit(9).g(4,5).pit(8).g(4,6).fb(8).g(8,6).cp(2).p(3,9,2).p(6,11,3).lost(7,11)
- .g(8,6).burden(2,'Self-pity').burden(5,'Old Shame').g(8,6).gate(4,'yourself').g(6,6).cross(3).g(3,9).g(5,9).pit(10).glad(5,10).g(6,6)
+ .pit(9).g(4,5).pit(8).g(4,6).fb(8).g(8,6).cp(2,null,'seek').p(3,9,2).p(6,11,3).lost(7,11)
+ .g(8,6).burden(2,'Self-pity').burden(5,'Old Shame').hint(7,'forgive2').g(8,6).gate(4,'yourself').g(6,6).cross(3).g(3,9).g(5,9).pit(10).glad(5,10).g(6,6)
  .g(6,6).dr(2,9,4).pit(3).g(6,7).p(2,10,2).p(5,12,2).sc(5,13)
- .g(4,6).g(18,5).deco(10,'milestone').sign(5,'Far off, on a hill, there is a house with a light in the window.').goal(12,'path');});
+ .g(4,6).g(15,5).hint(1,'stone').roof(4,14,3).stone(9).g(18,5).deco(10,'milestone').sign(5,'Far off, on a hill, there is a house with a light in the window.').goal(12,'path');});
 ROOMS['4-1']=b=>{b.dk(.55).g(8,4).gate(5,'an old enemy').g(6,4).burden(3,'Spite').g(8,4).gate(4,'a broken promise').g(5,4).cross(2).g(3,7).fb(6).pit(8).g(10,6).sc(4,7,2).exit(7);};
 ST(4,'The Road Home',20,b=>{b.dk(.35).flag('home',1).flag('startBurdens',['Shame','Regret','Hunger'])
- .g(14,5).sign(3,'One last weight to lay down, and then run. He has watched this road every evening.').cross(9).g(3,8).g(8,8).cp(2)
+ .g(14,5).sign(3,'One last weight to lay down, and then run. He has watched this road every evening.').hint(6,'rest').cross(9).g(3,8).g(8,8).cp(2,null,'wings')
  .dk(.3).pit(9).g(6,7).pit(8).g(4,7).fb(8).g(8,7).p(2,10,2).p(5,12,3).sc(6,13)
- .g(4,6).g(8,5).sh(3,4).pit(3).g(3,6).pit(3).g(3,7).pit(9).g(8,6).gate(5,'the years you lost').g(6,6).cp(2).oil(4)
+ .g(4,6).g(8,5).sh(3,4).pit(3).g(3,6).pit(3).g(3,7).pit(9).g(8,6).gate(5,'the years you lost').g(6,6).cp(2,null,'faith').oil(4)
  .fb(9).g(4,6).pit(9).glad(4,8).g(4,5).g(8,5).swm(4,7).pit(9).g(8,5).p(2,8,2).p(5,10,3).lost(6,10)
- .dk(.22).g(6,5).deco(3,'villager').pit(8).g(6,5).deco(2,'villager').fb(7).g(8,5).cp(2).deco(5,'villager').p(3,8,2).p(0,10,2).sc(0,11)
+ .dk(.22).g(6,5).deco(3,'villager').pit(8).g(6,5).deco(2,'villager').fb(7).g(8,5).cp(2,null,'home').deco(5,'villager').p(3,8,2).p(0,10,2).sc(0,11)
  .g(6,6).pit(9).g(6,6).deco(3,'villager').g(4,5).pit(9).p(3,3,3).sc(4,4).p(7,4,2).g(10,5).deco(4,'lanterns')
  .dk(.12).g(44,5).deco(6,'villager').deco(12,'lanterns').deco(19,'villager').deco(26,'lanterns').deco(34,'house').goal(16,'father');});
 
 // ---- Chapter six: the valley, the cross, the dawn ----
 ST(5,'The Valley of the Shadow',20,b=>{b.dk(.85)
- .g(12,5).sign(3,'The valley of the shadow. Keep the lamp trimmed. You are not alone.').g(6,4).oil(3).g(10,3).sw(2).sh(5,4).pit(3).g(4,3).ch(2).fb(7).g(6,3).cp(2)
+ .g(12,5).sign(3,'The valley of the shadow. Keep the lamp trimmed. You are not alone.').hint(9,'oil').g(6,4).oil(3).g(10,3).sw(2).sh(5,4).pit(3).g(4,3).ch(2).fb(7).g(6,3).cp(2,null,'love')
  .g(3,4).g(3,5).g(8,6).swm(4,8).pit(9).g(6,5).oil(2).g(8,5).wand(4,'Mourner','I had stopped expecting anyone. Walk on. I will follow the light.')
- .g(6,5).burden(3,'Dread').g(8,5).sw(2).burden(5,'Grief').g(8,5).gate(4,'the one who wounded you deepest').g(6,5).cross(3).g(3,8).g(6,8).cp(2).p(3,11,2).p(0,13,2).sc(0,14)
+ .g(6,5).burden(3,'Dread').g(8,5).sw(2).burden(5,'Grief').g(8,5).gate(4,'the one who wounded you deepest').g(6,5).cross(3).g(3,8).g(6,8).cp(2,null,'hidden').p(3,11,2).p(0,13,2).sc(0,14)
  .pit(9).g(4,7).dr(1,10,4).fb(8).fp(2,10,2).fp(5,12,2).glad(5,13)
- .g(6,7).door(3).g(4,6).g(10,5).sw(3).ch(6).oil(8).pit(8).g(4,5).pit(9).g(8,4).cp(2).swm(5,6)
+ .g(6,7).door(3).g(4,6).g(10,5).sw(3).ch(6).oil(8).pit(8).g(4,5).pit(9).g(8,4).cp(2,null,'seek').swm(5,6)
  .pit(3).g(3,5).pit(3).g(3,6).fb(6).g(8,6).fl(3,9,1.5).fl(6,9,1.5).p(2,9,2).p(5,11,3).lost(6,11)
  .g(6,5).sw(2).g(8,5).ch(2).ch(6).oil(4).pit(9).p(3,2,3).sc(4,3).p(7,4,2).g(6,5)
- .g(16,5).deco(9,'signpost').goal(12,'path');});
+ .g(8,5).hint(2,'lift').ladder(7,7).g(16,12).deco(9,'signpost').goal(12,'path');});
 ROOMS['5-0']=b=>{b.dk(.92).g(8,4).oil(5).g(8,4).sw(3).ch(6).pit(9).g(4,4).swm(2,6).fb(6).g(4,4).ch(2).pit(8).g(10,4).sc(4,5,2).exit(7);};
 ST(5,'The Looming Dark',20,b=>{b.dk(.9).flag('giant',{x:-350}).flag('drain',3)
- .g(14,5).sign(3,'Something vast is following. You cannot drive it off. Keep the lamp lit, and keep walking.').oil(8)
- .g(8,5).sw(4).pit(3).g(6,5).oil(3).fb(6).g(8,5).cp(2).swm(5,7).pit(8).g(6,4).oil(2).g(8,4).wand(4,'One Who Gave Up','I sat down here long ago. Is there truly a morning?')
+ .g(14,5).sign(3,'Something vast is following. You cannot drive it off. Keep the lamp lit, and keep walking.').oil(8).hint(11,'vast')
+ .g(8,5).sw(4).pit(3).g(6,5).oil(3).fb(6).g(8,5).cp(2,null,'love').swm(5,7).pit(8).g(6,4).oil(2).g(8,4).wand(4,'One Who Gave Up','I sat down here long ago. Is there truly a morning?')
  .g(8,4).oil(3).p(1,7,2).p(4,9,3).sc(5,10)
- .pit(9).g(4,4).g(4,5).g(10,6).sw(3).oil(6).cp(7).pit(3).g(3,6).pit(3).g(3,6).ch(1).fb(7).g(8,6).oil(2).door(5)
- .g(8,6).gate(4,'the dark itself, for frightening you').g(6,6).oil(3).pit(9).glad(4,8).g(8,5).cp(2).p(3,8,2).p(6,10,3).lost(7,10)
+ .pit(9).g(4,4).g(4,5).g(10,6).sw(3).oil(6).cp(7,null,'forgive2').pit(3).g(3,6).pit(3).g(3,6).ch(1).fb(7).g(8,6).oil(2).door(5)
+ .g(8,6).gate(4,'the dark itself, for frightening you').g(6,6).oil(3).pit(9).glad(4,8).g(8,5).cp(2,null,'flee').p(3,8,2).p(6,10,3).lost(7,10)
  .g(8,5).sw(2).sw(5).oil(7).pit(8).g(6,5).swm(3,7).fb(8).p(2,8,2).p(5,10,2).sc(5,11)
- .g(6,5).oil(3).cp(4).g(30,5).sign(3,'There is no way forward yet. Stand here, and keep the lamp lit until morning.').fount(10).vigil(4,24)
+ .g(6,5).oil(3).cp(4,null,'wait').g(30,5).sign(3,'There is no way forward yet. Stand here, and keep the lamp lit until morning.').fount(10).vigil(4,24)
  .g(16,5).deco(9,'signpost').goal(11,'path');});
 ROOMS['5-1']=b=>{b.dk(.92).g(8,4).oil(5).g(6,4).wand(3,'Doubter','I asked for a sign. You brought a lamp. It will do.').g(6,4).burden(3,'Fear of the End').g(8,4).gate(4,'the night').g(5,4).cross(2).g(3,7).pit(9).fl(4,9,1.5).g(10,6).sc(4,7,2).exit(7);};
 ST(5,'The Gauntlet of Night',22,b=>{b.dk(.92)
- .g(12,5).sign(3,'The last stretch of night. Lift the lamp high, and do not put it down.').oil(8).g(8,5).sw(4).pit(3).g(4,5).fb(6).g(8,5).cp(2).p(3,8,2).p(0,10,2).sc(0,11)
+ .g(12,5).sign(3,'The last stretch of night. Lift the lamp high, and do not put it down.').oil(8).hint(10,'flee').g(8,5).sw(4).pit(3).g(4,5).fb(6).g(8,5).cp(2,null,'rest').p(3,8,2).p(0,10,2).sc(0,11)
  .pit(9).g(8,5).wand(4,'Accuser','I had a long list against you. I cannot seem to read it in this light.').g(6,5).burden(3,'Guilt').g(8,5).cross(4).g(3,8).g(6,8).swm(3,10).pit(9)
- .g(10,6).oil(4).p(2,9,2).p(5,11,3).lost(6,11).g(10,6).fount(4).cp(6).sign(1,'Fill the lamp here. Then walk into the night, and keep it lifted.')
+ .g(10,6).oil(4).hint(1,'encourage').p(2,9,2).p(5,11,3).lost(6,11).g(10,6).fount(4).cp(6,null,'armor').sign(1,'Fill the lamp here. Then walk into the night, and keep it lifted.')
  .mk('gx1').g(10,6).g(8,5).g(10,6).sc(5,7).g(8,5).g(8,6).glad(4,8).g(8,7).sc(4,8).g(8,6).mk('gx2')
- .dk(.92).g(4,7).g(4,8).cp(2).dk(.6).g(4,9).g(4,10).dk(.35).g(28,11).deco(15,'crosses').goal(10,'cross');});
+ .dk(.92).g(4,7).g(8,8).cp(2,null,'arise').ladder(7,7).dk(.6).g(4,15).dk(.35).g(28,15).deco(15,'crosses').goal(10,'cross');});
 
 // ============================================================
 // PLAY. Physics, the lamp, Shadows, virtues, grace.
@@ -679,18 +1117,28 @@ function enterRoom(){
 function leaveRoom(){
   const p=G.p;if(G.hiddenNew&&!G.hiddenTold){G.hiddenTold=true;G.reward=null;toast('Back on the road, with a stronger lamp.');}G.lv=G.main;G.room=false;p.x=G.ret.x;p.y=G.ret.y;p.vx=p.vy=0;G.cp=G.ret.cp;p.burdens=G.ret.burdens;p.carry=G.ret.carry;sfx('cp');updateCam(0,true);
 }
-function toast(text){G.toast={text:text,t:0};}
-function showVerse(k,kind){G.verse={k:k,t:0,kind:kind||'scroll',label:refLabel(k)};}
+function readHint(id){const H=HINTS[id];if(!H)return;showVerse(H.v,'hint',H.gloss);G.hintK=H.v;guide(H.look);}
+function guide(look){if(!look||!G)return;const p=G.p,lv=G.lv;let tx=null,ty=null;
+  if(look.indexOf('tile:')===0){const ch=look.slice(5),c0=Math.max(0,Math.floor(p.x/T)),c1=Math.min(lv.W-1,c0+45);
+    outer:for(let c=c0;c<=c1;c++)for(let r=0;r<lv.H;r++)if(lv.tiles[r][c]===ch&&(ch!=='S'||lv.sH[r*lv.W+c]>0)){tx=c*T+12;ty=r*T+(ch==='S'?12:-8);break outer;}}
+  else{let best=1e9;for(const e of lv.ents){if(e.gone||e.type!==look)continue;if((look==='lost'&&e.found)||(look==='help'&&e.done)||(look==='sh'&&e.a<0.3))continue;
+      const d=e.x-p.x;if(d>-2*T&&d<45*T&&d<best){best=d;tx=e.x;ty=e.y-(look==='sh'?0:26);}}}
+  if(tx!==null)G.guide={x0:p.x+p.face*10,y0:p.y-24,x1:tx,y1:ty,t:0};}
+function guidePos(g){const k=clamp(g.t/1.8,0,1),e=k*k*(3-2*k);return {x:lerp(g.x0,g.x1,e),y:lerp(g.y0,g.y1,e)-Math.sin(k*Math.PI)*70,k:k};}
+function toast(text,o){o=o||{};G.toast={text:text,t:0};const q=text.charAt(0)==='“';say(text,{pri:o.pri||(q?2:1),pitch:o.pitch||(q?1.14:1)});}
+// Verses stay up long enough to read (and for the voice to finish), longer for longer verses.
+function showVerse(k,kind,gloss){const n=(V(k)+' '+(gloss||'')).split(' ').length;
+  G.verse={k:k,t:0,kind:kind||'scroll',label:refLabel(k),gloss:gloss||null,dur:clamp(n*0.42+3,8,18)};sayVerse(k,gloss);G.verse.gen=voice.gen;}
 function part(x,y,vx,vy,life,col,size,grav,glw){if(G.parts.length>240)G.parts.shift();G.parts.push({x:x,y:y,vx:vx,vy:vy,life:life,max:life,col:col,size:size||2,g:grav||0,glow:glw||0});}
 function burst(x,y,n,col,sp,glw){for(let i=0;i<n;i++){const a=rnd(TAU),s=rnd(sp*0.3,sp);part(x,y,Math.cos(a)*s,Math.sin(a)*s,rnd(0.4,1.1),col,rnd(1.5,3),0,glw);}}
 
 function tileCh(c,r){const lv=G.lv;if(r<0||r>=lv.H)return ' ';if(c<0||c>=lv.W)return '#';return lv.tiles[r][c];}
 function solid(c,r){const ch=tileCh(c,r);
-  switch(ch){case '#':case '=':case '~':case 'C':return true;
+  switch(ch){case '#':case '=':case '~':case 'C':case 'P':case 'O':return true;
     case 'S':return G.lv.sH[r*G.lv.W+c]>0;
     case 'V':return !(G.lv.vigil&&G.lv.vigil.done);
     default:return false;}}
-function oneWay(c,r){const ch=tileCh(c,r);if(ch==='-')return true;if(ch==='F')return save.virtues[0];if(ch==='B')return G.lv.grow&&G.lv.grow.on&&r*T>=G.lv.grow.y;return false;}
+function oneWay(c,r){const ch=tileCh(c,r);if(ch==='-'||ch==='L')return true;if(ch==='F')return save.virtues[0];if(ch==='B')return G.lv.grow&&G.lv.grow.on&&r*T>=G.lv.grow.y;return false;}
 function blockers(){const out=[];for(const e of G.lv.ents){if((e.type==='wand'&&!e.friend)||(e.type==='gate'&&!e.open))out.push(e);}return out;}
 function moveX(p,dx){
   if(!dx)return;const ox=p.x;p.x+=dx;
@@ -699,19 +1147,42 @@ function moveX(p,dx){
   else{const c=Math.floor((p.x-7)/T);for(let r=t;r<=b;r++)if(solid(c,r)){p.x=(c+1)*T+7.01;p.vx=0;break;}}
   for(const e of blockers()){if(Math.abs(p.y-e.y)<80&&Math.abs(p.x-e.x)<17){p.x=ox<e.x?e.x-17:e.x+17;p.vx=0;}}
 }
-function moveY(p,dy){
+function moveY(p,dy,fx){
   const prevB=p.y;p.y+=dy;p.ground=false;let landed=null;
   const l=Math.floor((p.x-6)/T),r=Math.floor((p.x+6)/T);
   if(dy>=0){
     const rr=Math.floor(p.y/T);
     for(let c=l;c<=r;c++){if(solid(c,rr)||(oneWay(c,rr)&&prevB<=rr*T+0.01)){p.y=rr*T;p.ground=true;break;}}
     if(!p.ground){for(const e of G.lv.ents){if(e.type!=='boat')continue;if(Math.abs(p.x-e.x)<e.w/2+5&&prevB<=e.y-e.dy+5&&p.y>=e.y){p.y=e.y;p.ground=true;landed=e;break;}}}
-    if(p.ground){if(p.vy>260){sfx('land');p.sq=1;for(let i=0;i<4;i++)part(p.x+rnd(-6,6),p.y,rnd(-40,40),rnd(-30,-5),0.4,'rgba(230,220,200,0.6)',2);}p.vy=0;}
+    if(p.ground){if(p.vy>260&&fx!==false){sfx('land');p.sq=1;for(let i=0;i<4;i++)part(p.x+rnd(-6,6),p.y,rnd(-40,40),rnd(-30,-5),0.4,'rgba(230,220,200,0.6)',2);}p.vy=0;}
   }else{
     const rr=Math.floor((p.y-p.h)/T);
     for(let c=l;c<=r;c++)if(solid(c,rr)){p.y=(rr+1)*T+p.h;p.vy=0;break;}
   }
   p.riding=landed;
+}
+// One step of the pilgrim's movement: run, jump, glide, fall, collide. I = {l,r,jump,jumpP}.
+// fx=false skips sounds and sparkles (used by the level checker in the test hooks).
+function stepMove(p,dt,I,fx){
+  const lv=G.lv,nb=Math.min(5,p.burdens.length),bear=p.carry==='traveler'&&!G.helpCarry;
+  const spd=150*(1-0.07*nb)*(bear?0.8:1)*(lv.home&&nb===0?1.2:1);
+  const jv=520*(1-0.06*nb)*(bear?0.95:1);
+  let ax=0;if(I.l)ax-=1;if(I.r)ax+=1;
+  if(ax){p.vx+=ax*(p.ground?1500:1000)*dt;p.face=ax;}
+  else{const f=(p.ground?1400:500)*dt;if(Math.abs(p.vx)<=f)p.vx=0;else p.vx-=Math.sign(p.vx)*f;}
+  p.vx=clamp(p.vx,-spd,spd);
+  let wind=0;for(const g of lv.gusts){if(p.x>g.x1&&p.x<g.x2)wind=-48*(0.6+0.4*Math.sin(G.t*1.7))*(1-G.calm);}
+  G.wind=wind;
+  if(I.jumpP)p.buf=0.12;else p.buf-=dt;
+  if(p.ground)p.coy=0.1;else p.coy-=dt;
+  if(p.buf>0&&p.coy>0){p.vy=-jv;p.buf=0;p.coy=0;p.ground=false;p.riding=null;p.jumping=true;if(fx){sfx('jump');p.sq=-1;for(let i=0;i<3;i++)part(p.x+rnd(-5,5),p.y,rnd(-30,30),rnd(-10,0),0.35,'rgba(230,220,200,0.5)',2);}}
+  if(p.jumping&&!I.jump&&p.vy<-170)p.vy=-170;
+  if(p.vy>=0)p.jumping=false;
+  p.vy+=1500*dt;
+  p.glide=false;
+  if(save.virtues[1]&&I.jump&&!p.ground&&p.vy>55&&p.coy<=0){p.vy=55;p.glide=true;if(fx&&Math.random()<dt*20)part(p.x-p.face*10,p.y-18,-p.face*20,rnd(-5,10),0.6,'#fff7d8',2,0,1);}
+  if(p.vy>620)p.vy=620;
+  moveX(p,(p.vx+wind)*dt);moveY(p,p.vy*dt,fx);
 }
 function darkAt(){
   const lv=G.lv,col=G.p.x/T,k=lv.dk;let d=k[0][1];
@@ -723,8 +1194,8 @@ function darkAt(){
 }
 function stumble(){
   if(G.carried>0||G.ending||G.sink>0)return;const p=G.p;
-  G.stumbles++;G.carried=1.5;G.fromX=p.x;G.fromY=p.y-14;sfx('stumble');G.cam.shake=5;
-  showVerse(GRACE[G.graceI++%GRACE.length],'grace');journal('stumble');
+  G.stumbles++;G.carried=1.5;G.fromX=p.x;G.fromY=p.y-14;sfx('stumble');G.cam.shake=5;G.verse=null;
+  journal('stumble');
   burst(p.x,p.y-14,10,'#ffe9a8',70,1);
 }
 function respawn(){
@@ -734,8 +1205,18 @@ function respawn(){
   if(lv.flood&&lv.flood.on)lv.flood.y=Math.max(lv.flood.y,G.cp.y+230);
   if(lv.giant)lv.giant.x=G.cp.x-400;
   if(lv.vigil){lv.vigil.off=0;lv.vigil.t=Math.max(0,lv.vigil.t-6);}
+  for(const e of lv.ents)if(e.type==='boat'&&e.ferry){e.bx=Math.abs(G.cp.x-e.fx0)<Math.abs(G.cp.x-e.fx1)?e.fx0:e.fx1;e.rest=true;}
   for(const e of lv.ents){if(e.type==='sh'){if(e.k==='g'||e.k==='m')e.gone=true;else if(e.k==='c'||e.k==='s'){e.x=e.bx;e.y=e.by;}}}
   burst(p.x,p.y-14,14,'#fff3c0',80,1);updateCam(0,true);
+}
+function applyHelp(lv,e,study){
+  const put=(c,hh,ch)=>{const r=lv.H-hh;if(r>=0&&r<lv.H&&c>=0&&c<lv.W)lv.tiles[r][c]=ch;};
+  switch(e.kind){
+    case 'ladder':for(let k=2;k<=e.hh;k+=2)put(e.c,e.gh+k,'L');if(e.hh%2)put(e.c,e.gh+e.hh,'L');break;
+    case 'bridge':for(let i=0;i<e.w;i++)put(e.c0+i,e.gh,'P');break;
+    case 'stone':for(let k=1;k<=3;k++){put(e.c,e.gh+k,' ');put(e.c+1,e.gh+k,' ');}break;
+    case 'ferry':if(study){const b=e.boat,h=Math.round(lv.H-b.by/T);for(let x=b.fx0-b.w/2;x<=b.fx1+b.w/2;x+=T)put(Math.floor(x/T),h,'P');}break;
+  }
 }
 function growTree(e){
   const lv=G.lv,H=e.H,c=e.c,put=(cc,hh)=>{const r=lv.H-hh;if(r>=0&&r<lv.H&&cc>=0&&cc<lv.W&&lv.tiles[r][cc]===' ')lv.tiles[r][cc]='-';};
@@ -751,16 +1232,20 @@ function actNeed(e){
     case 'soil':return {dur:0.7,label:'Plant a seed'};
     case 'carry':return {dur:0.7,label:e.who==='lamb'?'Lift the lamb':'Lift him up'};
     case 'door':return {dur:0.5,label:'Enter'};
+    case 'hint':return {dur:0.3,label:'Read the stone again'};
+    case 'help':{const f=freeFollower(),L={ladder:'Ask your friend to hold the ladder',bridge:e.art==='log'?'Lift the log across together':'Lower the bridge together',stone:'Roll the stone together',ferry:'Ask your friend to row'}[e.kind];
+      return {dur:e.kind==='ferry'?0.5:1.0,label:f?L:'This takes two',block:f?null:'helper'};}
     case 'exit':return {dur:0.5,label:'Leave'};
   }return null;
 }
 function canAct(e){const p=G.p;
   switch(e.type){case 'lost':return !e.found;case 'wand':return !e.friend;case 'gate':return !e.open;case 'cross':return p.burdens.length>0;
-    case 'soil':return !e.planted;case 'carry':return !e.taken;case 'door':case 'exit':return true;}return false;}
+    case 'soil':return !e.planted;case 'carry':return !e.taken;case 'door':case 'exit':case 'hint':return true;case 'help':return !e.done;}return false;}
 function doAct(e){
   const p=G.p,lv=G.lv,key=G.ci+'-'+G.si;
   switch(e.type){
-    case 'lost':e.found=true;G.lostFound=true;if(!G.room){save.lost[key]=1;writeSave();}G.followers.push({x:e.x,y:e.y,seed:G.followers.length});sfx('love');toast('“I thought I was forgotten. May I walk with you?”');journal('lost');burst(e.x,e.y-16,14,'#ffd9e0',60,1);break;
+    case 'lost':e.found=true;G.lostFound=true;if(!G.room){save.lost[key]=1;writeSave();}G.followers.push({x:e.x,y:e.y,seed:G.followers.length,task:null,a:1,fade:0});sfx('love');G.beacon=null;
+    toast(p.carry==='traveler'?'“I thought I was forgotten. Here, let me take his other arm.”':(G.lv.ents.some(x=>x.type==='help'&&!x.done)?'“I thought I was forgotten. May I walk with you? I will help however I can.”':'“I thought I was forgotten. May I walk with you?”'),{pitch:1.16});journal('lost');burst(e.x,e.y-16,14,'#ffd9e0',60,1);break;
     case 'wand':e.friend=true;sfx('love');toast('“'+e.thanks+'”');burst(e.x,e.y-18,16,'#ffd9e0',70,1);break;
     case 'gate':e.open=true;sfx('rest');toast('You forgive '+e.name+'. The gate swings open.');burst(e.x,e.y-30,18,'#fff3c0',90,1);break;
     case 'cross':for(let i=0;i<p.burdens.length;i++)part(p.x-8,p.y-18,rnd(-60,-10),rnd(-120,-40),1.2,'#6b6570',5,500);p.burdens=[];sfx('rest');showVerse(G.t%2<1?'Matthew 11:28':'Matthew 11:30','grace');burst(e.x,e.y-30,20,'#fff3c0',90,1);break;
@@ -768,7 +1253,50 @@ function doAct(e){
     case 'carry':e.taken=true;p.carry=e.who;sfx('love');if(lv.flood&&!lv.flood.on){lv.flood.on=true;lv.flood.y=lv.H*T+50;toast('The water is rising. Climb!');music.swell=1;}break;
     case 'door':enterRoom();break;
     case 'exit':leaveRoom();break;
+    case 'hint':readHint(e.id);break;
+    case 'help':startHelp(e);break;
   }
+}
+// ---- Friends who help. A Lost One you found walks with you, and can do what takes two.
+function freeFollower(){if(!G)return null;for(const f of G.followers)if(!f.task&&f.a>0.6)return f;return null;}
+const HELP_LINES={ladder:['“I will hold it steady. Climb!”','“Go on up. I have it.”'],bridge:['“Ready? Lift, and lay it across!”','“Together, then. There!”'],
+  stone:['“On three. One, two, push!”','“Together we can move it.”'],ferry:['“I will row. You keep the lamp lit.”','“Sit down, hold on. I have the oars.”']};
+function startHelp(e){const f=freeFollower();if(!f)return;
+  f.task=e;e.f=f;e.done=true;e.t=0;sfx('love');journal('helper');
+  if(e.kind!=='ferry')applyHelp(G.lv,e);else{e.boat.manned=true;e.boat.armed=true;}
+  const ls=HELP_LINES[e.kind];toast(ls[(f.seed+G.stumbles)%ls.length],{pitch:1.16+0.06*(f.seed%2)});
+  burst(e.x,e.y-20,16,'#ffd9e0',70,1);
+}
+// Where a helping friend stands (or sits) to do their part.
+function helpStation(e){switch(e.kind){
+  case 'ladder':return {x:e.c*T-3,y:e.y,pose:'up',face:1};
+  case 'bridge':return {x:e.x-6,y:e.y,pose:'up',face:1};
+  case 'stone':return {x:e.c*T-22,y:e.y,pose:'hug',face:1};
+  case 'ferry':return {x:e.boat.x-e.boat.w*0.22,y:e.boat.y,pose:'oars',face:1,sit:true};}return {x:e.x,y:e.y};}
+// Is the friend's part done? Then they let go and catch up with you.
+function helpReleased(e){const p=G.p;switch(e.kind){
+  case 'ladder':{const top=(G.lv.H-(e.gh+e.hh))*T,lx=(e.c+0.5)*T;return (p.ground&&p.y<=top+1&&Math.abs(p.x-lx)>T*1.6)||Math.abs(p.x-lx)>9*T;}
+  case 'bridge':return p.x>(e.c0+e.w+1)*T||p.x<e.x-9*T;
+  case 'stone':return e.t>1.6;
+  case 'ferry':{const b=e.boat;return b.rest&&p.riding!==b&&Math.abs(p.x-b.x)>3*T;}}return true;}
+function updateHelpers(dt){
+  const lv=G.lv,p=G.p;
+  for(const e of lv.ents){if(e.type!=='help')continue;if(e.done)e.t+=dt;
+    if(e.kind==='ferry'){e.x=e.boat.x-e.boat.w/2+6;e.y=e.boat.y;}
+    // walking up to one alone: say so once, and let the one left behind call out
+    if(!e.done&&!e.warned&&Math.abs(e.x-p.x)<70&&Math.abs(e.y-p.y)<90&&!freeFollower()){e.warned=true;helperNeeded(e);}}
+  for(const f of G.followers){
+    if(f.task){const e=f.task,st=helpStation(e);f.x=lerp(f.x,st.x,1-Math.exp(-6*dt));f.y=lerp(f.y,st.y,1-Math.exp(-9*dt));if(e.kind==='ferry'){f.x=st.x;f.y=st.y;}
+      if(e.t>0.4&&helpReleased(e)){f.task=null;f.fade=1;e.f=null;if(e.kind==='ferry'){e.done=false;e.boat.manned=false;e.warned=true;}}}
+    if(f.fade>0){f.fade-=dt*2.2;f.a=Math.abs(f.fade-0.5)*2;if(f.fade<=0.5&&!f.moved){f.moved=true;const t=G.trail[Math.min(G.trail.length-1,14)]||p;f.x=t.x-p.face*16;f.y=t.y;}
+      if(f.fade<=0){f.fade=0;f.a=1;f.moved=false;}}}
+  G.helpCarry=p.carry==='traveler'&&!!freeFollower();
+}
+function helperNeeded(e){
+  const lost=G.lv.ents.find(x=>x.type==='lost'&&!x.found),busy=G.followers.length>0;
+  const what={ladder:'This wall is too high to climb alone. The ladder needs someone to hold it.',bridge:'The gap is too wide to leap, and the '+(e.art==='log'?'log':'bridge')+' is too heavy for one.',stone:'This stone is too heavy for one to move.',ferry:'Someone has to row this boat.'}[e.kind];
+  if(lost){toast(what+' Someone is waiting back along the road.');G.beacon={e:lost,t:0};setTimeout(()=>{if(G&&G.beacon&&G.beacon.e===lost&&!lost.found)say('“Hello? Is someone there? I am back here, in the dark!”',{pri:2,pitch:1.18});},2600);}
+  else toast(busy?what+' Your friend is still busy. Give them a moment.':what);
 }
 function spawnMotes(e){for(let i=0;i<3;i++){const a=-Math.PI/2+(i-1)*1.1+rnd(-0.2,0.2);G.lv.ents.push({type:'sh',k:'m',x:e.x,y:e.y,bx:e.x,by:e.y,vx:Math.cos(a)*90,vy:Math.sin(a)*70,name:e.name,a:0.9,t:0,dir:1,sp:e.sp,gone:false,r:7});}}
 function updShadow(e,dt){
@@ -845,12 +1373,13 @@ function updateParts(dt){
   const ps=G.parts;for(let i=ps.length-1;i>=0;i--){const q=ps[i];q.life-=dt;if(q.life<=0){ps.splice(i,1);continue;}q.vy+=q.g*dt;q.x+=q.vx*dt;q.y+=q.vy*dt;}
   if(G.toast){G.toast.t+=dt;if(G.toast.t>4.5)G.toast=null;}
   if(G.reward){G.reward.t+=dt;if(G.reward.t>7)G.reward=null;}
-  if(G.verse){G.verse.t+=dt;if(G.verse.t>(G.verse.kind==='scroll'?9:6.5))G.verse=null;}
+  if(G.verse){const v=G.verse;v.t+=dt;if(voice.speaking&&v.gen===voice.gen&&v.t>v.dur-1)v.t=v.dur-1;if(v.t>v.dur)G.verse=null;}
   if(G.note){G.note.t+=dt;if(G.note.t>3.5)G.note=null;}
 }
 function updatePlay(dt){
   if(G)G.shadowNear=G.shadowSeen!==undefined&&G.t-G.shadowSeen<0.2;
   const p=G.p,lv=G.lv;G.t+=dt;
+  if(G.word){updateWord(dt);updateParts(dt);return;}
   if(G.vcard){G.vcard.t+=dt;if(G.vcard.t>1.2&&(inp.jumpP||inp.actP||G.vcard.skip))G.vcard=null;return;}
   if(G.ending){updateEnding(dt);updateParts(dt);updateCam(dt);return;}
   G.time+=dt;if(G.intro>0)G.intro-=dt;
@@ -858,33 +1387,19 @@ function updatePlay(dt){
   if(Math.random()<dt*5)part(G.cam.x+rnd(VW),G.cam.y+rnd(VH),rnd(-8,8),rnd(-14,-2),rnd(2,4),G.ch.pal.mote,rnd(1,2),0,1);
   if(lv.lightning&&G.calm<0.5){G.thunder-=dt;if(G.thunder<=0){G.thunder=rnd(7,13);G.flash=1;sfx('thunder');}}
   if(G.flash>0)G.flash=Math.max(0,G.flash-dt*1.6);
-  if(G.carried>0){G.carried-=dt;if(G.carried<=0)respawn();updateParts(dt);updateCam(dt);return;}
+  if(G.carried>0){G.carried-=dt;if(G.carried<=0){respawn();openWord(G.hintK);}updateParts(dt);updateCam(dt);return;}
   if(G.sink>0){G.sink-=dt;p.sinkOff=Math.min(22,p.sinkOff+dt*30);if(G.sink<0.7)p.sinkOff=Math.max(0,p.sinkOff-dt*70);
-    if(G.sink<=0){G.sink=0;p.sinkOff=0;G.faith=70;}updateParts(dt);updateCam(dt);return;}
+    if(G.sink<=0){G.sink=0;p.sinkOff=0;G.faith=70;openWord('Matthew 14:31');}updateParts(dt);updateCam(dt);return;}
   // boats
+  for(const e of lv.ents){if(e.type==='boat'&&e.ferry){
+      // it sets off once you have stepped aboard and settled; after landing you must step off before it crosses again
+      const on=p.riding===e;if(!on)e.armed=true;
+      if(e.rest&&e.manned&&on&&e.armed){e.onT=(e.onT||0)+dt;if(e.onT>0.45){e.dir=Math.abs(e.bx-e.fx0)<2?1:-1;e.rest=false;e.armed=false;e.onT=0;sfx('splash');}}else e.onT=0;
+      if(!e.rest){const tgt=e.dir>0?e.fx1:e.fx0,st=72*dt;if(Math.abs(tgt-e.bx)<=st){e.bx=tgt;e.rest=true;sfx('land');}else e.bx+=Math.sign(tgt-e.bx)*st;}}}
   for(const e of lv.ents){if(e.type==='boat'){const ph=G.t*TAU/e.per+e.ph,nx=e.bx+Math.sin(ph)*e.ax,ny=e.by+Math.sin(G.t*1.7+e.ph)*4*(1-G.calm);e.dx=nx-e.x;e.dy=ny-e.y;e.x=nx;e.y=ny;}}
   if(p.riding){p.x+=p.riding.dx;p.y=p.riding.y;}
   // movement
-  const nb=Math.min(5,p.burdens.length);
-  const spd=150*(1-0.07*nb)*(p.carry==='traveler'?0.8:1)*(lv.home&&nb===0?1.2:1);
-  const jv=520*(1-0.06*nb)*(p.carry==='traveler'?0.95:1);
-  let ax=0;if(inp.l)ax-=1;if(inp.r)ax+=1;
-  if(ax){p.vx+=ax*(p.ground?1500:1000)*dt;p.face=ax;}
-  else{const f=(p.ground?1400:500)*dt;if(Math.abs(p.vx)<=f)p.vx=0;else p.vx-=Math.sign(p.vx)*f;}
-  p.vx=clamp(p.vx,-spd,spd);
-  let wind=0;for(const g of lv.gusts){if(p.x>g.x1&&p.x<g.x2)wind=-48*(0.6+0.4*Math.sin(G.t*1.7))*(1-G.calm);}
-  G.wind=wind;
-  if(inp.jumpP)p.buf=0.12;else p.buf-=dt;
-  if(p.ground)p.coy=0.1;else p.coy-=dt;
-  if(p.buf>0&&p.coy>0){p.vy=-jv;p.buf=0;p.coy=0;p.ground=false;p.riding=null;p.jumping=true;sfx('jump');p.sq=-1;for(let i=0;i<3;i++)part(p.x+rnd(-5,5),p.y,rnd(-30,30),rnd(-10,0),0.35,'rgba(230,220,200,0.5)',2);}
-  if(p.jumping&&!inp.jump&&p.vy<-170)p.vy=-170;
-  if(p.vy>=0)p.jumping=false;
-  p.vy+=1500*dt;
-  p.glide=false;
-  if(save.virtues[1]&&inp.jump&&!p.ground&&p.vy>55&&p.coy<=0){p.vy=55;p.glide=true;if(Math.random()<dt*20)part(p.x-p.face*10,p.y-18,-p.face*20,rnd(-5,10),0.6,'#fff7d8',2,0,1);}
-  if(p.vy>620)p.vy=620;
-  const wasG=p.ground;
-  moveX(p,(p.vx+wind)*dt);moveY(p,p.vy*dt);
+  stepMove(p,dt,inp,true);
   if(p.ground&&Math.abs(p.vx)>20){p.anim+=dt*Math.abs(p.vx)*0.085;}else if(p.ground)p.anim=0;
   p.sq*=Math.exp(-9*dt);
   // hazards of place
@@ -919,7 +1434,7 @@ function updatePlay(dt){
   if(lv.waterwalk&&p.x>9*T){
     if(p.vx>25)G.faith+=18*dt;else if(p.vx<-25)G.faith-=26*(G.ng?1.3:1)*dt;else G.faith-=11*(G.ng?1.3:1)*dt;
     G.faith=clamp(G.faith,0,100);
-    if(G.faith<=0&&p.ground){G.sink=1.9;G.stumbles++;sfx('splash');showVerse('Matthew 14:31','grace');journal('stumble');burst(p.x,p.y,12,'#bcd0ff',80);}
+    if(G.faith<=0&&p.ground){G.sink=1.9;G.stumbles++;sfx('splash');G.verse=null;journal('stumble');burst(p.x,p.y,12,'#bcd0ff',80);}
   }
   // the looming giant, and the vigil
   if(lv.giant){
@@ -944,34 +1459,136 @@ function updatePlay(dt){
     const dx=e.x-p.x,dy=e.y-p.y,adx=Math.abs(dx);
     switch(e.type){
       case 'sh':if(adx<VW)updShadow(e,dt);break;
-      case 'cp':if(!e.on&&adx<18&&Math.abs(dy)<44){e.on=true;G.cp={x:e.x,y:e.y};sfx('cp');burst(e.x,e.y-24,14,'#fff3c0',70,1);showVerse(WAYSIDE[G.wayI++%WAYSIDE.length],'way');}break;
+      case 'cp':if(!e.on&&adx<18&&Math.abs(dy)<44){e.on=true;G.cp={x:e.x,y:e.y};sfx('cp');burst(e.x,e.y-24,14,'#fff3c0',70,1);
+        if(e.hint)readHint(e.hint);else{const k=WAYSIDE[G.wayI++%WAYSIDE.length];showVerse(k,'way');if(!G.hintK)G.hintK=k;}}break;
       case 'scroll':if(!e.got&&adx<20&&Math.abs(dy-14+14)<34){e.got=true;save.scrolls[G.ci+'-'+G.si+'-'+e.i]=1;writeSave();sfx('scroll');showVerse(SCROLLS[G.ci][G.si][e.i],'scroll');journal('scroll');
         if(G.room&&e.i===2&&G.si<2){p.oil=oilMax();G.reward={t:0,n:hiddenCount()};G.hiddenNew=true;G.toast=null;journal('hidden');sfx('virtue');burst(p.x,p.y-30,40,'#ffe9a8',160,1);}burst(e.x,e.y-16,18,'#fff3c0',90,1);}break;
       case 'oil':if(adx<18&&Math.abs(dy)<36){e.gone=true;p.oil=Math.min(oilMax(),p.oil+50);sfx('oil');burst(e.x,e.y-10,8,'#ffd070',60,1);}break;
       case 'glad':if(adx<22&&Math.abs(dy)<40){e.gone=true;save.glad[G.ci+'-'+G.si]=1;writeSave();p.oil=oilMax();sfx('virtue');showVerse('Psalm 45:7','scroll');toast('Oil of Gladness. Your lamp shines wider.');journal('glad');burst(e.x,e.y-12,24,'#ffe9a8',110,1);}break;
       case 'fount':if(adx<26&&Math.abs(dy)<40){if(p.oil<oilMax()-1){p.oil=oilMax();if(!e.said){e.said=true;showVerse('Psalm 23:5','way');sfx('oil');}}}break;
-      case 'shrine':if(!e.used&&adx<20&&Math.abs(dy)<44){e.used=true;if(!save.virtues[e.v]||!save.journal['v'+e.v]){save.virtues[e.v]=true;writeSave();sfx('virtue');G.vcard={v:e.v,t:0};journal('v'+e.v);burst(e.x,e.y-30,26,'#fff3c0',120,1);}}break;
-      case 'sign':if(adx<44&&Math.abs(dy)<70)G.signText=e.text;break;
+      case 'shrine':if(!e.used&&adx<20&&Math.abs(dy)<44){e.used=true;if(!save.virtues[e.v]||!save.journal['v'+e.v]){save.virtues[e.v]=true;writeSave();sfx('virtue');G.vcard={v:e.v,t:0};{const vv=VIRTUES[e.v];say('A virtue is given. '+vv.name+'. '+vv.title+'. '+V(vv.v)+' '+sayRef(vv.v)+'. '+keyWords(vv.how),{pri:3});}journal('v'+e.v);burst(e.x,e.y-30,26,'#fff3c0',120,1);}}break;
+      case 'hint':if(!e.read&&adx<26&&Math.abs(dy)<56){e.read=true;readHint(e.id);sfx('scroll');burst(e.x,e.y-26,10,'#fff3c0',50,1);}
+        if(canAct(e)){const d=Math.hypot(dx,dy);if(d<bd&&e.read&&adx<30){bd=d;best=e;}}break;
+      case 'sign':if(adx<44&&Math.abs(dy)<70){G.signText=e.text;if(!e.said){e.said=true;say(keyWords(e.text),{pri:2});}}break;
       case 'burden':if(adx<14&&Math.abs(dy)<36){e.gone=true;p.burdens.push(e.name);sfx('burden');toast('You pick up '+e.name+'. It is heavier than it looked.');}break;
       case 'goal':if(adx<22&&Math.abs(dy)<70)tryGoal(e);break;
       case 'soil':if(e.planted&&!e.great&&e.grow<1){e.grow=Math.min(1,e.grow+dt/1.6);growTree(e);if(Math.random()<dt*20)part(e.x+rnd(-20,20),e.y-e.grow*e.H*T,rnd(-20,20),rnd(-30,10),0.8,'#9be07a',2.5);}
-      case 'lost':case 'wand':case 'gate':case 'cross':case 'carry':case 'door':case 'exit':
+      case 'lost':case 'wand':case 'gate':case 'cross':case 'carry':case 'door':case 'exit':case 'help':
         if(canAct(e)){const d=Math.hypot(dx,dy);if(d<bd){bd=d;best=e;}}break;
     }
     if(G.ending||G.carried>0||state!=='play'||G.lv!==lv)break;
   }
   G.near=best;
   if(best&&G.lv===lv&&!G.ending){const need=actNeed(best);
-    if(inp.act){if(need.block){if(inp.actP)toast(need.block);}else{best.chn=(best.chn||0)+dt;if(Math.random()<dt*14)part(best.x+rnd(-10,10),best.y-rnd(8,30),0,-30,0.6,'#ffd9e0',2,0,1);if(best.chn>=need.dur){best.chn=0;doAct(best);}}}
+    if(inp.act){if(need.block){if(inp.actP){if(need.block==='helper')helperNeeded(best);else toast(need.block);}}else{best.chn=(best.chn||0)+dt;if(Math.random()<dt*14)part(best.x+rnd(-10,10),best.y-rnd(8,30),0,-30,0.6,'#ffd9e0',2,0,1);if(best.chn>=need.dur){best.chn=0;doAct(best);}}}
     else best.chn=Math.max(0,(best.chn||0)-dt*2);}
   // followers trail behind
   if(G.followers.length){G.trail.unshift({x:p.x,y:p.y});if(G.trail.length>90)G.trail.pop();
-    for(let i=0;i<G.followers.length;i++){const f=G.followers[i],t=G.trail[Math.min(G.trail.length-1,14+i*12)];f.x=lerp(f.x,t.x-p.face*4,1-Math.exp(-8*dt));f.y=lerp(f.y,t.y,1-Math.exp(-8*dt));}}
+    for(let i=0;i<G.followers.length;i++){const f=G.followers[i];if(f.task||f.fade>0.5)continue;const t=G.trail[Math.min(G.trail.length-1,14+i*12)];f.x=lerp(f.x,t.x-p.face*4,1-Math.exp(-8*dt));f.y=lerp(f.y,t.y,1-Math.exp(-8*dt));}}
+  updateHelpers(dt);
+  if(G.beacon){G.beacon.t+=dt;if(G.beacon.t>16||G.beacon.e.found)G.beacon=null;}
+  if(G.guide){G.guide.t+=dt;if(G.guide.t>6)G.guide=null;}
   // weather particles
   if(lv.home&&Math.random()<dt*4)part(G.cam.x+rnd(VW),G.cam.y-4,rnd(-10,10),rnd(15,30),4,'#ffcf80',2,0,1);
   if(G.ci===2&&Math.random()<dt*3)part(G.cam.x+rnd(VW),G.cam.y-4,rnd(-25,5),rnd(20,40),5,'#b9d77a',2.5);
   updateParts(dt);updateCam(dt);
 }
+
+// ============================================================
+// REMEMBER THE WORD. After a fall, grace carries you back. Then the verse that lights this
+// part of the road appears with a word or two glowing in it, and you type them to rise again.
+// The words are always shown: this is remembering, not guessing.
+// ============================================================
+const STOPWORDS=new Set('the and of to a an in that is for you your yours he his him they them their it its be not will shall my me i we our us with as on by are was were all but have has had who whom what this from at or so when then there one into upon do no nor if am may can let out up'.split(' '));
+const KB_ROWS=['qwertyuiop','asdfghjkl','zxcvbnm'];
+const normWord=t=>String(t).toLowerCase().replace(/[^a-z]/g,'');
+function verseTokens(k){return V(k).toLowerCase().match(/[a-z]+/g)||[];}
+function wordChoices(k){const toks=verseTokens(k),set=new Set(toks);
+  let c=(KEYWORDS[k]||[]).filter(w=>set.has(w));
+  if(!c.length){const seen=new Set();for(const t of toks)if(t.length>=4&&t.length<=8&&!STOPWORDS.has(t)&&!seen.has(t)){seen.add(t);c.push(t);}}
+  if(!c.length)c=toks.filter(t=>t.length>=3).slice(0,1);
+  return c.length?c:['light'];}
+// One word in the first chapters, two later, one more on the Pilgrim's Return.
+function wordCount(){return Math.min(3,(G.ci<2?1:2)+(G.ng?1:0));}
+function openWord(k){
+  if(!k||!VERSES[k])k=GRACE[G.graceI++%GRACE.length];
+  const all=wordChoices(k),n=Math.min(wordCount(),all.length);G.wordRot=G.wordRot||{};const r=G.wordRot[k]||0,pick=[];
+  for(let i=0;i<n;i++){const w=all[(r+i)%all.length];if(pick.indexOf(w)<0)pick.push(w);}G.wordRot[k]=r+n;
+  const toks=verseTokens(k);pick.sort((a,b)=>toks.indexOf(a)-toks.indexOf(b));
+  G.word={k:k,words:pick,i:0,typed:'',t:0,shake:0,done:0,label:refLabel(k),hit:null,hitT:0,keys:[],sel:0,pad:false,prev:0};
+  for(const id in touches)delete touches[id];mouseShine=false;for(const c in keys)keys[c]=false;
+  say(V(k)+' '+sayRef(k)+'. '+(pick.length>1?'Type the words: '+pick.join(', then '):'Type the word: '+pick[0])+'.',{pri:3});
+}
+function typeLetter(ch){
+  const W=G&&G.word;if(!W||W.done>0)return;const w=W.words[W.i];ch=String(ch).toLowerCase();W.hit=ch;W.hitT=0.18;
+  if(ch===w.charAt(W.typed.length)){W.typed+=ch;sfx('key');
+    if(W.typed===w){sfx('word');W.i++;W.typed='';
+      if(W.i>=W.words.length){W.done=0.9;burst(G.p.x,G.p.y-14,22,'#fff3c0',100,1);}
+      else say('Now: '+W.words[W.i]+'.',{pri:3});}}
+  else{W.shake=0.35;sfx('nope');}
+}
+function finishWord(){const W=G.word;for(const w of W.words)save.words[w]=1;writeSave();journal('word');G.word=null;sfx('grace');G.cam.shake=0;}
+function updateWord(dt){
+  const W=G.word;W.t+=dt;W.shake=Math.max(0,W.shake-dt);W.hitT=Math.max(0,W.hitT-dt);
+  if(W.done>0){W.done-=dt;if(W.done<=0)finishWord();return;}
+  // a gamepad can choose letters on the on-screen keys: the pad moves, A presses
+  try{const gps=navigator.getGamepads?navigator.getGamepads():[];let m=0;for(const gp of gps){if(!gp)continue;const B=i=>gp.buttons[i]&&gp.buttons[i].pressed,ax=gp.axes[0]||0,ay=gp.axes[1]||0;
+      if(B(14)||ax<-0.5)m|=1;if(B(15)||ax>0.5)m|=2;if(B(12)||ay<-0.5)m|=4;if(B(13)||ay>0.5)m|=8;if(B(0))m|=16;}
+    const e=m&~W.prev;W.prev=m;
+    if(e){W.pad=true;const pos=keyPos(W.sel);let r=pos[0],c=pos[1];
+      if(e&1)c--;if(e&2)c++;if(e&4)r--;if(e&8)r++;r=clamp(r,0,2);c=clamp(c,0,KB_ROWS[r].length-1);W.sel=keyIndex(r,c);
+      if(e&16)typeLetter(KB_ROWS.join('').charAt(W.sel));}}catch(e){}
+}
+function keyPos(i){let r=0;while(i>=KB_ROWS[r].length&&r<2){i-=KB_ROWS[r].length;r++;}return [r,i];}
+function keyIndex(r,c){let i=c;for(let k=0;k<r;k++)i+=KB_ROWS[k].length;return i;}
+// Lay out a verse word by word, so the words to type can glow where they stand.
+function richLines(toks,maxW){const sp=ctx.measureText(' ').width,lines=[];let cur=[],cw=0;
+  for(let i=0;i<toks.length;i++){const tw=ctx.measureText(toks[i]).width;if(cur.length&&cw+sp+tw>maxW){lines.push(cur);cur=[];cw=0;}cw+=(cur.length?sp:0)+tw;cur.push(i);}
+  if(cur.length)lines.push(cur);return lines;}
+function drawWord(){
+  const W=G.word;if(!W)return;ctx.fillStyle='rgba(6,4,12,0.74)';ctx.fillRect(0,0,VW,VH);
+  const w=Math.min(VW-20,680),x=VW/2-w/2,touchy=anyTouch||W.pad;
+  // keys along the bottom
+  const kw=Math.min(touchy?48:40,(w-12)/10-5),kh=Math.min(touchy?36:30,Math.max(26,kw*0.8)),kg=5,kbH=3*kh+2*kg,kbTop=VH-8-kbH;
+  // the current word as letter tiles; the verse above it; the whole group centred over the keys
+  const cw=W.words[Math.min(W.i,W.words.length-1)],bs=Math.min(34,(w-40)/Math.max(6,cw.length)-6);
+  const toks=V(W.k).split(' '),marks=new Map();
+  W.words.forEach((wd,i)=>{for(let j=0;j<toks.length;j++)if(!marks.has(j)&&normWord(toks[j])===wd){marks.set(j,i);break;}});
+  const room=kbTop-16-bs-24-66;let fs=19,lines=null;
+  for(const f of [19,17.5,16,14.5,13,12]){fs=f;font(f,'italic');lines=richLines(toks,w-36);if(lines.length*f*1.3<=room)break;}
+  const lh=fs*1.3,group=lines.length*lh+24+bs,vTop=66+Math.max(0,(room+24+bs-group)/2),boxY=vTop+lines.length*lh+24;
+  panel(x,8,w,boxY-8+bs+12,0.9);
+  ctx.textAlign='center';font(15,'italic');ctx.fillStyle='#fff6dc';ctx.fillText('Remember the Word',VW/2,32);
+  font(12);ctx.fillStyle='#bfe0ff';ctx.fillText(W.done>0?'Remembered. Rise, and walk on.':(touchy?'Grace carried you back. Tap the glowing letters to rise again.':'Grace carried you back. Type the glowing word to rise again.'),VW/2,50);
+  if(W.words.length>1){font(11);ctx.textAlign='right';ctx.fillStyle='#e0c070';ctx.fillText('Word '+Math.min(W.i+1,W.words.length)+' of '+W.words.length,x+w-12,30);}
+  font(fs,'italic');const sp=ctx.measureText(' ').width;ctx.textAlign='left';
+  lines.forEach((L,li)=>{let lw=0;L.forEach((i,k)=>{lw+=(k?sp:0)+ctx.measureText(toks[i]).width;});let xx=VW/2-lw/2;const yy=vTop+li*lh+fs*0.4;
+    L.forEach((i,k)=>{if(k)xx+=sp;const t=toks[i],tw=ctx.measureText(t).width,m=marks.get(i);
+      if(m===undefined)ctx.fillStyle='#f6ecd0';
+      else if(m<W.i)ctx.fillStyle='#b8e6a2';
+      else if(m===W.i){const lead=t.match(/^[^A-Za-z]*/)[0],core=t.slice(lead.length).replace(/[^A-Za-z]+$/,''),ux=xx+ctx.measureText(lead).width,uw=ctx.measureText(core).width;
+        ctx.globalCompositeOperation='lighter';glow(ctx,ux+uw/2,yy-fs*0.35,uw*0.75+12,'rgba(255,215,120,'+(0.28+0.12*Math.sin(W.t*5))+')');ctx.globalCompositeOperation='source-over';ctx.fillStyle='#ffe28a';ctx.fillRect(ux,yy+4,uw,2);}
+      else ctx.fillStyle='#e9cf8a';
+      ctx.fillText(t,xx,yy);xx+=tw;});});
+  font(12.5);ctx.textAlign='right';ctx.fillStyle='#e0c070';ctx.fillText(W.label,x+w-14,boxY-9);
+  // letter tiles: typed letters bright, the next one glowing, the rest shown faintly so nothing is guessed
+  const n=cw.length,gap=6,tot=n*bs+(n-1)*gap,sx=VW/2-tot/2+(W.shake>0?Math.sin(W.t*70)*5*W.shake/0.35:0);
+  const typed=W.i>=W.words.length?n:W.typed.length;
+  for(let i=0;i<n;i++){const bx=sx+i*(bs+gap),done=i<typed,next=i===typed&&W.done<=0;
+    ctx.fillStyle=done?'rgba(120,90,40,0.95)':'rgba(10,8,18,0.9)';rrect(ctx,bx,boxY,bs,bs,6);ctx.fill();
+    ctx.strokeStyle=next?'rgba(255,233,168,'+(0.65+0.35*Math.sin(W.t*7))+')':done?'#ffe9a8':'rgba(233,217,168,0.4)';ctx.lineWidth=next?2.2:1.2;ctx.stroke();
+    font(Math.round(bs*0.62));ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=done?'#fff6dc':next?'rgba(255,240,200,0.75)':'rgba(233,217,168,0.42)';ctx.fillText(cw.charAt(i).toUpperCase(),bx+bs/2,boxY+bs/2+1);ctx.textBaseline='alphabetic';}
+  // the on-screen keys (always shown; on a computer they show where the next letter is)
+  W.keys=[];const nextCh=W.done>0?'':cw.charAt(W.typed.length);let flat=0;
+  for(let r=0;r<3;r++){const row=KB_ROWS[r],rw=row.length*kw+(row.length-1)*kg,rx=VW/2-rw/2,ry=kbTop+r*(kh+kg);
+    for(let c=0;c<row.length;c++,flat++){const ch=row[c],kx=rx+c*(kw+kg),isNext=ch===nextCh,isHit=W.hitT>0&&W.hit===ch,isSel=W.pad&&W.sel===flat;
+      W.keys.push({x:kx,y:ry,w:kw,h:kh,ch:ch});
+      if(isNext){ctx.globalCompositeOperation='lighter';glow(ctx,kx+kw/2,ry+kh/2,kw*0.9,'rgba(255,215,120,'+(0.25+0.15*Math.sin(W.t*6))+')');ctx.globalCompositeOperation='source-over';}
+      ctx.fillStyle=isHit?'rgba(120,90,40,0.95)':'rgba(20,16,32,0.92)';rrect(ctx,kx,ry,kw,kh,6);ctx.fill();
+      ctx.strokeStyle=isSel?'#bfe0ff':isNext?'#ffe9a8':'rgba(233,217,168,0.4)';ctx.lineWidth=isSel||isNext?2:1;ctx.stroke();
+      font(Math.round(kh*0.5));ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=isNext?'#fff6dc':'#e9d9a8';ctx.fillText(ch.toUpperCase(),kx+kw/2,ry+kh/2+1);ctx.textBaseline='alphabetic';}}
+}
+function wordTap(qx,qy){const W=G&&G.word;if(!W)return false;for(const k of W.keys)if(qx>=k.x-2&&qx<=k.x+k.w+2&&qy>=k.y-2&&qy<=k.y+k.h+2){typeLetter(k.ch);return true;}return true;}
 
 // ============================================================
 // DRAWING. Backgrounds, tiles, figures, light and dark.
@@ -1108,9 +1725,47 @@ function drawEnt(e){
     case 'door':case 'exit':ctx.fillStyle='#4a3020';ctx.beginPath();ctx.moveTo(x-11,y);ctx.lineTo(x-11,y-26);ctx.quadraticCurveTo(x,y-40,x+11,y-26);ctx.lineTo(x+11,y);ctx.fill();ctx.fillStyle=e.type==='exit'?'#bfe0ff':'#ffd070';ctx.beginPath();ctx.arc(x+6,y-14,1.8,0,TAU);ctx.fill();
       ctx.globalCompositeOperation='lighter';glow(ctx,x,y-18,24,e.type==='exit'?'rgba(170,210,255,0.3)':'rgba(255,215,120,0.3)');ctx.globalCompositeOperation='source-over';break;
     case 'boat':{const w=e.w/2;ctx.fillStyle='#6a4a30';ctx.beginPath();ctx.moveTo(x-w-6,y);ctx.lineTo(x+w+6,y);ctx.quadraticCurveTo(x+w-2,y+18,x+w-14,y+18);ctx.lineTo(x-w+14,y+18);ctx.quadraticCurveTo(x-w+2,y+18,x-w-6,y);ctx.fill();ctx.fillStyle='#8a6a44';ctx.fillRect(x-w-6,y,e.w+12,4);
-      if(e.w>80){ctx.fillStyle='#5a4028';ctx.fillRect(x-1.5,y-60,3,60);ctx.fillStyle='rgba(230,225,210,0.8)';ctx.beginPath();ctx.moveTo(x+2,y-58);ctx.lineTo(x+30,y-20);ctx.lineTo(x+2,y-14);ctx.fill();}break;}
+      if(e.ferry&&e.manned){const sw=Math.sin(t*(e.rest?1.5:5))*(e.rest?0.15:0.6),ox=x-e.w*0.22;ctx.strokeStyle='#8a6a44';ctx.lineWidth=2.4;ctx.lineCap='round';ctx.beginPath();
+        ctx.moveTo(ox-4,y-12);ctx.lineTo(ox-26+Math.cos(sw)*6,y+16+Math.sin(sw)*6);ctx.moveTo(ox+4,y-12);ctx.lineTo(ox+26-Math.cos(sw)*6,y+16-Math.sin(sw)*6);ctx.stroke();}
+      if(e.w>80&&!e.ferry){ctx.fillStyle='#5a4028';ctx.fillRect(x-1.5,y-60,3,60);ctx.fillStyle='rgba(230,225,210,0.8)';ctx.beginPath();ctx.moveTo(x+2,y-58);ctx.lineTo(x+30,y-20);ctx.lineTo(x+2,y-14);ctx.fill();}break;}
     case 'goal':if(e.kind==='path'||e.kind==='tree'){ctx.globalCompositeOperation='lighter';const g=ctx.createLinearGradient(0,y-150,0,y);g.addColorStop(0,'rgba(255,240,190,0)');g.addColorStop(1,'rgba(255,240,190,0.28)');ctx.fillStyle=g;ctx.fillRect(x-14,y-150,28,150);ctx.globalCompositeOperation='source-over';}break;
     case 'deco':drawDeco(e);break;
+    case 'help':drawHelp(e);break;
+    case 'hint':{// a waystone with a lamp carved in it; it glows until read
+      ctx.fillStyle='#8a8478';ctx.beginPath();ctx.moveTo(x-10,y);ctx.lineTo(x-9,y-26);ctx.quadraticCurveTo(x,y-38,x+9,y-26);ctx.lineTo(x+10,y);ctx.fill();ctx.fillStyle='#6d685e';ctx.fillRect(x-11,y-3,22,3);
+      const a=e.read?0.35:0.75+0.25*Math.sin(t*3);ctx.globalCompositeOperation='lighter';glow(ctx,x,y-19,e.read?18:34,'rgba(255,225,150,'+(a*0.6)+')');ctx.globalCompositeOperation='source-over';
+      ctx.fillStyle='rgba(255,226,138,'+(0.45+a*0.55)+')';ctx.beginPath();ctx.arc(x,y-21,2.8,0,TAU);ctx.fill();ctx.fillRect(x-3.5,y-17,7,2.5);ctx.fillRect(x-1,y-15,2,4);break;}
+  }
+}
+function drawHelp(e){
+  const lv=G.lv,t=G.t,gy=e.y;
+  switch(e.kind){
+    case 'ladder':{// lies on the ground until a friend lifts it and holds it against the wall
+      const k=e.done?clamp(e.t/0.7,0,1):0,ang=-Math.PI/2*(1-k*k*(3-2*k)),H=(e.hh*T)+12;
+      ctx.save();ctx.translate((e.c+0.5)*T,gy-1);ctx.rotate(ang);ctx.lineCap='round';
+      ctx.strokeStyle='#8a6a44';ctx.lineWidth=3.2;ctx.beginPath();ctx.moveTo(-8,0);ctx.lineTo(-8,-H);ctx.moveTo(8,0);ctx.lineTo(8,-H);ctx.stroke();
+      ctx.strokeStyle='#a5835a';ctx.lineWidth=2.2;ctx.beginPath();for(let r=12;r<H;r+=12){ctx.moveTo(-8,-r);ctx.lineTo(8,-r);}ctx.stroke();
+      if(k>=1){const rungs=[];for(let h=2;h<=e.hh;h+=2)rungs.push(h);if(e.hh%2)rungs.push(e.hh);ctx.strokeStyle='#c9a66a';ctx.lineWidth=3.5;ctx.beginPath();for(const h of rungs){ctx.moveTo(-9,-h*T+1);ctx.lineTo(9,-h*T+1);}ctx.stroke();}
+      ctx.restore();break;}
+    case 'bridge':{// stands on end at the near edge until two lay it across the gap
+      const k=e.done?clamp(e.t/0.8,0,1):0,ease=k<1?k*k:1,ang=-Math.PI/2*(1-ease),L=e.w*T+6,log=e.art==='log';
+      ctx.save();ctx.translate(e.c0*T-3,gy);ctx.rotate(ang);
+      if(log){ctx.fillStyle='#6a4a2a';rrect(ctx,0,0,L,15,7);ctx.fill();ctx.strokeStyle='#4e351c';ctx.lineWidth=1.2;ctx.beginPath();for(let x=10;x<L-6;x+=17){ctx.moveTo(x,3);ctx.lineTo(x+9,6);}ctx.stroke();
+        ctx.fillStyle='#a5835a';ctx.beginPath();ctx.ellipse(L,7.5,3.5,7.5,0,0,TAU);ctx.fill();ctx.fillStyle='#3f7a45';ctx.beginPath();ctx.arc(L*0.35,1,4,Math.PI,0);ctx.fill();}
+      else{ctx.fillStyle='#7a5a3a';ctx.fillRect(0,0,L,8);ctx.fillStyle='#5e432a';for(let x=0;x<L;x+=12)ctx.fillRect(x,0,1.5,8);ctx.fillStyle='#8a6a44';ctx.fillRect(0,0,L,2);}
+      ctx.restore();
+      if(!log){ctx.strokeStyle='#5a4028';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(e.c0*T-14,gy);ctx.lineTo(e.c0*T-14,gy-38);ctx.stroke();
+        ctx.strokeStyle='rgba(200,170,120,0.9)';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(e.c0*T-14,gy-36);
+        if(k>=1)ctx.quadraticCurveTo((e.c0+e.w/2)*T,gy-10,(e.c0+e.w)*T,gy-2);else ctx.lineTo(e.c0*T-1,gy-L*(1-ease)+4);ctx.stroke();}
+      break;}
+    case 'stone':{// a great stone in a low cut; together you roll it out of the way
+      const k=e.done?clamp(e.t/1.5,0,1):0,cx=(e.c+1)*T+k*k*90,cy=gy-35+(k>0.55?(k-0.55)*(k-0.55)*260:0),rot=k*4;
+      ctx.save();ctx.globalAlpha=1-clamp((k-0.6)/0.4,0,1);ctx.translate(cx,cy);ctx.rotate(rot);
+      const g=ctx.createRadialGradient(-10,-12,4,0,0,38);g.addColorStop(0,'#9a958c');g.addColorStop(1,'#5a564f');ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,35,0,TAU);ctx.fill();
+      ctx.strokeStyle='rgba(40,36,32,0.6)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-14,-20);ctx.lineTo(-4,-6);ctx.lineTo(-12,10);ctx.moveTo(10,14);ctx.lineTo(20,4);ctx.stroke();
+      ctx.fillStyle='rgba(90,140,80,0.7)';ctx.beginPath();ctx.arc(-6,-30,9,Math.PI*1.05,Math.PI*1.95);ctx.fill();ctx.restore();ctx.globalAlpha=1;break;}
+    case 'ferry':{const b=e.boat;// mooring posts at each end of the crossing
+      ctx.fillStyle='#5a4a3a';for(const fx of [b.fx0-b.w/2-14,b.fx1+b.w/2+10])ctx.fillRect(fx,b.by-18,5,40);break;}
   }
 }
 function drawShadow(e){
@@ -1127,7 +1782,8 @@ function drawTiles(){
   for(let r=r0;r<=r1;r++){const row=lv.tiles[r];for(let c=c0;c<=c1;c++){const ch=row[c];if(ch===' '||ch==='c')continue;const x=c*T,y=r*T,i=r*lv.W+c;
     switch(ch){
       case '#':{const up=r>0?lv.tiles[r-1][c]:' ';if(up==='#'){ctx.fillStyle=(r>1&&lv.tiles[r-2][c]==='#')?pal.deep:pal.body;ctx.fillRect(x,y,T+0.5,T+0.5);}
-        else{ctx.fillStyle=pal.body;ctx.fillRect(x,y,T+0.5,T+0.5);ctx.fillStyle=pal.top;ctx.fillRect(x,y,T+0.5,7);ctx.fillRect(x+2+(c*7)%13,y+7,4,3);ctx.fillRect(x+4+(c*11)%15,y-2,2,3);}break;}
+        else{ctx.fillStyle=pal.body;ctx.fillRect(x,y,T+0.5,T+0.5);ctx.fillStyle=pal.top;ctx.fillRect(x,y,T+0.5,7);ctx.fillRect(x+2+(c*7)%13,y+7,4,3);ctx.fillRect(x+4+(c*11)%15,y-2,2,3);}
+        const dn=r+1<lv.H?lv.tiles[r+1][c]:'#';if(up==='#'&&dn!=='#'&&dn!=='C'){ctx.fillStyle=pal.body;ctx.fillRect(x,y,T+0.5,T+0.5);ctx.fillStyle=pal.deep;ctx.fillRect(x,y+T-6,T+0.5,6);ctx.fillRect(x+3+(c*7)%12,y+T,4,5+(c%3)*2);ctx.fillRect(x+12+(c*5)%9,y+T,3,3+(c%2)*3);}break;}
       case '=':ctx.fillStyle='#6b5a48';ctx.fillRect(x,y,T+0.5,T+0.5);ctx.fillStyle='#57483a';ctx.fillRect(x,y+T-3,T+0.5,3);ctx.fillRect(x+((r*5)%2?6:16),y,1.5,T);break;
       case '-':ctx.fillStyle='#8a6a44';ctx.fillRect(x,y,T+0.5,6);ctx.fillStyle='#6a4e30';ctx.fillRect(x,y+5,T+0.5,2);break;
       case 'B':if(lv.grow&&lv.grow.on&&y>=lv.grow.y){ctx.fillStyle='#6a4a2a';ctx.fillRect(x,y,T+0.5,7);ctx.fillStyle=(c+r)%2?'#4f9a4a':'#5fae56';ctx.beginPath();ctx.arc(x+12,y-2,9,Math.PI,0);ctx.fill();ctx.beginPath();ctx.arc(x+4,y+8,6,0,Math.PI);ctx.fill();}break;
@@ -1154,8 +1810,13 @@ function drawDark(d){
     switch(e.type){case 'cp':if(e.on)hole(e.x,e.y-18,70,0.85);break;case 'scroll':if(!e.got)hole(e.x,e.y-18,36,0.8);break;case 'glad':hole(e.x,e.y-14,48,0.9);break;
       case 'shrine':hole(e.x,e.y-24,80,0.9);break;case 'fount':hole(e.x,e.y-18,70,0.9);break;case 'door':case 'exit':hole(e.x,e.y-18,40,0.6);break;case 'cross':hole(e.x,e.y-36,80,0.8);break;
       case 'goal':hole(e.x,e.y-30,e.kind==='father'?60:110,0.7);break;
+      case 'hint':hole(e.x,e.y-20,e.read?50:80,0.85);break;
+      case 'help':hole(e.kind==='stone'?(e.c+1)*T:e.x,e.y-30,e.kind==='ladder'&&e.done?140:90,0.55);break;
       case 'deco':if(e.kind==='christ')hole(e.x,e.y-30,260,1);else if(e.kind==='house')hole(e.x,e.y-50,220,0.95);else if(e.kind==='lanterns')hole(e.x,e.y-50,120,0.8);else if(e.kind==='villager')hole(e.x,e.y-20,60,0.8);else if(e.kind==='inn')hole(e.x,e.y-40,130,0.8);else if(e.kind==='crosses')hole(e.x,e.y-60,200,0.5);break;}}
   if(G.father)hole(G.father.x,p.y-20,70,0.9);
+  if(G.beacon&&!G.beacon.e.found)hole(G.beacon.e.x,G.beacon.e.y-30,140,0.95);
+  if(G.guide){const g=guidePos(G.guide);hole(g.x,g.y,90,0.9*clamp(6-G.guide.t,0,1));}
+  for(const f of G.followers)if(f.task)hole(f.x,f.y-20,60,0.6);
   ctx.drawImage(darkCv,0,0,VW,VH);
 }
 function drawWorld(){
@@ -1175,7 +1836,16 @@ function drawWorld(){
   drawTiles();
   for(const e of lv.ents){if(e.gone||e.type==='deco'||e.type==='sh')continue;if(e.x>x0&&e.x<x1){drawEnt(e);
     if(e.chn>0){const need=actNeed(e);ctx.strokeStyle='#ffe9a8';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y-52,9,-Math.PI/2,-Math.PI/2+TAU*clamp(e.chn/need.dur,0,1));ctx.stroke();}}}
-  for(let i=0;i<G.followers.length;i++){const f=G.followers[i];drawPerson(f.x,f.y,p.face,'#56627a',{walk:p.anim+i,hair:'#3a3028',arms:'down'});}
+  for(let i=0;i<G.followers.length;i++){const f=G.followers[i],tk=f.task;if(f.a<=0.02)continue;
+    if(tk){const st=helpStation(tk);drawPerson(f.x,f.y-(st.sit?10:0),st.face,'#56627a',{hair:'#3a3028',arms:st.pose==='oars'?'open':st.pose,sit:!!st.sit,alpha:f.a});}
+    else drawPerson(f.x,f.y,p.face,'#56627a',{walk:p.anim+i,hair:'#3a3028',arms:'down',alpha:f.a});}
+  // the one left behind, calling out: a column of soft light where they sit
+  if(G.beacon&&!G.beacon.e.found){const e=G.beacon.e,a=0.5+0.4*Math.sin(t*4);ctx.globalCompositeOperation='lighter';const g=ctx.createLinearGradient(0,e.y-220,0,e.y);g.addColorStop(0,'rgba(255,200,210,0)');g.addColorStop(1,'rgba(255,200,210,'+(0.35*a)+')');ctx.fillStyle=g;ctx.fillRect(e.x-16,e.y-220,32,220);glow(ctx,e.x,e.y-16,50,'rgba(255,210,220,'+(0.5*a)+')');ctx.globalCompositeOperation='source-over';
+    ctx.strokeStyle='rgba(255,220,230,'+(1-((t*0.8)%1))+')';ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y-16,12+((t*0.8)%1)*40,0,TAU);ctx.stroke();}
+  // the guiding light a hint sends ahead
+  if(G.guide){const g=guidePos(G.guide),a=clamp(6-G.guide.t,0,1);ctx.globalAlpha=a;ctx.globalCompositeOperation='lighter';glow(ctx,g.x,g.y,26+(g.k>=1?Math.sin(t*6)*6:0),'rgba(255,235,170,0.85)');glow(ctx,g.x,g.y,9,'rgba(255,255,240,1)');ctx.globalCompositeOperation='source-over';
+    if(g.k>=1){ctx.strokeStyle='rgba(255,233,168,'+(0.7*(1-((t*0.9)%1)))+')';ctx.lineWidth=2;ctx.beginPath();ctx.arc(g.x,g.y,10+((t*0.9)%1)*34,0,TAU);ctx.stroke();}
+    else if(Math.random()<0.6)part(g.x,g.y,rnd(-15,15),rnd(-15,15),0.6,'#fff3c0',2,0,1);ctx.globalAlpha=1;}
   if(G.father){const f=G.father;drawPerson(f.x,p.y,-1,'#b8884a',{walk:f.met?0:t*14,arms:f.met?'hug':'open',hair:'#ddd',beard:'#ddd',scale:1.12});}
   // the pilgrim
   if(G.carried>0){const k=1-G.carried/1.5,mx=lerp(G.fromX,G.cp.x,k*k),my=lerp(G.fromY,G.cp.y-20,k*k)-Math.sin(k*Math.PI)*50;ctx.globalCompositeOperation='lighter';glow(ctx,mx,my,26,'rgba(255,240,190,0.9)');ctx.globalCompositeOperation='source-over';if(Math.random()<0.5)part(mx,my,rnd(-20,20),rnd(-20,20),0.5,'#fff3c0',2,0,1);}
@@ -1211,13 +1881,45 @@ function drawWorld(){
   const vg=ctx.createRadialGradient(VW/2,VH/2,VH*0.5,VW/2,VH/2,VW*0.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,0.3)');ctx.fillStyle=vg;ctx.fillRect(0,0,VW,VH);
 }
 function panel(x,y,w,h,a){ctx.fillStyle='rgba(14,11,22,'+(a===undefined?0.78:a)+')';rrect(ctx,x,y,w,h,8);ctx.fill();ctx.strokeStyle='rgba(233,217,168,0.45)';ctx.lineWidth=1;ctx.stroke();}
-function versePanel(k,label,cx,y,maxW,alpha,fromBottom){
-  font(13,'italic');const ls=wrap(V(k),maxW-28),h=ls.length*17+30;const top=fromBottom?y-h:y;
-  ctx.globalAlpha=alpha;panel(cx-maxW/2,top,maxW,h);ctx.fillStyle='#f6ecd0';ctx.textAlign='center';ctx.textBaseline='alphabetic';
-  for(let i=0;i<ls.length;i++)ctx.fillText(ls[i],cx,top+20+i*17);
-  font(11);ctx.fillStyle='#e0c070';ctx.textAlign='right';ctx.fillText(label,cx+maxW/2-12,top+h-8);ctx.globalAlpha=1;return h;
+const VF=17;                                           // verse type size (lines are 1.3 times as tall)
+function verseMeasure(k,maxW,gloss,fs){fs=fs||VF;const gf=Math.max(11.5,fs-3);font(fs,'italic');const ls=wrap(V(k),maxW-30);let gl=[];if(gloss){font(gf);gl=wrap('✦ '+gloss,maxW-30);}
+  const lh=Math.round(fs*1.3),gh=Math.round(gf*1.3);return {ls:ls,gl:gl,fs:fs,gf:gf,lh:lh,gh:gh,h:ls.length*lh+(gl.length?gl.length*gh+6:0)+Math.round(fs*2)};}
+function versePanel(k,label,cx,y,maxW,alpha,fromBottom,gloss,fs){
+  const M=verseMeasure(k,maxW,gloss,fs),h=M.h,top=fromBottom?y-h:y,pad=Math.round(M.fs*1.4);
+  ctx.globalAlpha=alpha;panel(cx-maxW/2,top,maxW,h,0.86);ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  font(M.fs,'italic');ctx.fillStyle='#f6ecd0';for(let i=0;i<M.ls.length;i++)ctx.fillText(M.ls[i],cx,top+pad+i*M.lh);
+  if(M.gl.length){const y0=top+pad+4+M.ls.length*M.lh;font(M.gf);ctx.fillStyle='#bfe0ff';for(let i=0;i<M.gl.length;i++)ctx.fillText(M.gl[i],cx,y0+i*M.gh);}
+  font(Math.max(11,M.fs-4));ctx.fillStyle='#e0c070';ctx.textAlign='right';ctx.fillText(label,cx+maxW/2-12,top+h-Math.round(M.fs*0.55));ctx.globalAlpha=1;return h;
+}
+// On a phone held sideways, a verse sits to one side of the pilgrim (behind them, to the left, when there is
+// room) instead of across the bottom, clear of the touch buttons. Its width is set when it appears, so the
+// words do not jump about as you walk; it only narrows if the pilgrim walks underneath it.
+function verseBox(v){
+  const p=G.p,psx=p.x-G.cam.x,gap=28,L=Math.max(10,safe.l/SC+10),R=VW-Math.max(10,safe.r/SC+10),minW=220,maxW=400;
+  const TL=touchLayout(),top=48+(p.burdens.length?14:0);
+  const room={left:Math.min(maxW,psx-gap-L),right:Math.min(maxW,R-(psx+gap))};
+  let side=v.side;if(side&&side!=='top'&&room[side]<minW-30)side=null;
+  if(!side){side=room.left>=minW?'left':room.right>=minW?'right':'top';v.bw=0;}
+  v.side=side;if(side==='top')return {side:'top'};
+  if(!v.bw||room[side]<v.bw-6)v.bw=Math.floor(room[side]);
+  const w=v.bw,x0=side==='left'?L:R-w,btn=side==='left'?TL.left:TL.act,bottom=(btn.y-btn.r*1.1-OY)/SC-6;
+  if(v.bfs===undefined||v.bfw!==w){let fs=VF;for(const f of [17,15.5,14,12.5]){fs=f;if(verseMeasure(v.k,w,v.gloss,f).h<=bottom-top)break;}v.bfs=fs;v.bfw=w;}
+  const h=verseMeasure(v.k,w,v.gloss,v.bfs).h;return {side:side,x0:x0,x1:x0+w,cx:x0+w/2,w:w,top:top,fs:v.bfs,h:h};
+}
+// The open stretch of the top of the screen beside a verse box, for signs and notes.
+function freeSpan(vb,w){if(!vb||vb.side==='top')return {cx:VW/2,w:w};
+  const x0=vb.side==='left'?vb.x1+10:Math.max(10,safe.l/SC+10),x1=vb.side==='left'?VW-Math.max(10,safe.r/SC+10):vb.x0-10;
+  return {cx:(x0+x1)/2,w:Math.max(160,Math.min(w,x1-x0))};}
+// On a phone held upright, the verse goes in the empty band under the picture, above the buttons.
+function verseBelowRoom(){if(!(portrait&&anyTouch))return null;const TL=touchLayout(),top=OY+VH*SC+10,bottom=TL.act.y-TL.act.r-12;return bottom-top>=70?{top:top,bottom:bottom}:null;}
+function drawVerseBelow(){
+  const v=G.verse,room=verseBelowRoom();if(!v||!room)return;const a=clamp(Math.min(v.t*3,(v.dur-v.t)*2),0,1);
+  ctx.setTransform(DPR,0,0,DPR,0,0);const w=Math.min(CW-24-safe.l-safe.r,560);let fs=VF;
+  for(const f of [17,15.5,14,12.5]){fs=f;if(verseMeasure(v.k,w,v.gloss,f).h<=room.bottom-room.top)break;}
+  versePanel(v.k,v.label,CW/2,room.top,w,a,false,v.gloss,fs);
 }
 function drawHUD(){
+  if(G.word){drawWord();return;}
   const p=G.p,lv=G.lv,lm=anyTouch&&!portrait?170/SC:16;
   ctx.textBaseline='alphabetic';
   // oil
@@ -1239,34 +1941,44 @@ function drawHUD(){
   const qx2=px-34;ctx.fillStyle='rgba(14,11,22,0.55)';ctx.beginPath();ctx.arc(qx2,py,13,0,TAU);ctx.fill();font(15);ctx.fillStyle='#e9d9a8';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('?',qx2,py+1);ctx.textBaseline='alphabetic';
   G.helpBtn={x:qx2,y:py,r:17};
   // first-time coaching: how to shine the lamp
-  if(!save.shone&&!G.vcard&&!G.ending&&(G.shadowNear||(G.ci===0&&G.si===0&&G.t>3&&G.t<16))){const a=0.75+0.25*Math.sin(G.t*5);const msg=shineHowShort();font(14);const w=Math.min(VW-40,ctx.measureText(msg).width+60),bx=VW/2-w/2,by=VH*0.66;ctx.globalAlpha=a;panel(bx,by,w,30,0.82);ctx.globalCompositeOperation='lighter';glow(ctx,bx+20,by+15,18,'rgba(255,215,130,0.6)');ctx.globalCompositeOperation='source-over';ctx.fillStyle='#ffe28a';ctx.beginPath();ctx.arc(bx+20,by+15,4,0,TAU);ctx.fill();ctx.fillStyle='#fff6dc';ctx.textAlign='center';ctx.fillText(msg,VW/2+10,by+20);ctx.globalAlpha=1;}
+  if(!save.shone&&!G.vcard&&!G.ending&&!(G.verse&&G.verse.kind!=='grace')&&(G.shadowNear||(G.ci===0&&G.si===0&&G.t>3&&G.t<16))){const a=0.75+0.25*Math.sin(G.t*5);const msg=shineHowShort();font(14);const w=Math.min(VW-40,ctx.measureText(msg).width+60),bx=VW/2-w/2,by=VH*0.66;ctx.globalAlpha=a;panel(bx,by,w,30,0.82);ctx.globalCompositeOperation='lighter';glow(ctx,bx+20,by+15,18,'rgba(255,215,130,0.6)');ctx.globalCompositeOperation='source-over';ctx.fillStyle='#ffe28a';ctx.beginPath();ctx.arc(bx+20,by+15,4,0,TAU);ctx.fill();ctx.fillStyle='#fff6dc';ctx.textAlign='center';ctx.fillText(msg,VW/2+10,by+20);ctx.globalAlpha=1;}
   // stage name
   if(G.intro>0&&!G.room){const a=clamp(G.intro,0,1);ctx.globalAlpha=a;ctx.textAlign='center';font(12);ctx.fillStyle='#e0c070';ctx.fillText((G.ng?'Pilgrim’s Return  ·  ':'')+'Chapter '+NUMW[G.ci]+'  ·  '+G.ch.name,VW/2,150);font(24,'italic');ctx.fillStyle='#fff6dc';ctx.fillText(G.st.name,VW/2,178);ctx.globalAlpha=1;}
   // sign text and prompts
-  const midW=Math.max(220,Math.min(520,VW-2*lm));
-  if(G.signText&&!G.ending&&!G.vcard){font(13);const ls=wrap(keyWords(G.signText),midW-28),h=ls.length*17+14,top=56;panel(VW/2-midW/2,top,midW,h);ctx.fillStyle='#f6ecd0';ctx.textAlign='center';for(let i=0;i<ls.length;i++)ctx.fillText(ls[i],VW/2,top+19+i*17);}
+  const midW=Math.max(220,Math.min(620,VW-2*lm));
+  const verseUp=G.verse&&!G.ending&&!G.vcard&&!G.word,below=verseUp&&!!verseBelowRoom(),vb=verseUp&&!below&&anyTouch&&!portrait?verseBox(G.verse):null;
+  if(G.signText&&!G.ending&&!G.vcard){const sp=freeSpan(vb,midW);font(13);const ls=wrap(keyWords(G.signText),sp.w-28),h=ls.length*17+14,top=56;panel(sp.cx-sp.w/2,top,sp.w,h);ctx.fillStyle='#f6ecd0';ctx.textAlign='center';for(let i=0;i<ls.length;i++)ctx.fillText(ls[i],sp.cx,top+19+i*17);}
   if(G.near&&!G.ending&&G.carried<=0){const e=G.near,need=actNeed(e),sx=e.x-G.cam.x,sy=e.y-G.cam.y-66;font(11);const tx=(anyTouch?'Hold Act: ':'Hold C: ')+need.label;const w=ctx.measureText(tx).width+16;panel(sx-w/2,sy-14,w,20,0.7);ctx.fillStyle='#ffe9a8';ctx.textAlign='center';ctx.fillText(tx,sx,sy);
     if(e.name){font(11,'italic');ctx.fillStyle='#e9d9a8';ctx.fillText(e.type==='gate'?'A grudge against '+e.name:e.name,sx,sy-20);}}
   // verses
-  if(G.verse&&!G.ending&&!G.vcard){const v=G.verse,dur=v.kind==='scroll'?9:6.5,a=clamp(Math.min(v.t*3,(dur-v.t)*2),0,1);
-    if(v.kind==='scroll')versePanel(v.k,v.label,VW/2,VH-(portrait||!anyTouch?14:10),midW,a,true);
-    else versePanel(v.k,v.label,VW/2,G.signText?132:56,midW,a,false);}
-  if(G.reward&&!G.vcard){const r=G.reward,a=clamp(Math.min(r.t*3,(7-r.t)*1.5),0,1),w=Math.min(VW-24,420),top=VH*0.14;font(12.5);const ls=wrap('Reward: your lamp now holds more oil and shines farther, for the rest of the journey. Your oil is full.',w-30),h=58+ls.length*17;
-    ctx.globalAlpha=a;panel(VW/2-w/2,top,w,h,0.82);ctx.textAlign='center';font(17,'italic');ctx.fillStyle='#ffe9a8';ctx.fillText('Hidden Scroll found',VW/2,top+24);font(12.5);ctx.fillStyle='#fff6dc';for(let i=0;i<ls.length;i++)ctx.fillText(ls[i],VW/2,top+46+i*17);font(11,'italic');ctx.fillStyle='#bfe0ff';ctx.fillText('Hidden scrolls: '+r.n+' of 12.  Leave by the blue door to return to the road.',VW/2,top+h-10);ctx.globalAlpha=1;}
-  if(G.toast&&!G.vcard){const a=clamp(Math.min(G.toast.t*4,(4.5-G.toast.t)*2),0,1);font(13);const ls=wrap(G.toast.text,midW-28),h=ls.length*17+12,top=VH*0.36;ctx.globalAlpha=a;panel(VW/2-midW/2,top,midW,h,0.7);ctx.fillStyle='#fff6dc';ctx.textAlign='center';for(let i=0;i<ls.length;i++)ctx.fillText(ls[i],VW/2,top+18+i*17);ctx.globalAlpha=1;}
+  if(verseUp&&!below){const v=G.verse,a=clamp(Math.min(v.t*3,(v.dur-v.t)*2),0,1);
+    if(vb&&vb.side!=='top')versePanel(v.k,v.label,vb.cx,vb.top,vb.w,a,false,v.gloss,vb.fs);
+    else if(v.kind==='grace'||(vb&&vb.side==='top'))versePanel(v.k,v.label,VW/2,G.signText?132:50,midW,a,false,v.gloss);
+    else versePanel(v.k,v.label,VW/2,VH-(portrait||!anyTouch?12:8),midW,a,true,v.gloss);}
+  if(G.reward&&!G.vcard){const r=G.reward,a=clamp(Math.min(r.t*3,(7-r.t)*1.5),0,1),sp=freeSpan(vb,Math.min(VW-24,420)),w=sp.w,cx=sp.cx,top=VH*0.14;font(12.5);const ls=wrap('Reward: your lamp now holds more oil and shines farther, for the rest of the journey. Your oil is full.',w-30),ls2=wrap('Hidden scrolls: '+r.n+' of 12.  Leave by the blue door to return to the road.',w-30),h=50+ls.length*17+ls2.length*15;
+    ctx.globalAlpha=a;panel(cx-w/2,top,w,h,0.82);ctx.textAlign='center';font(17,'italic');ctx.fillStyle='#ffe9a8';ctx.fillText('Hidden Scroll found',cx,top+24);font(12.5);ctx.fillStyle='#fff6dc';for(let i=0;i<ls.length;i++)ctx.fillText(ls[i],cx,top+46+i*17);font(11,'italic');ctx.fillStyle='#bfe0ff';for(let i=0;i<ls2.length;i++)ctx.fillText(ls2[i],cx,top+h-10-(ls2.length-1-i)*15);ctx.globalAlpha=1;}
+  if(G.toast&&!G.vcard){const a=clamp(Math.min(G.toast.t*4,(4.5-G.toast.t)*2),0,1),sp=freeSpan(vb,midW);font(13);const ls=wrap(G.toast.text,sp.w-28),h=ls.length*17+12,top=VH*0.36;ctx.globalAlpha=a;panel(sp.cx-sp.w/2,top,sp.w,h,0.7);ctx.fillStyle='#fff6dc';ctx.textAlign='center';for(let i=0;i<ls.length;i++)ctx.fillText(ls[i],sp.cx,top+18+i*17);ctx.globalAlpha=1;}
+  // someone waiting back along the road: an arrow at the edge of the screen
+  if(G.beacon&&!G.beacon.e.found&&!G.vcard){const e=G.beacon.e,sx=e.x-G.cam.x;if(sx<10||sx>VW-10){const left=sx<10,ax=left?24:VW-24,ay=VH*0.58,a=0.7+0.3*Math.sin(G.t*5);
+    font(13,'italic');const tw=ctx.measureText('Someone is waiting').width;ctx.globalAlpha=0.8;panel(left?ax-16:ax-tw-30,ay-16,tw+46,30,0.7);
+    ctx.globalAlpha=a;ctx.fillStyle='#ffd9e0';ctx.beginPath();if(left){ctx.moveTo(ax-10,ay);ctx.lineTo(ax+4,ay-10);ctx.lineTo(ax+4,ay+10);}else{ctx.moveTo(ax+10,ay);ctx.lineTo(ax-4,ay-10);ctx.lineTo(ax-4,ay+10);}ctx.fill();
+    ctx.textAlign=left?'left':'right';ctx.fillText('Someone is waiting',left?ax+12:ax-12,ay+5);ctx.globalAlpha=1;}}
   if(G.note){const a=clamp(Math.min(G.note.t*4,(3.5-G.note.t)*2),0,1);ctx.globalAlpha=a;font(11,'italic');ctx.fillStyle='#bfe0ff';ctx.textAlign='right';ctx.fillText(G.note.text,VW-48,30);ctx.globalAlpha=1;}
   // endings
   if(G.ending){const en=G.ending,def=ENDINGS[en.kind],n=def.lines.length;if(n){const seg=def.dur/n,i=Math.min(n-1,Math.floor(en.t/seg)),L=def.lines[i],lt=en.t-i*seg,a=clamp(Math.min(lt*2,(seg-lt)*2),0,1);
       if(!en.labels)en.labels=[];
+      if(en.said!==i){en.said=i;if(L.v)sayVerse(L.v);else say(L.text,{pri:3});}
       if(L.v){if(!en.labels[i])en.labels[i]=refLabel(L.v);versePanel(L.v,en.labels[i],VW/2,40,midW,a,false);}
-      else{font(14,'italic');const ls=wrap(L.text,midW-28),h=ls.length*18+14;ctx.globalAlpha=a;panel(VW/2-midW/2,40,midW,h);ctx.fillStyle='#fff6dc';ctx.textAlign='center';for(let k=0;k<ls.length;k++)ctx.fillText(ls[k],VW/2,60+k*18);ctx.globalAlpha=1;}}}
+      else{font(17,'italic');const ls=wrap(L.text,midW-28),h=ls.length*23+16;ctx.globalAlpha=a;panel(VW/2-midW/2,40,midW,h,0.86);ctx.fillStyle='#fff6dc';ctx.textAlign='center';for(let k=0;k<ls.length;k++)ctx.fillText(ls[k],VW/2,64+k*23);ctx.globalAlpha=1;}}}
   // a virtue is given
-  if(G.vcard){const v=VIRTUES[G.vcard.v],a=clamp(G.vcard.t*2,0,1),w=Math.min(VW-40,480);ctx.globalAlpha=a;ctx.fillStyle='rgba(6,4,12,0.6)';ctx.fillRect(0,0,VW,VH);
+  if(G.vcard){const v=VIRTUES[G.vcard.v],a=clamp(G.vcard.t*2,0,1),w=Math.min(VW-30,580);ctx.globalAlpha=a;ctx.fillStyle='rgba(6,4,12,0.6)';ctx.fillRect(0,0,VW,VH);
     if(!G.vcard.label)G.vcard.label=refLabel(v.v);
-    panel(VW/2-w/2,50,w,250,0.9);ctx.textAlign='center';font(12);ctx.fillStyle='#e0c070';ctx.fillText('A virtue is given',VW/2,76);font(26,'italic');ctx.fillStyle='#fff6dc';ctx.fillText(v.name,VW/2,108);font(13);ctx.fillStyle='#e9d9a8';ctx.fillText(v.title,VW/2,128);
-    font(13,'italic');ctx.fillStyle='#f6ecd0';let y=154;y+=textBlock(V(v.v),VW/2,y,w-40,17);font(11);ctx.fillStyle='#e0c070';ctx.fillText(G.vcard.label,VW/2,y+2);
-    font(13);ctx.fillStyle='#fff6dc';textBlock(v.how,VW/2,y+26,w-40,17);
-    if(G.vcard.t>1.2){font(11);ctx.fillStyle='rgba(233,217,168,'+(0.5+0.4*Math.sin(ui.t*4))+')';ctx.fillText(anyTouch?'Tap to go on':'Press Space to go on',VW/2,288);}
+    font(16,'italic');const vl=wrap(V(v.v),w-40);font(14.5);const hl=wrap(keyWords(v.how),w-40);
+    const h=96+vl.length*20+24+hl.length*19+30,top=Math.max(6,(VH-h)/2);
+    panel(VW/2-w/2,top,w,h,0.92);ctx.textAlign='center';font(12);ctx.fillStyle='#e0c070';ctx.fillText('A virtue is given',VW/2,top+24);font(26,'italic');ctx.fillStyle='#fff6dc';ctx.fillText(v.name,VW/2,top+56);font(13);ctx.fillStyle='#e9d9a8';ctx.fillText(v.title,VW/2,top+76);
+    let y=top+100;font(16,'italic');ctx.fillStyle='#f6ecd0';for(const l of vl){ctx.fillText(l,VW/2,y);y+=20;}font(13);ctx.fillStyle='#e0c070';ctx.fillText(G.vcard.label,VW/2,y);y+=24;
+    font(14.5);ctx.fillStyle='#fff6dc';for(const l of hl){ctx.fillText(l,VW/2,y);y+=19;}
+    if(G.vcard.t>1.2){font(11);ctx.fillStyle='rgba(233,217,168,'+(0.5+0.4*Math.sin(ui.t*4))+')';ctx.fillText(anyTouch?'Tap to go on':'Press Space to go on',VW/2,top+h-10);}
     ctx.globalAlpha=1;}
 }
 function drawTouch(){
@@ -1282,7 +1994,7 @@ function drawTouch(){
 // ============================================================
 const ui={sel:0,btns:[],t:0,page:0,chap:0,back:null,msg:null};
 const NUMW=['One','Two','Three','Four','Five','Six'];
-function go(s){state=s;ui.sel=0;ui.t=0;ui.page=0;if(hum&&AC)hum.g.gain.setTargetAtTime(0,AC.currentTime,0.05);}
+function go(s){state=s;ui.sel=0;ui.t=0;ui.page=0;hush();if(hum&&AC)hum.g.gain.setTargetAtTime(0,AC.currentTime,0.05);}
 function hot(x,y,w,h,fn,dis){const i=ui.btns.length;ui.btns.push({x:x,y:y,w:w,h:h,fn:fn,dis:!!dis});return i===ui.sel&&!dis;}
 function btn(label,x,y,w,h,fn,o){
   o=o||{};const sel=hot(x,y,w,h,fn,o.dis);
@@ -1310,10 +2022,22 @@ function drawTitle(){
   items.push(['Controls',()=>openControls('title')]);
   items.push(['Chapters',()=>{runMode='pilgrim';ui.chap=Math.min(5,(save.unlocked/3)|0);go('map');}]);
   if(save.finished)items.push(['Pilgrim’s Return',()=>{runMode='return';ui.chap=Math.min(5,((save.retUnlocked||0)/3)|0);go('map');}]);
-  items.push(['Virtues',()=>go('virtues')],['Scrolls',()=>go('scrolls')],['Testimony',()=>go('journal')],['About',()=>go('about')],['Sound: '+(save.mute?'Off':'On'),()=>setMute(!save.mute)]);
+  items.push(['Virtues',()=>go('virtues')],['Scrolls',()=>go('scrolls')],['Testimony',()=>go('journal')],['About',()=>go('about')],['Sound & Voice',()=>openSound('title')]);
   for(let i=0;i<items.length;i++)btn(items[i][0],x0+(i%cols)*(bw+gap),y0+((i/cols)|0)*(bh+gap),bw,bh,items[i][1]);
+  drawAcctButton();
   if(ui.msg){font(12,'italic');ctx.fillStyle='#bfe0ff';ctx.textAlign='center';ctx.fillText(ui.msg,VW/2,114);}
   ui.back=null;
+}
+function drawAcctButton(){
+  const on=!!acct.token,label=on?acct.name:'Sign In';font(12);
+  const w=Math.round(Math.max(86,ctx.measureText(label).width+(on?42:30))),h=24;
+  const right=Math.min(VW-12,(CW-safe.r-OX)/SC-12),y=Math.max(10,(safe.t-OY)/SC+8),x=right-w;
+  btn(label,x,y,w,h,openAccount,{size:12});
+  const st=acctStatus(),saved=st==='Journey saved',warn=!saved&&st!=='Saving…'&&on;
+  if(on){ctx.fillStyle=saved?'#ffe28a':warn?'#c9a0a0':'rgba(255,226,138,'+(0.35+0.35*Math.sin(ui.t*6))+')';ctx.beginPath();ctx.arc(x+14,y+h/2,3.2,0,TAU);ctx.fill();}
+  font(10);const sw=ctx.measureText(st).width;
+  font(Math.min(40,VW*0.07),'italic');const tw=ctx.measureText('Lamp Unto My Feet').width;
+  if(right-sw>VW/2+tw/2+8){font(10);ctx.textAlign='right';ctx.fillStyle=warn||(!on&&save.acct)?'#e8b9a8':'rgba(233,217,168,0.72)';ctx.fillText(st,right,y+h+13);}
 }
 function drawMap(){
   drawNight();const ret=runMode==='return',u=ret?(save.retUnlocked||0):save.unlocked;
@@ -1358,19 +2082,24 @@ function pager(n,backTo){
 }
 function drawScrolls(){
   drawNight();const pg=clamp(ui.page,0,17),c=(pg/3)|0,s=pg%3;let total=0;for(const k in save.scrolls)total++;
-  heading('Scrolls','Found: '+total+' of 54   ·   Chapter '+NUMW[c]+', '+CHAP[c].stages[s].name);
-  const w=Math.min(VW-30,640),x=VW/2-w/2;let y=64;
-  for(let i=0;i<3;i++){const k=SCROLLS[c][s][i],got=save.scrolls[c+'-'+s+'-'+i];font(11.5,'italic');const ls=got?wrap(V(k),w-28):wrap('Not yet found.'+(i===2&&s<2?' Look for a small door. This hidden scroll makes your lamp stronger.':''),w-28),h=Math.max(40,ls.length*14+26);
-    panel(x,y,w,h,0.65);ctx.globalAlpha=got?1:0.5;ctx.fillStyle='#f6ecd0';ctx.textAlign='left';for(let q=0;q<ls.length;q++)ctx.fillText(ls[q],x+14,y+17+q*14);
-    if(got){font(10);ctx.fillStyle='#e0c070';ctx.textAlign='right';ctx.fillText(refOf(k)+(i===0?' (ESV)':''),x+w-12,y+h-7);}ctx.globalAlpha=1;y+=h+6;}
+  heading('Scrolls','Found: '+total+' of 54   ·   Words remembered: '+Object.keys(save.words||{}).length+'   ·   Chapter '+NUMW[c]+', '+CHAP[c].stages[s].name);
+  const w=Math.min(VW-30,660),x=VW/2-w/2;let y=64;
+  const texts=[0,1,2].map(i=>save.scrolls[c+'-'+s+'-'+i]?V(SCROLLS[c][s][i]):'Not yet found.'+(i===2&&s<2?' Look for a small door. This hidden scroll makes your lamp stronger.':''));
+  let fs=15;for(const f of [15,13.5,12.5,11.5]){fs=f;font(f,'italic');let H=0;for(const t of texts)H+=Math.max(40,wrap(t,w-28).length*f*1.25+28)+6;if(H<=VH-44-64)break;}
+  const lh=fs*1.25;
+  for(let i=0;i<3;i++){const k=SCROLLS[c][s][i],got=save.scrolls[c+'-'+s+'-'+i];font(fs,'italic');const ls=wrap(texts[i],w-28),h=Math.max(40,ls.length*lh+28);
+    panel(x,y,w,h,0.65);ctx.globalAlpha=got?1:0.5;ctx.fillStyle='#f6ecd0';ctx.textAlign='left';for(let q=0;q<ls.length;q++)ctx.fillText(ls[q],x+14,y+fs+6+q*lh);
+    if(got){font(11);ctx.fillStyle='#e0c070';ctx.textAlign='right';ctx.fillText(refOf(k)+(i===0?' (ESV)':''),x+w-12,y+h-7);}ctx.globalAlpha=1;y+=h+6;}
   pager(18);
 }
 function drawJournal(){
   drawNight();const got=JOURNAL.filter(j=>save.journal[j[0]]),per=3,n=Math.max(1,Math.ceil(got.length/per));ui.page=clamp(ui.page,0,n-1);
   heading('Testimony',got.length+' of '+JOURNAL.length+' pages written   ·   page '+(ui.page+1)+' of '+n);
-  const w=Math.min(VW-30,600),x=VW/2-w/2;let y=66;
+  const w=Math.min(VW-30,640),x=VW/2-w/2;let y=66;
   if(!got.length){font(13,'italic');ctx.fillStyle='#e9d9a8';ctx.textAlign='center';ctx.fillText('The pages are blank. Set out, and they will fill.',VW/2,150);}
-  for(let i=ui.page*per;i<Math.min(got.length,(ui.page+1)*per);i++){font(12.5,'italic');const ls=wrap(got[i][1],w-30),h=ls.length*16+18;panel(x,y,w,h,0.65);ctx.fillStyle='#f6ecd0';ctx.textAlign='left';for(let q=0;q<ls.length;q++)ctx.fillText(ls[q],x+15,y+20+q*16);y+=h+8;}
+  const pageItems=got.slice(ui.page*per,(ui.page+1)*per);let fs=15;
+  for(const f of [15,14,12.5]){fs=f;font(f,'italic');let H=0;for(const j of pageItems)H+=wrap(j[1],w-30).length*f*1.25+18+8;if(H<=VH-44-66)break;}
+  for(const j of pageItems){font(fs,'italic');const lh=fs*1.25,ls=wrap(j[1],w-30),h=ls.length*lh+18;panel(x,y,w,h,0.65);ctx.fillStyle='#f6ecd0';ctx.textAlign='left';for(let q=0;q<ls.length;q++)ctx.fillText(ls[q],x+15,y+fs+7+q*lh);y+=h+8;}
   pager(n);
 }
 function drawAbout(){
@@ -1380,6 +2109,31 @@ function drawAbout(){
   font(10.5);ctx.fillStyle='#e9d9a8';y+=textBlock(ESV_NOTICE,VW/2,y,w,13.5)+8;
   y+=textBlock(ESV_TRADEMARK,VW/2,y,w,13.5);
   btn('Back',VW/2-50,VH-34,100,24,()=>go('title'));ui.back=()=>go('title');
+}
+let soundFrom='title';
+function openSound(from){soundFrom=from;go('sound');}
+function pickVoice(d){const n=voice.list.length;if(n<2)return;let i=voice.list.indexOf(voice.v);i=((i<0?0:i)+d+n)%n;voice.v=voice.list[i];voice.uri=voice.v.voiceURI;writeVoicePrefs();voiceSample();}
+function voiceName(){if(!voice.v)return 'This device’s voice';let n=String(voice.v.name).replace(/\s*\(.*\)\s*$/,'').replace(/^(Microsoft|Google|Apple)\s+/,'').replace(/\s+Online$/,'');font(12);while(n.length>4&&ctx.measureText('Reader: '+n).width>176)n=n.slice(0,-2);return n;}
+function drawSound(){
+  if(soundFrom==='title')drawNight();else{drawWorld();ctx.fillStyle='rgba(6,4,12,0.86)';ctx.fillRect(0,0,VW,VH);}
+  heading('Sound and Voice','A gentle voice can read the verses, signs and story aloud');
+  const bw=270,x=VW/2-bw/2,bh=28,gap=8;let y=72;
+  btn('Sound: '+(save.mute?'Off':'On'),x,y,bw,bh,()=>{setMute(!save.mute);if(!save.mute)voiceSample();});y+=bh+gap;
+  if(!voice.ok){font(12.5,'italic');ctx.fillStyle='#e9d9a8';ctx.textAlign='center';ctx.fillText('This browser has no reading voice, so the words stay on the screen.',VW/2,y+18);}
+  else{
+    btn('Voice: '+(voice.on?'On':'Off'),x,y,bw,bh,()=>{voice.on=!voice.on;writeVoicePrefs();if(voice.on)voiceSample();else hush();});y+=bh+gap;
+    const many=voice.list.length>1;
+    btn('◀',x,y,38,bh,()=>pickVoice(-1),{dis:!many});btn('Reader: '+voiceName(),x+44,y,bw-88,bh,()=>pickVoice(1),{dis:!many,size:12});btn('▶',x+bw-38,y,38,bh,()=>pickVoice(1),{dis:!many});y+=bh+gap;
+    let si=0;for(let i=0;i<VOICE_SPEEDS.length;i++)if(Math.abs(VOICE_SPEEDS[i][0]-voice.rate)<0.03)si=i;
+    btn('Speed: '+VOICE_SPEEDS[si][1],x,y,bw,bh,()=>{voice.rate=VOICE_SPEEDS[(si+1)%VOICE_SPEEDS.length][0];writeVoicePrefs();voiceSample();});y+=bh+gap;
+    btn('Hear a Sample',x,y,bw,bh,voiceSample,{dis:!voice.on||save.mute});y+=bh+gap;
+    font(11);ctx.fillStyle='rgba(233,217,168,0.75)';ctx.textAlign='center';
+    const why=save.mute?'Sound is off, so the voice is quiet too.':!voice.on?'The voice is off.':voice.err==='not-allowed'||(!voice.unlocked&&!voice.spoke)?'Tap Hear a Sample to wake the voice.':
+      voice.err?'The voice could not start here ('+voice.err+'). Try another reader, or check the device volume.':(many?'Try a few readers and keep the one that sounds kindest.':(voice.list.length?'This device has one English voice.':'Using this device’s own voice.'));
+    ctx.fillText(why,VW/2,y+14);if(voice.on&&!save.mute){font(10.5);ctx.fillStyle='rgba(233,217,168,0.55)';ctx.fillText('On a phone, make sure the ringer switch and media volume are up.',VW/2,y+30);}
+  }
+  const back=()=>{if(soundFrom==='pause')go('pause');else go('title');};
+  btn('Back',VW/2-50,VH-32,100,24,back);ui.back=back;
 }
 let ctrlFrom='title';
 function openControls(from){ctrlFrom=from;for(const k in touches)delete touches[k];mouseShine=false;go('controls');}
@@ -1407,7 +2161,7 @@ function drawPause(){
   ctx.fillStyle='rgba(6,4,12,0.72)';ctx.fillRect(0,0,VW,VH);heading('Rest a While',G.ch.name+'   ·   '+G.st.name);
   const items=[['Resume',()=>{state='play';}],['Controls',()=>openControls('pause')],['Restart Stage',()=>startStage(G.ci,G.si)]];
   if(G.room)items.push(['Leave This Room',()=>{leaveRoom();state='play';}]);
-  items.push(['Chapter Map',()=>{ui.chap=G.ci;go('map');setMusic('title');}],['Sound: '+(save.mute?'Off':'On'),()=>setMute(!save.mute)],['Title',()=>{go('title');setMusic('title');}]);
+  items.push(['Chapter Map',()=>{ui.chap=G.ci;go('map');setMusic('title');}],['Sound & Voice',()=>openSound('pause')],['Title',()=>{go('title');setMusic('title');}]);
   const bw=180,bh=30;let y=VH/2-items.length*(bh+8)/2+10;for(const it of items){btn(it[0],VW/2-bw/2,y,bw,bh,it[1]);y+=bh+8;}
   font(10.5);ctx.fillStyle='rgba(233,217,168,0.7)';ctx.textAlign='center';ctx.fillText(anyTouch?'Hold Shine to light your lamp.  Tap ? for every control.':'Arrows to walk.  Space to jump.  Hold X or Shift to shine.  C to act.  H for every control.',VW/2,VH-12);
   ui.back=()=>{state='play';};
@@ -1429,8 +2183,10 @@ function drawComplete(){
 }
 // ---- Story scenes: small moving pictures between chapters ----
 let CARD=null;
-function showCard(ci,kind,next){const ch=CHAP[ci];CARD={ci:ci,kind:kind,lines:kind==='story'?ch.story:ch.reflect,i:0,t:0,lt:0,next:next,labels:[]};go('card');setMusic(ch.song);music.swell=kind==='reflect'?0.7:0;bgCache=null;}
-function cardAdvance(){if(!CARD||CARD.lt<0.5)return;CARD.i++;CARD.lt=0;sfx('ui');if(CARD.i>=CARD.lines.length){const n=CARD.next;CARD=null;n();}}
+function showCard(ci,kind,next){const ch=CHAP[ci];CARD={ci:ci,kind:kind,lines:kind==='story'?ch.story:ch.reflect,i:0,t:0,lt:0,next:next,labels:[]};go('card');setMusic(ch.song);music.swell=kind==='reflect'?0.7:0;bgCache=null;cardSay();}
+function cardSay(){const C=CARD;if(!C)return;const L=C.lines[C.i];if(!L)return;const pre=C.i===0?(C.kind==='story'?'Chapter '+NUMW[C.ci]+'. '+CHAP[C.ci].name+'. ':'Reflection. '):'';
+  if(L.v)say(pre+V(L.v)+' '+sayRef(L.v)+'.',{pri:3});else say(pre+L,{pri:3});}
+function cardAdvance(){if(!CARD||CARD.lt<0.5)return;CARD.i++;CARD.lt=0;sfx('ui');if(CARD.i>=CARD.lines.length){const n=CARD.next;CARD=null;hush();n();}else cardSay();}
 function drawTomb(x,gy,open,lightK){
   ctx.fillStyle='#4a4650';ctx.beginPath();ctx.moveTo(x-150,gy);ctx.quadraticCurveTo(x-90,gy-150,x,gy-150);ctx.quadraticCurveTo(x+100,gy-150,x+150,gy);ctx.fill();
   ctx.fillStyle=lightK>0?'rgba(255,246,210,'+clamp(0.25+lightK,0,1)+')':'#0a0810';ctx.beginPath();ctx.moveTo(x-22,gy);ctx.lineTo(x-22,gy-40);ctx.quadraticCurveTo(x,gy-62,x+22,gy-40);ctx.lineTo(x+22,gy);ctx.fill();
@@ -1465,9 +2221,9 @@ function drawCard(){
   const C=CARD;if(!C)return;drawScene(C.ci,C.kind,C.t);
   const vg=ctx.createLinearGradient(0,0,0,VH);vg.addColorStop(0,'rgba(6,4,12,0.55)');vg.addColorStop(0.3,'rgba(6,4,12,0)');vg.addColorStop(0.75,'rgba(6,4,12,0)');vg.addColorStop(1,'rgba(6,4,12,0.6)');ctx.fillStyle=vg;ctx.fillRect(0,0,VW,VH);
   ctx.textAlign='center';font(11);ctx.fillStyle='#e0c070';ctx.fillText(C.kind==='story'?'Chapter '+NUMW[C.ci]:'Reflection   ·   '+CHAP[C.ci].ref,VW/2,28);font(24,'italic');ctx.fillStyle='#fff6dc';ctx.fillText(CHAP[C.ci].name,VW/2,54);
-  const L=C.lines[C.i],w=Math.min(VW-40,560),a=clamp(C.lt*2.5,0,1);
+  const L=C.lines[C.i],w=Math.min(VW-40,620),a=clamp(C.lt*2.5,0,1);
   if(L){if(L.v){if(!C.labels[C.i])C.labels[C.i]=refLabel(L.v);versePanel(L.v,C.labels[C.i],VW/2,VH-30,w,a,true);}
-    else{font(14);const ls=wrap(L,w-30),h=ls.length*19+16;ctx.globalAlpha=a;panel(VW/2-w/2,VH-30-h,w,h);ctx.fillStyle='#fff6dc';ctx.textAlign='center';for(let i=0;i<ls.length;i++)ctx.fillText(ls[i],VW/2,VH-30-h+22+i*19);ctx.globalAlpha=1;}}
+    else{font(17);const ls=wrap(L,w-30),h=ls.length*23+18;ctx.globalAlpha=a;panel(VW/2-w/2,VH-30-h,w,h,0.86);ctx.fillStyle='#fff6dc';ctx.textAlign='center';for(let i=0;i<ls.length;i++)ctx.fillText(ls[i],VW/2,VH-30-h+25+i*23);ctx.globalAlpha=1;}}
   if(C.lt>1.2){font(10.5);ctx.fillStyle='rgba(233,217,168,'+(0.5+0.4*Math.sin(ui.t*4))+')';ctx.textAlign='center';ctx.fillText(anyTouch?'Tap to go on':'Press Space to go on',VW/2,VH-10);}
 }
 // ---- The ending: the cross, three days, the dawn, the Father's house ----
@@ -1499,9 +2255,10 @@ function drawFinale(){
     let n=0;for(const k in save.lost)n++;const px=F.ph===3?Math.min(hx-80,VW*0.12+t*20):hx-80,walk=px<hx-80?t*9:0;
     for(let i=0;i<Math.min(n,8);i++)drawPerson(px-22-i*17,gy,1,['#56627a','#7a5a8a','#5a7a6a','#8a6a4a'][i%4],{walk:walk+i,hair:'#3a3028'});
     drawPilgrim(px,gy,1,walk,{lamp:px<hx-80,robe:G&&G.ng?'#4a5a7b':'#7b4a32'});}
-  if(F.ph<4){const Ls=FIN_LINES[F.ph],seg=FIN_DUR[F.ph]/Ls.length,i=Math.min(Ls.length-1,Math.floor(t/seg)),L=Ls[i],lt=t-i*seg,a=clamp(Math.min(lt*1.5,(seg-lt)*1.5),0,1),w=Math.min(VW-40,540),key=F.ph+'-'+i;
+  if(F.ph<4){const Ls=FIN_LINES[F.ph],seg=FIN_DUR[F.ph]/Ls.length,i=Math.min(Ls.length-1,Math.floor(t/seg)),L=Ls[i],lt=t-i*seg,a=clamp(Math.min(lt*1.5,(seg-lt)*1.5),0,1),w=Math.min(VW-40,620),key=F.ph+'-'+i;
+    if(F.said!==key){F.said=key;if(L.v)sayVerse(L.v);else say(L.text,{pri:3});}
     if(L.v){if(!F.labels[key])F.labels[key]=refLabel(L.v);versePanel(L.v,F.labels[key],VW/2,VH-22,w,a,true);}
-    else{font(14,'italic');const ls=wrap(L.text,w-30),h=ls.length*19+16;ctx.globalAlpha=a;panel(VW/2-w/2,VH-22-h,w,h);ctx.fillStyle='#fff6dc';ctx.textAlign='center';for(let q=0;q<ls.length;q++)ctx.fillText(ls[q],VW/2,VH-22-h+22+q*19);ctx.globalAlpha=1;}}
+    else{font(17,'italic');const ls=wrap(L.text,w-30),h=ls.length*23+18;ctx.globalAlpha=a;panel(VW/2-w/2,VH-22-h,w,h,0.86);ctx.fillStyle='#fff6dc';ctx.textAlign='center';for(let q=0;q<ls.length;q++)ctx.fillText(ls[q],VW/2,VH-22-h+25+q*23);ctx.globalAlpha=1;}}
   else{ctx.fillStyle='rgba(6,4,12,0.74)';ctx.fillRect(0,0,VW,VH);const w=Math.min(VW-36,620);ctx.textAlign='center';font(26,'italic');ctx.fillStyle='#fff3c8';ctx.fillText('Lamp Unto My Feet',VW/2,44);
     font(12,'italic');ctx.fillStyle='#f6ecd0';ctx.fillText(V('Psalm 119:105'),VW/2,66);font(10);ctx.fillStyle='#e0c070';ctx.fillText('Psalm 119:105 (ESV)',VW/2,80);
     let sc=0,lo=0;for(const k in save.scrolls)sc++;for(const k in save.lost)lo++;
@@ -1516,6 +2273,7 @@ function pauseGame(){if(state==='play'){go('pause');}}
 function uiTap(px,py){
   const qx=(px-OX)/SC,qy=(py-OY)/SC;
   if(state==='play'){
+    if(G.word)return wordTap(qx,qy);
     if(G.vcard){G.vcard.skip=true;return true;}
     if(G.ending){G.ending.skip=true;return true;}
     const b=G.pauseBtn;if(b&&Math.hypot(qx-b.x,qy-b.y)<b.r+8){pauseGame();return true;}
@@ -1540,7 +2298,11 @@ function keyPress(code){
   else if(goKey){const b=ui.btns[ui.sel];if(b&&!b.dis){sfx('ui');b.fn();}}
   else if(code==='Escape'||code==='KeyP'){if(ui.back)ui.back();}
 }
-addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].indexOf(e.code)>=0)e.preventDefault();initAudio();if(!keys[e.code]){keys[e.code]=true;keyPress(e.code);}});
+addEventListener('keydown',e=>{if(acctUI.open)return;
+  if(state==='play'&&G&&G.word&&!e.ctrlKey&&!e.metaKey&&!e.altKey){initAudio();
+    if(e.key&&e.key.length===1&&/[a-z]/i.test(e.key)){e.preventDefault();if(!e.repeat)typeLetter(e.key);return;}
+    if(e.code==='Escape'){e.preventDefault();pauseGame();return;}
+    if(e.code==='Space'||e.code.indexOf('Arrow')===0){e.preventDefault();return;}}if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].indexOf(e.code)>=0)e.preventDefault();initAudio();if(!keys[e.code]){keys[e.code]=true;keyPress(e.code);}});
 addEventListener('keyup',e=>{keys[e.code]=false;});
 addEventListener('blur',()=>{mouseShine=false;for(const k in keys)keys[k]=false;for(const k in touches)delete touches[k];if(state==='play')pauseGame();});
 cv.addEventListener('touchstart',e=>{e.preventDefault();anyTouch=true;initAudio();for(const t of e.changedTouches){if(!uiTap(t.clientX,t.clientY))touches[t.identifier]={x:t.clientX,y:t.clientY};}},{passive:false});
@@ -1551,7 +2313,7 @@ let lastTouchT=0;cv.addEventListener('touchstart',()=>{lastTouchT=Date.now();},{
 cv.addEventListener('mousedown',e=>{if(Date.now()-lastTouchT<700)return;initAudio();if(!uiTap(e.clientX,e.clientY)&&state==='play')mouseShine=true;});
 addEventListener('mouseup',()=>{mouseShine=false;});
 cv.addEventListener('mousemove',e=>{if(state==='play'||anyTouch)return;const qx=(e.clientX-OX)/SC,qy=(e.clientY-OY)/SC;for(let i=0;i<ui.btns.length;i++){const b=ui.btns[i];if(!b.dis&&qx>=b.x&&qx<=b.x+b.w&&qy>=b.y&&qy<=b.y+b.h){ui.sel=i;break;}}});
-for(const ev of ['gesturestart','gesturechange','dblclick','contextmenu'])document.addEventListener(ev,e=>e.preventDefault(),{passive:false});
+for(const ev of ['gesturestart','gesturechange','dblclick','contextmenu'])document.addEventListener(ev,e=>{if(!(acctUI.open&&e.target&&e.target.closest&&e.target.closest('#acct')))e.preventDefault();},{passive:false});
 
 // ---- Main loop ----
 let lastT=0;
@@ -1574,6 +2336,7 @@ function frame(ts){
     case 'journal':drawJournal();break;
     case 'about':drawAbout();break;
     case 'controls':if(ctrlFrom!=='title')drawWorld();drawControls();break;
+    case 'sound':drawSound();break;
     case 'card':drawCard();break;
     case 'play':drawWorld();drawHUD();break;
     case 'pause':drawWorld();drawPause();break;
@@ -1582,11 +2345,12 @@ function frame(ts){
   }
   if(ui.sel>=ui.btns.length)ui.sel=0;
   ctx.restore();
-  if(state==='play'&&anyTouch&&!G.vcard)drawTouch();
+  if(state==='play'&&G&&G.verse&&!G.ending&&!G.vcard&&!G.word&&verseBelowRoom())drawVerseBelow();
+  if(state==='play'&&anyTouch&&!G.vcard&&!G.word)drawTouch();
   if(portrait&&state!=='play'){ctx.setTransform(DPR,0,0,DPR,0,0);ctx.font='13px '+FONT;ctx.fillStyle='rgba(233,217,168,0.75)';ctx.textAlign='center';ctx.fillText('Turn your phone sideways for the best view',CW/2,OY+VH*SC+30);}
   const hd=state==='title'?'':'none';if(homeLink.style.display!==hd)homeLink.style.display=hd;
 }
-loadSave();resize();setMusic('title');
+loadSave();startCloud();resize();setMusic('title');
 window.__lamp={
   get state(){return {screen:state,mode:runMode,play:G,save:save};},
   startStage:function(ci,si){runMode='pilgrim';startStage(ci,si);},
@@ -1595,7 +2359,22 @@ window.__lamp={
   finale:function(){startFinale();},
   enterRoom:function(){if(G&&!G.room)enterRoom();},
   screen:function(s){go(s);},card:function(ci,kind){showCard(ci,kind,function(){go('title');});},
-  verses:VERSES,stages:NUM_STAGES
+  verses:VERSES,stages:NUM_STAGES,
+  // Test hooks for the level checker: build any stage and drive the real movement code without drawing it.
+  dev:{
+    build:function(ci,si){const st=CHAP[ci].stages[si];const lv=buildLevel(st.build,st.rows);prepLevel(lv,ci,si,false,false);return lv;},
+    buildRoom:function(key){const lv=buildLevel(ROOMS[key],20);prepLevel(lv,+key[0],+key[2],false,true);return lv;},
+    rooms:function(){return Object.keys(ROOMS);},
+    begin:function(lv,ci,si){for(let v=0;v<4;v++)save.virtues[v]=v<ci;
+      G={ci:ci,si:si,lv:lv,main:lv,room:false,ch:CHAP[ci],st:CHAP[ci].stages[si]||{},ng:false,t:0,time:0,calm:0,dawn:0,parts:[],followers:[],trail:[],cam:{x:0,y:0,shake:0},cp:{x:lv.startX,y:lv.startY},wind:0};return G;},
+    virtues:function(v){for(let i=0;i<4;i++)save.virtues[i]=!!v[i];},
+    end:function(){G=null;},
+    newPlayer:function(lv){return newPlayer(lv);},
+    growAll:function(lv){for(const e of lv.ents)if(e.type==='soil'&&!e.great){e.planted=true;e.grow=1;growTree(e);}if(lv.grow){lv.grow.on=true;lv.grow.y=0;}},
+    stepMove:stepMove,moveX:moveX,moveY:moveY,applyHelp:applyHelp,solid:solid,oneWay:oneWay,tileCh:tileCh,T:T
+  },
+  get account(){return {name:acct.name,signedIn:!!acct.token,pending:acct.pending,status:acctStatus()};},
+  openAccount:function(){openAccount();},syncNow:function(){return pushSync();}
 };
 requestAnimationFrame(frame);
 })();

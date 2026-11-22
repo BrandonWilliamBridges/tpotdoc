@@ -99,6 +99,8 @@ body.nogame #hud,body.nogame #bottom{visibility:hidden}
 #titleBox .btn{font-size:16px;padding:12px 18px;background:rgba(46,33,64,.85);border-color:rgba(255,231,190,.35)}
 #titleBox .btn.pri{background:linear-gradient(180deg,#F7C14E,#E39A24);color:#3A2410}
 #titleBox .foot{margin-top:14px;font-size:12px;opacity:.85}
+#titleBox .acct-btn{background:rgba(47,156,149,.55);border-color:rgba(255,231,190,.45)}
+#titleBox .acct-status{font-size:13px;font-weight:700;color:#FFE9C7;text-shadow:0 2px 6px rgba(0,0,0,.6);margin-top:-2px;min-height:17px}
 #titleBox .foot a{color:#FFE7A8}
 /* map screen */
 #mapScr .card{max-width:980px;padding:14px}
@@ -135,6 +137,7 @@ body.nogame #hud,body.nogame #bottom{visibility:hidden}
 }
 @media (prefers-reduced-motion:reduce){.hbtn.go.pulse{animation:none}}
 </style>
+<style>.acct-btn,.acct-status{display:none!important}</style>
 <link rel="stylesheet" href="../fonts/fonts.css">
 <meta name="robots" content="noindex, nofollow">
 <meta name="author" content="Brandon Bridges">
@@ -1082,7 +1085,8 @@ const save={unlocked:0,stars:{},vigil:{},up:{},verses:{},codex:{},helpers:{},end
 function loadSave(){try{const s=localStorage.getItem(SAVE_KEY);if(s){const o=JSON.parse(s);if(o&&typeof o==='object')for(const k in save)if(k in o&&o[k]!=null)save[k]=o[k];}}catch(e){}
   ['stars','vigil','up','verses','codex','helpers','coach'].forEach(k=>{if(!save[k]||typeof save[k]!=='object')save[k]={};});
   save.unlocked=clamp(save.unlocked|0,0,10);if(![1,2,3].includes(save.speed))save.speed=1;}
-function writeSave(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){}}
+let CLOUD=null;   // the account and cloud save, set up near the end
+function writeSave(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){}if(CLOUD)CLOUD.changed();}
 function totalHope(){let h=0;for(const k in save.stars)h+=save.stars[k]|0;for(const k in save.vigil)if(save.vigil[k])h++;return h+(save.endlessHope|0);}
 function spentHope(){let s=0;for(const u of UPGRADES){const r=save.up[u.id]|0;for(let i=0;i<r;i++)s+=u.costs[i];}return s;}
 function hopeLeft(){return totalHope()-spentHope();}
@@ -1143,6 +1147,8 @@ function buildTitle(){
   add('How to play',()=>openHelp('title'));
   add('Sound: '+(save.sound?'on':'off'),()=>{save.sound=!save.sound;writeSave();buildTitle();});
   add('About and credits',()=>openAbout('title'));
+  const ab=add(CLOUD?CLOUD.label():'Sign in',()=>{if(CLOUD)CLOUD.open();});ab.classList.add('acct-btn');
+  const st=document.createElement('div');st.className='acct-status';st.textContent=CLOUD?CLOUD.status():'';m.appendChild(st);
 }
 function openTitle(){A.G=null;hideSel();coach(null);buildTitle();showScreen('title');}
 
@@ -1481,10 +1487,10 @@ function openAbout(from){backTo=from;const card=$('aboutCard');
   card.innerHTML='<h2>About Watchmen on the Walls</h2><p>A tower defense game about Nehemiah rebuilding the walls of Jerusalem, told from the book of Nehemiah. Made by Brandon Bridges, for anyone who would rather build something than give up.</p>'+
   '<p>The story is told in my own words between the verses. Names, gates and events follow Nehemiah chapters 1 to 12; the shadows are pictures of the discouragements the builders faced, not the people who opposed them.</p>'+
   '<h3>Scripture</h3><p class="small">'+esc(ESV_NOTICE)+'</p><p class="small">'+esc(ESV_TRADEMARK)+'</p><p class="small">This game quotes '+VERSE_ORDER.length+' verses or verse groups.</p>'+
-  '<h3>Your saved game</h3><p class="small">Progress is kept in this browser on this device. Clearing your browser data erases it.</p>'+
-  '<div class="row"><button class="btn pri full" id="aBack">Back</button><button class="btn ghost" id="aWipe">Erase saved game</button></div>';
+  '<h3>Your saved game</h3><p class="small">Progress is kept in this browser on this device. Erasing here forgets it.</p>'+
+  '<div class="row"><button class="btn pri full" id="aBack">Back</button><button class="btn ghost" id="aWipe">Erase saved game on this device</button></div>';
   $('aBack').onclick=()=>goBack();
-  $('aWipe').onclick=()=>{if($('aWipe').dataset.sure){try{localStorage.removeItem(SAVE_KEY);}catch(e){}location.reload();}else{$('aWipe').dataset.sure=1;$('aWipe').textContent='Tap again to erase everything';}};
+  $('aWipe').onclick=()=>{if($('aWipe').dataset.sure){try{localStorage.removeItem(SAVE_KEY);}catch(e){}if(CLOUD)CLOUD.forget();location.reload();}else{$('aWipe').dataset.sure=1;$('aWipe').textContent='Tap again to erase everything';}};
   showScreen('aboutScr');
 }
 
@@ -1572,12 +1578,232 @@ function frame(ts){
   requestAnimationFrame(frame);
 }
 
+// ============================================================
+//  Account and cloud save
+//  Sign in with a username (4 to 12 characters) and a 4-digit passcode, and progress is kept on the shared
+//  /api server as well as on this device, so it can be picked up on any device. This device always keeps its
+//  own copy and plays fine offline. Collections only grow, so the server combines what each device sends;
+//  a game in progress follows whichever device played it last. These rules match mergeBy in
+//  netlify/functions/api.mjs and functions/api.js.
+// ============================================================
+function makeCloud(cfg){
+  const K=cfg.key,ACCT_KEY=K+'.account.v1',GUEST_KEY=K+'.guest.v1',STAMP_KEY=K+'.stamps.v1';
+  const ls={get:k=>{try{return localStorage.getItem(k);}catch(e){return null;}},set:(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}},del:k=>{try{localStorage.removeItem(k);}catch(e){}}};
+  const acct={token:null,name:'',key:'',pending:false,owner:''};   // owner: the account this device's progress belongs to ('' = no one)
+  const sync={busy:null,timer:0,fails:0,ver:0,status:'',lastPull:0,quiet:0};
+  let stamps={};
+  try{const o=JSON.parse(ls.get(ACCT_KEY)||'null');if(o&&typeof o==='object')for(const k in acct)if(k in o)acct[k]=o[k];}catch(e){}
+  try{const o=JSON.parse(ls.get(STAMP_KEY)||'null');if(o&&typeof o==='object')stamps=o;}catch(e){}
+  const writeAcct=()=>ls.set(ACCT_KEY,JSON.stringify(acct)),writeStamps=()=>ls.set(STAMP_KEY,JSON.stringify(stamps));
+  // ---- the merge rules, the same as on the server
+  const plain=x=>(x&&typeof x==='object'&&!Array.isArray(x))?x:{};
+  const BAD=/^(__proto__|constructor|prototype)$/,anyKey=k=>typeof k==='string'&&k.length>0&&k.length<=64&&!BAD.test(k)&&!/[\u0000-\u001f]/.test(k);
+  const num=x=>{const n=Number(x);return isFinite(n)&&n>=0?Math.min(n,1e13):0;};
+  const PICK={set:(o,v)=>v?1:o,
+    maxmap:(o,v)=>(typeof v==='number'&&isFinite(v)&&v>=0)?(o===undefined?v:Math.max(o,v)):o,
+    firstmap:(o,v)=>(typeof v==='number'&&isFinite(v)&&v>0)?(o===undefined?v:Math.min(o,v)):o};
+  function mergeMap(x,y,pick){const out={};let n=0;for(const src of [plain(x),plain(y)])for(const k in src){if(!anyKey(k))continue;
+    const had=Object.prototype.hasOwnProperty.call(out,k),c=pick(had?out[k]:undefined,src[k]);if(c===undefined)continue;if(!had){if(n>=600)continue;n++;}out[k]=c;}return out;}
+  function mergeBy(a,b){a=plain(a);b=plain(b);const out={};for(const f in cfg.schema){const r=cfg.schema[f],rule=Array.isArray(r)?r[0]:r;
+      if(rule==='max')out[f]=Math.max(num(a[f]),num(b[f]));else if(rule==='or')out[f]=!!(a[f]||b[f]);
+      else if(rule==='newest'){const t=r[1],ta=num(a[t]),tb=num(b[t]),src=tb>ta?b:a;out[f]=src[f]===undefined?null:src[f];out[t]=Math.max(ta,tb);}
+      else out[f]=mergeMap(a[f],b[f],PICK[rule]);}return out;}
+  // ---- things taken whole (a game in progress) carry the time they last changed here, so the newest play wins
+  const newestFields=Object.keys(cfg.schema).filter(f=>Array.isArray(cfg.schema[f]));
+  const blank=v=>v==null||(typeof v==='object'&&Object.keys(v).length===0);
+  function hash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return h+':'+s.length;}
+  const jh=v=>hash(JSON.stringify(v===undefined?null:v));
+  function gather(){const p=cfg.gather();let ch=false;
+    for(const f of newestFields){const h=jh(p[f]),s=stamps[f];if(!s||s.h!==h){stamps[f]={h:h,at:!s&&blank(p[f])?0:Date.now()};ch=true;}p[cfg.schema[f][1]]=stamps[f].at;}
+    if(ch)writeStamps();return p;}
+  function settle(m,zero){const now=cfg.gather();for(const f of newestFields){const h=jh(now[f]);if(zero)stamps[f]={h:h,at:0};else if(h===jh(m[f]))stamps[f]={h:h,at:num(m[cfg.schema[f][1]])};}writeStamps();}
+  function absorb(p,force){if(!p)return;const was=jh(cfg.gather()),m=mergeBy(gather(),p);sync.quiet++;try{cfg.apply(m,!!force);}finally{sync.quiet--;}settle(m);
+    if(force||jh(cfg.gather())!==was){if(!cfg.playing())cfg.refresh();}else paint();}
+  // ---- talking to the server
+  function api(action,extra,keep){if(typeof fetch!=='function')return Promise.resolve(null);
+    return Promise.resolve(null)||fetch('/api',{method:'POST',headers:{'content-type':'application/json'},keepalive:!!keep,
+      body:JSON.stringify(Object.assign({action:action,game:cfg.game,token:acct.token||null},extra||{}))}).then(r=>r.json()).catch(()=>null);}
+  function changed(){if(sync.quiet)return;sync.ver++;if(!acct.token)return;if(!acct.pending){acct.pending=true;writeAcct();}
+    if(!sync.timer&&!sync.busy)sync.timer=setTimeout(push,3000);paint();}
+  function push(keep){clearTimeout(sync.timer);sync.timer=0;if(!acct.token)return Promise.resolve(false);if(sync.busy)return sync.busy;
+    const ver=sync.ver,tok=acct.token;sync.lastPull=Date.now();
+    sync.busy=api('progress',{data:gather()},keep).then(j=>{sync.busy=null;
+      if(acct.token!==tok){if(acct.token&&acct.pending&&!sync.timer)sync.timer=setTimeout(push,300);return false;}
+      if(j&&j.ok){sync.fails=0;sync.status='';absorb(j.progress);
+        if(sync.ver===ver){acct.pending=false;writeAcct();}else if(!sync.timer)sync.timer=setTimeout(push,1000);paint();return true;}
+      if(j&&j.error==='not logged in'){acct.token=null;writeAcct();sync.status='expired';paint();return false;}
+      sync.fails++;sync.status='offline';if(!sync.timer)sync.timer=setTimeout(push,Math.min(60000,4000*Math.pow(2,sync.fails-1)));paint();return false;});
+    paint();return sync.busy;}
+  let flash='',flashT=0;
+  function tell(m){if(cfg.say)cfg.say(m);else{flash=m;flashT=Date.now()+7000;paint();setTimeout(paint,7100);}}
+  function status(){
+    if(flash&&Date.now()<flashT)return flash;
+    if(!acct.token)return sync.status==='expired'||acct.owner?'Sign in again to keep saving':'Sign in to keep your progress on any device';
+    if(sync.status==='offline')return acct.pending?'Offline. It will save when it can.':'Offline';
+    if(sync.busy||acct.pending)return 'Saving…';return 'Saved to your account';}
+  function label(){return acct.token?'Account: '+acct.name:'Sign in';}
+  function paint(){try{document.querySelectorAll('.acct-btn').forEach(b=>{b.textContent=label();});document.querySelectorAll('.acct-status').forEach(e=>{e.textContent=status();});}catch(e){}
+    if(ui.open&&ui.view==='me'&&!ui.busy){const st=ui.el.querySelector('.ca-st');if(st)st.textContent=meLine();}}
+  function signIn(mode,name,pin){return api('auth',{mode:mode,name:name,pin:pin,token:null}).then(j=>{
+    if(!j)return {err:'Can’t reach the server right now. Check your connection and try again.'};
+    if(!j.ok||!j.token||!j.me)return {err:String(j.error||'Could not sign in').replace(/\bPIN\b/g,'passcode')};
+    return {login:{token:j.token,name:j.me.name,key:j.me.key,cloud:j.progress||null,created:!!j.created}};});}
+  // choice: 'merge' adds this device's progress to the account; 'apart' sets it aside until sign-out
+  function finishSignIn(L,choice){
+    const mine=acct.owner===L.key||choice==='merge';
+    if(choice==='apart')ls.set(GUEST_KEY,JSON.stringify(cfg.stash()));
+    if(!mine){sync.quiet++;try{cfg.reset();}finally{sync.quiet--;}settle(null,true);}
+    acct.token=L.token;acct.name=L.name;acct.key=L.key;acct.owner=L.key;acct.pending=true;writeAcct();
+    sync.status='';sync.fails=0;
+    if(L.cloud)absorb(L.cloud,true);else cfg.refresh();
+    sync.ver++;push();
+  }
+  function finishSignOut(){
+    const tok=acct.token;if(tok)api('logout',{token:tok});
+    clearTimeout(sync.timer);sync.timer=0;sync.status='';
+    acct.token=null;acct.key='';acct.owner='';acct.pending=false;writeAcct();
+    let g=null;try{g=JSON.parse(ls.get(GUEST_KEY)||'null');}catch(e){}ls.del(GUEST_KEY);
+    sync.quiet++;try{cfg.reset();if(g&&typeof g==='object')cfg.unstash(g);}finally{sync.quiet--;}
+    stamps={};writeStamps();cfg.refresh();paint();
+  }
+  // Erasing this device's progress also forgets the sign-in here; the account keeps its copy.
+  function forget(){ls.del(ACCT_KEY);ls.del(GUEST_KEY);ls.del(STAMP_KEY);acct.token=null;acct.owner='';}
+  function start(){
+    if(acct.token)push();
+    document.addEventListener('visibilitychange',()=>{if(!acct.token)return;if(document.hidden){if(acct.pending)push(true);}else if(Date.now()-sync.lastPull>5000)push();});
+    addEventListener('pagehide',()=>{if(acct.token&&acct.pending)push(true);});
+    addEventListener('online',()=>{if(acct.token)push();});
+    paint();
+  }
+  // ---- the sign-in window: a plain form, so phones bring up a real keyboard
+  const ui={open:false,el:null,view:'',mode:'login',login:null,busy:false};
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+  const T=cfg.theme;
+  function css(){if(document.getElementById('cloudAcctCss'))return;const st=document.createElement('style');st.id='cloudAcctCss';st.textContent=
+    ':root{'+T.vars+'}'+
+    '#cloudAcct{position:fixed;inset:0;z-index:9999;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;box-sizing:border-box;padding:max(16px,7vh) 16px 24px;background:var(--ca-veil);touch-action:manipulation;font-family:var(--ca-font);-webkit-user-select:none;user-select:none}'+
+    '#cloudAcct.on{display:flex}'+
+    '#cloudAcct .ca-box{width:min(390px,100%);box-sizing:border-box;margin:0;padding:20px 20px 18px;background:var(--ca-card);color:var(--ca-text);border:var(--ca-border);border-radius:var(--ca-radius);box-shadow:0 14px 50px rgba(0,0,0,.5);text-align:center}'+
+    '#cloudAcct h2{margin:0 0 8px;font-family:var(--ca-head);font-weight:var(--ca-headw);font-size:27px;line-height:1.1;color:var(--ca-title);letter-spacing:.01em}'+
+    '#cloudAcct p{margin:0 0 12px;font-size:15.5px;line-height:1.45;color:var(--ca-text)}#cloudAcct b{color:var(--ca-strong)}'+
+    '#cloudAcct .ca-tabs,#cloudAcct .ca-row{display:flex;gap:8px}#cloudAcct .ca-tabs{margin:2px 0 14px}'+
+    '#cloudAcct .ca-row>button,#cloudAcct .ca-tabs>button{flex:1;min-height:42px;margin:0}#cloudAcct .ca-tabs>button:not(.ca-on){opacity:.7}'+
+    '#cloudAcct label{display:block;text-align:left;font-size:14px;font-weight:700;color:var(--ca-label);margin:0 0 4px}'+
+    '#cloudAcct input{display:block;width:100%;box-sizing:border-box;margin:0 0 4px;padding:10px 12px;font-family:inherit;font-size:18px;border-radius:9px;border:2px solid var(--ca-line);background:var(--ca-input);color:var(--ca-text);-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}'+
+    '#cloudAcct input:focus{outline:none;border-color:var(--ca-focus);box-shadow:0 0 0 3px var(--ca-glow)}'+
+    '#cloudAcct button:focus-visible{outline:3px solid var(--ca-focus);outline-offset:2px}'+
+    '#cloudAcct .ca-hint{margin:0 0 12px;text-align:left;font-size:13.5px;line-height:1.4;color:var(--ca-muted)}#cloudAcct .ca-hint.ca-mid{text-align:center;margin:12px 0 0}'+
+    '#cloudAcct .ca-box>.ca-hint.ca-mid:not(:last-child){margin:0 0 12px}'+
+    '#cloudAcct .ca-err{min-height:20px;margin:0 0 10px;font-size:14.5px;line-height:1.4;font-weight:600;color:var(--ca-err)}#cloudAcct .ca-err.ca-ok{color:var(--ca-okc)}#cloudAcct .ca-err.ca-slim:empty{min-height:0;margin:0}'+
+    '@media (min-width:1000px) and (min-height:640px){#cloudAcct .ca-box{zoom:1.15}}';
+    document.head.appendChild(st);}
+  function open(){
+    css();
+    if(!ui.el){const el=document.createElement('div');el.id='cloudAcct';document.body.appendChild(el);ui.el=el;
+      // keep keys and taps inside the window away from the game underneath
+      for(const ev of ['keydown','keyup','keypress','pointerdown','pointerup','mousedown','mouseup','touchstart','touchend','wheel','contextmenu'])el.addEventListener(ev,e=>e.stopPropagation());
+      el.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-ca]');if(b)act(b.getAttribute('data-ca'));else if(e.target===el&&ui.view==='me'&&!ui.busy)act('close');});
+      el.addEventListener('submit',e=>{e.preventDefault();submit();});
+      el.addEventListener('keydown',e=>{if(e.key==='Escape'&&!ui.busy){e.preventDefault();act('close');}});
+      el.addEventListener('input',e=>{if(e.target.id==='caP')e.target.value=e.target.value.replace(/\D/g,'').slice(0,4);if(!ui.busy)note('');});}
+    ui.open=true;ui.el.className='on';ui.busy=false;
+    if(acct.token)view('me');else{ui.mode='login';view('form');}
+    if(cfg.onOpen)cfg.onOpen();
+  }
+  function close(){ui.open=false;ui.busy=false;ui.login=null;if(ui.el){ui.el.className='';ui.el.innerHTML='';}try{document.activeElement.blur();}catch(e){}if(cfg.onClose)cfg.onClose();}
+  function meLine(){const s=flash&&Date.now()<flashT?'':status();return s==='Saved to your account'?'Your progress is saved to your account: '+cfg.words(gather())+'.':s;}
+  const B=(cls,a,txt,on)=>'<button type="'+(a==='submit'?'submit':'button')+'" class="'+cls+(on?' ca-on':'')+'"'+(a&&a!=='submit'?' data-ca="'+a+'"':'')+(on?' aria-pressed="true"':'')+'>'+txt+'</button>';
+  function view(v,msg){
+    ui.view=v;const c=ui.mode==='create';let h='';
+    if(v==='form'){const again=!!(acct.name&&acct.owner&&!c);
+      h='<form class="ca-box" role="dialog" aria-modal="true" aria-labelledby="caH" novalidate><h2 id="caH">Your Account</h2>'+
+        '<p>'+(again?'Sign in again to keep saving your progress.':'Sign in to keep your progress safe and pick it up again on any device.')+'</p>'+
+        '<div class="ca-tabs">'+B(c?T.btn:T.pri,'login','Sign In',!c)+B(c?T.pri:T.btn,'create','New Account',c)+'</div>'+
+        '<label for="caN">Username</label><input id="caN" name="username" maxlength="12" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" value="'+esc(c?'':acct.name||'')+'">'+
+        '<div class="ca-hint">4 to 12 letters or numbers</div>'+
+        '<label for="caP">Passcode</label><input id="caP" name="passcode" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="'+(c?'new-password':'current-password')+'">'+
+        '<div class="ca-hint">'+(c?'Choose 4 numbers. Write your username and passcode down: you will need both on your other devices.':'4 numbers')+'</div>'+
+        '<div class="ca-err" role="alert">'+esc(msg||'')+'</div>'+
+        '<div class="ca-row">'+B(T.btn,'close','Cancel')+B(T.pri,'submit',c?'Create Account':'Sign In')+'</div></form>';}
+    else if(v==='choice'){const L=ui.login;
+      h='<div class="ca-box" role="dialog" aria-modal="true" aria-labelledby="caH"><h2 id="caH">Bring This Progress?</h2>'+
+        '<p>This device has progress that is not saved to any account: <b>'+esc(cfg.words(gather()))+'</b>.</p>'+
+        '<p>'+(L.cloud&&cfg.has(L.cloud)?'<b>'+esc(L.name)+'</b> already has <b>'+esc(cfg.words(L.cloud))+'</b>. Add this one too, and everything earned on either is kept.':'Add it to <b>'+esc(L.name)+'</b> to keep it safe and take it to your other devices.')+'</p>'+
+        '<div class="ca-row">'+B(T.btn,'apart','Keep It Apart')+B(T.pri,'merge','Add It')+'</div>'+
+        '<div class="ca-hint ca-mid">If you keep it apart, it waits on this device and comes back when you sign out.</div></div>';}
+    else if(v==='me'){
+      h='<div class="ca-box" role="dialog" aria-modal="true" aria-labelledby="caH"><h2 id="caH">Your Account</h2><p>Signed in as <b>'+esc(acct.name)+'</b></p>'+
+        '<p class="ca-st">'+esc(meLine())+'</p>'+
+        '<div class="ca-hint ca-mid">To keep going on another phone or computer, open this game there and sign in with the same username and passcode.</div>'+
+        '<div class="ca-err ca-slim" role="alert">'+esc(msg||'')+'</div>'+
+        '<div class="ca-row">'+B(T.btn,'out','Sign Out')+B(T.pri,'close','Done')+'</div></div>';}
+    else if(v==='outfail'){
+      h='<div class="ca-box" role="dialog" aria-modal="true" aria-labelledby="caH"><h2 id="caH">Not Saved Yet</h2>'+
+        '<p>The server can’t be reached, so your newest progress is only on this device. If you sign out now, it will be lost.</p>'+
+        '<div class="ca-row">'+B(T.btn,'outnow','Sign Out Anyway')+B(T.pri,'me','Stay Signed In')+'</div></div>';}
+    ui.el.innerHTML=h;
+    let f=null;if(v==='form'){const n=ui.el.querySelector('#caN');f=n&&n.value?ui.el.querySelector('#caP'):n;}else f=ui.el.querySelector('[data-ca="merge"],[data-ca="close"],[data-ca="me"]');
+    try{if(f)f.focus();}catch(e){}
+  }
+  function note(t,ok){const e=ui.el&&ui.el.querySelector('.ca-err');if(e){e.textContent=t;e.classList.toggle('ca-ok',!!ok);}}
+  function submit(){
+    if(ui.busy||ui.view!=='form')return;
+    const el=ui.el,c=ui.mode==='create',name=el.querySelector('#caN').value.replace(/\s+/g,' ').trim(),pin=el.querySelector('#caP').value;
+    if(/[^A-Za-z0-9 _-]/.test(name))return note('Usernames can use letters, numbers, spaces, - and _');
+    if(name.length<4)return note('Your username needs at least 4 letters or numbers');
+    if(!/^\d{4}$/.test(pin))return note('Your passcode is 4 numbers');
+    ui.busy=true;note(c?'Making your account…':'Signing in…',true);for(const b of el.querySelectorAll('button'))b.disabled=true;
+    signIn(c?'create':'login',name,pin).then(r=>{
+      if(!ui.open)return;ui.busy=false;
+      if(r.err){for(const b of el.querySelectorAll('button'))b.disabled=false;note(r.err);return;}
+      const L=r.login;
+      if(!acct.owner&&cfg.has(gather())){ui.login=L;view('choice');return;}
+      welcome(L,null);
+    });
+  }
+  function welcome(L,choice){finishSignIn(L,choice);close();tell(L.created?'Welcome, '+L.name+'. Your progress will be saved to your account.':'Welcome back, '+L.name+'. Your progress is here.');}
+  function act(a){
+    if(ui.busy&&a!=='outnow')return;
+    if(a==='close'){close();return;}
+    if(a==='login'||a==='create'){if(ui.mode!==a){const n=ui.el.querySelector('#caN'),keep=n?n.value:'';ui.mode=a;view('form');const m=ui.el.querySelector('#caN');if(m&&keep)m.value=keep;}return;}
+    if(a==='merge'||a==='apart'){const L=ui.login;if(L)welcome(L,a);return;}
+    if(a==='me'){view('me');return;}
+    if(a==='outnow'){finishSignOut();close();tell('Signed out. This device has forgotten that progress, but your account still has it.');return;}
+    if(a==='out'){
+      const done=()=>{const nm=acct.name;finishSignOut();close();tell('Signed out. Your progress is safe in '+nm+'’s account.');};
+      if(!acct.pending&&!sync.busy){done();return;}
+      ui.busy=true;note('Saving your progress first…',true);
+      const run=()=>push().then(ok=>{if(!ui.open)return;ui.busy=false;if(ok&&acct.pending&&acct.token)return run();if(ok||!acct.token)done();else view('outfail');});
+      run();
+    }
+  }
+  return {changed:changed,open:open,start:start,status:status,label:label,paint:paint,forget:forget,push:push,
+    get signedIn(){return !!acct.token;},get name(){return acct.name;},get pending(){return acct.pending;},get isOpen(){return ui.open;}};
+}
+const WOTW_FIELDS=['unlocked','stars','vigil','up','verses','codex','helpers','endlessBest','endlessHope','prologue','finished','inProgress','coach'];
+CLOUD=makeCloud({game:'watchmen',key:'watchmenOnTheWalls',
+  schema:{unlocked:'max',stars:'maxmap',vigil:'set',up:['newest','upAt'],verses:'set',codex:'set',helpers:'set',endlessBest:'max',endlessHope:'max',prologue:'or',finished:'or',inProgress:['newest','ipAt'],coach:'set'},
+  gather(){const p={};for(const f of WOTW_FIELDS)p[f]=save[f];return JSON.parse(JSON.stringify(p));},
+  // a gate in progress is only swapped while you are not building it
+  apply(p,force){for(const f of WOTW_FIELDS){if(f==='inProgress'&&!force&&A.G)continue;save[f]=p[f];}save.unlocked=clamp(save.unlocked|0,0,10);
+    ['stars','vigil','up','verses','codex','helpers','coach'].forEach(k=>{if(!save[k]||typeof save[k]!=='object')save[k]={};});
+    if(save.inProgress&&!(save.inProgress.snap&&typeof save.inProgress.idx==='number'))save.inProgress=null;writeSave();},
+  playing(){return !!A.G;},
+  refresh(){if(!A.G&&$('title').classList.contains('show'))buildTitle();else CLOUD.paint();},
+  stash(){return JSON.parse(JSON.stringify(save));},
+  reset(){Object.assign(save,{unlocked:0,stars:{},vigil:{},up:{},verses:{},codex:{},helpers:{},endlessBest:0,endlessHope:0,prologue:false,finished:false,inProgress:null,coach:{}});writeSave();},
+  unstash(o){for(const f of WOTW_FIELDS)if(f in o)save[f]=o[f];writeSave();},
+  has(p){return !!(p.prologue||p.unlocked>0||p.inProgress||Object.keys(p.stars||{}).length);},
+  words(p){const g=Object.keys(p.stars||{}).length;let st=0;for(const k in p.stars||{})st+=p.stars[k]|0;
+    return g+' gate'+(g===1?'':'s')+' rebuilt, '+st+' star'+(st===1?'':'s')+(p.endlessBest?', Night Watch best '+p.endlessBest+' waves':'')+(p.inProgress?', and a gate half built':'');},
+  theme:{btn:'btn ghost',pri:'btn pri',vars:"--ca-veil:rgba(22,13,32,.78);--ca-card:linear-gradient(180deg,#FFF7E8,#F3E2BF);--ca-text:#2A1D2E;--ca-strong:#9E4A2F;--ca-muted:#5B4757;--ca-border:2px solid #E2C48C;--ca-radius:20px;--ca-font:'Nunito',system-ui,sans-serif;--ca-head:'Baloo 2',system-ui,sans-serif;--ca-headw:800;--ca-title:#9E4A2F;--ca-label:#5B4757;--ca-input:#FFFDF7;--ca-line:#D9BD88;--ca-focus:#F2B33D;--ca-glow:rgba(242,179,61,.3);--ca-err:#C8443A;--ca-okc:#2F9C95;"}});
+
 // test hooks for automated checks
-window.__wotw={A,save,LEVELS,VERSES,startLevel,openMap,openBrief,startWave:()=>A.G&&startWave(A.G),
+window.__wotw={cloud:CLOUD,A,save,LEVELS,VERSES,startLevel,openMap,openBrief,startWave:()=>A.G&&startWave(A.G),
   build:(t,c,r)=>doBuild(t,c,r),tick:(sec)=>{const G=A.G;let rem=sec;while(rem>0&&!G.over){update(G,1/60);rem-=1/60;handleEvents();}handleEvents();},
   tapTile,onKey:(key)=>onKey({key,preventDefault(){},ctrlKey:false,metaKey:false,altKey:false}),openShop,openBook,openHelp,openAbout,openPause,showEnding,resumeLevel};
 
-loadSave();setupInput();resize();openTitle();requestAnimationFrame(frame);
+loadSave();setupInput();resize();openTitle();CLOUD.start();requestAnimationFrame(frame);
 </script>
 </body>
 </html>
