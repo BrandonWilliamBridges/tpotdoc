@@ -10,7 +10,9 @@ Outputs
 Every page gets a title, description, canonical URL, Open Graph tags and JSON-LD structured data.
 Flip INDEXABLE to True only when Yv'e has approved the wording and the site launches.
 """
+import base64
 import datetime
+import hashlib
 import html
 import json
 import re
@@ -427,6 +429,21 @@ def page_ld(page, sections):
     return out
 
 
+def game_csp_meta(s, slug):
+    """The site's Content-Security-Policy for a game page. Each game is one page with its code in one inline <script>,
+    so instead of allowing every inline script, the policy allows exactly that script by its SHA-256 hash.
+    Call this last, after every edit to the page: changing the script changes its hash."""
+    inline = [m.group(2) for m in re.finditer(r"<script\b([^>]*)>(.*?)</script>", s, flags=re.S)
+              if "src=" not in m.group(1) and "application/ld+json" not in m.group(1)]
+    if not inline:
+        raise SystemExit(f"games/{slug}.html: no inline game script found; re-check game_csp_meta()")
+    if not re.search(r"<meta charset=", s, flags=re.I) or "Content-Security-Policy" in s:
+        raise SystemExit(f"games/{slug}.html: expected a <meta charset> tag and no policy yet; re-check game_csp_meta()")
+    hashes = " ".join("'sha256-" + base64.b64encode(hashlib.sha256(js.encode("utf-8")).digest()).decode() + "'" for js in inline)
+    csp = CSP.replace("script-src 'self'", f"script-src 'self' {hashes}", 1)
+    return f'<meta http-equiv="Content-Security-Policy" content="{csp}">'
+
+
 def build_games(og_image):
     """Copy each game to docs/games/<slug>/ with this site's head tags, local fonts and links back to TPOTDOC."""
     shutil.copytree(ROOT / "games" / "fonts", OUT / "games" / "fonts")
@@ -480,6 +497,7 @@ def build_games(og_image):
         if not re.search(r"<h1[\s>]", re.sub(r"<script\b.*?</script>", "", s, flags=re.S)):  # canvas games: a heading for screen readers and search
             s = s.replace("<body>", '<body>\n<h1 style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;'
                           f'clip:rect(0,0,0,0);white-space:nowrap;border:0">{html.escape(g["name"])}</h1>', 1)
+        s = re.sub(r"<meta charset=[^>]*>", lambda m: m.group(0) + "\n" + game_csp_meta(s, g["slug"]), s, count=1, flags=re.I)
         dest = OUT / "games" / g["slug"] / "index.html"
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(s)
