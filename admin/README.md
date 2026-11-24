@@ -15,8 +15,8 @@ It is separate from the public site: GitHub Pages serves tpotdoc.com, and this W
 1. **Zero Trust / Access (dashboard, or Claude Cowork):**
    - Zero Trust → set up a team name (free plan) if not done; note the team domain, e.g. `tpotdoc.cloudflareaccess.com`.
    - Settings → Authentication → enable **One-time PIN**.
-   - Access → Applications → Add → **Self-hosted**: domain `admin.tpotdoc.com`; policy **Allow** → Emails:
-     `markyve77@gmail.com`, `brandon.bridges@gmail.com`. Session duration 1 week is fine.
+   - Access → Applications → Add → **Self-hosted**: domain `admin.tpotdoc.com`; policy **Allow** → Emails.
+     The allowed emails are set in the Cloudflare Access policy, not written here. Session duration 1 week is fine.
    - Copy the app's **Application Audience (AUD) tag**.
 2. **Two API tokens** (My Profile → API Tokens → Create custom token), saved locally, never pasted in chat:
    - Deploy token (expires in 1 day): Account → Workers Scripts: Edit; Account → Account Analytics: Read;

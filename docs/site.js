@@ -32,6 +32,9 @@
     var payload = {
       _subject: 'TPOT DOC ' + kind.toLowerCase() + ' from ' + name + ' (' + f.topic.value + ')',
       _template: 'table',
+      // FormSubmit's captcha is a separate page that only ordinary (page-loading) form posts can show. This form sends in
+      // the background through the /ajax/ address, which can't show it, so it stays off; the hidden _honey field (checked
+      // above) is the spam trap. A real captcha would mean the form leaving the page, or a different form service.
       _captcha: 'false',
       'Type': kind,
       'Name': name,
